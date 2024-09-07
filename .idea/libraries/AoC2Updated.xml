@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="AoC2Updated">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../AOC2/AoC2Updated.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
