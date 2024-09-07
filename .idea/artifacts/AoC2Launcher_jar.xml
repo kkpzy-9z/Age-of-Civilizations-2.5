@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AoC2Launcher:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Launchers</output-path>
+    <root id="archive" name="AoC2Launcher.jar">
+      <element id="module-output" name="AOC2 Sandbox Cut" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../AOC2/AoC2Updated.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
