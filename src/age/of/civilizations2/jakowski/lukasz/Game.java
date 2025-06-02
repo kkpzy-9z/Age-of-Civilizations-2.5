@@ -15,7 +15,6 @@ class Game {
     //lProvinces arrayList => fixed size array set whenever map is loaded
     //fucking huge performance improvement
     private Province[] lProvinces;
-    private int iProvincesSize;
     private List<Region> lRegions;
     private int iRegionsSize;
     private boolean updateProvincesInView;
@@ -183,7 +182,6 @@ class Game {
         super();
         this.scenarioID = -1;
         this.lProvinces = null;
-        this.iProvincesSize = 0;
         this.lRegions = new ArrayList<Region>();
         this.iRegionsSize = 0;
         this.updateProvincesInView = true;
@@ -459,7 +457,6 @@ class Game {
 
     protected final void loadProvinces() {
         this.lProvinces = new Province[CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID())];
-        this.iProvincesSize = CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID());
 
         for (int i = 0; i < CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID()); ++i) {
             this.loadProvince(i);
@@ -470,7 +467,6 @@ class Game {
     protected final void loadProvince(final int i) {
         if (this.lProvinces == null) {
             this.lProvinces = new Province[CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID())];
-            this.iProvincesSize = CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID());
         }
 
         final FileHandle fileProvinceData = Gdx.files.internal("map/" + CFG.map.getFile_ActiveMap_Path() + "data/" + "provinces/" + i);
@@ -481,7 +477,14 @@ class Game {
                 CFG.exceptionStack(e);
             }
         } catch (final IOException | GdxRuntimeException e2) {
-            this.build_LoadProvince(i);
+            try {
+                this.build_LoadProvince(i);
+            } catch (final GdxRuntimeException e3) {
+                if (CFG.LOGS) {
+                    CFG.exceptionStack(e3);
+                }
+            }
+
             if (CFG.LOGS) {
                 CFG.exceptionStack(e2);
             }
@@ -608,7 +611,7 @@ class Game {
     }
 
     protected final void checkLandBySeaProvincesBorders() {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             if (!this.getProvince(i).getSeaProvince()) {
                 this.getProvince(i).checkLandBySeaProvinceBorders();
             }
@@ -616,13 +619,13 @@ class Game {
     }
 
     protected final void checkSeaBySeaProvincesBorders() {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             this.getProvince(i).checkSeaBySeaProvinceBorders();
         }
     }
 
     protected final void buildProvinceBorder() {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             int j;
             if (this.getProvince(i).getSeaProvince()) {
                 for (j = 0; j < this.getProvince(i).getProvinceBordersSeaBySeaSize(); ++j) {
@@ -638,20 +641,50 @@ class Game {
     }
 
     protected final void buildDrawArmy() {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             this.getProvince(i).updateDrawArmy();
         }
     }
 
     protected final void buildDrawArmy_ShowIDs() {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             this.getProvince(i).updateDrawArmy_ShowsIDs();
             this.getProvince(i).getArmy_Obj(0).updateArmyWidth("" + i);
         }
     }
 
+    //updateProvincesSize => refine provinces by removing ghost provinces
+    //no need to track province size now bc primitive array
+    //nulls from lProvinces removed using manual iteration bc older Java versions dont have lambda
+    private static List<Integer> ghostProvinces = new ArrayList<Integer>();
     protected final void updateProvincesSize() {
-        this.iProvincesSize = this.lProvinces.length;
+        ghostProvinces.clear();
+
+        //get ghost provinces (errored provinces that couldnt load)
+        for (int i = 0; i < lProvinces.length; i++) {
+            if (lProvinces[i] == null) {
+                CFG.toast.setInView("Province " + i + " corrupted, removing...", CFG.COLOR_TEXT_MODIFIER_NEGATIVE);
+                ghostProvinces.add(i);
+            }
+        }
+
+        //make new mem array of valid province size
+        Province[] newProvinces = new Province[lProvinces.length - ghostProvinces.size()];
+        int i = 0;
+        for (Province province : lProvinces) {
+            //add valid provinces
+            if (province != null) {
+                newProvinces[i] = province;
+                i++;
+            }
+        }
+
+        //update list to have no ghost provinces,
+        //plus ghostProvince list tracker for getProvinces
+        //for correctly adjusting saved province IDs
+        this.lProvinces = newProvinces;
+
+        //old: this.getProvincesSize() = this.lProvinces.length;
     }
 
     protected final void disposeMapData() {
@@ -665,15 +698,14 @@ class Game {
         }
         this.lRegions.clear();
         this.iRegionsSize = 0;
-        this.lProvinces = new Province[CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID())];
-        this.iProvincesSize = 0;
+        this.disposeCivilizations(); //reshuffled - now before provinces set to null to avoid exception
         this.scenarioID = -1;
         this.gameScenarios.disposeScenarios();
-        this.disposeCivilizations();
+        this.lProvinces = null;
     }
 
     protected final void loadProvinceTextures() {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             this.getProvince(i).loadProvinceBG();
         }
     }
@@ -681,7 +713,7 @@ class Game {
     protected final void loadProvinceTexture(final int i) {
         try {
             this.getProvince(i).loadProvinceBG();
-        } catch (final IndexOutOfBoundsException ex) {
+        } catch (final IndexOutOfBoundsException | NullPointerException ex) {
             if (CFG.LOGS) {
                 CFG.exceptionStack(ex);
             }
@@ -700,7 +732,7 @@ class Game {
                     this.getProvince(i).setName(sNames[i]);
                 }
             }
-            for (int i = sNames.length; i < this.iProvincesSize; ++i) {
+            for (int i = sNames.length; i < this.getProvincesSize(); ++i) {
                 this.getProvince(i).setName("");
             }
         } catch (final GdxRuntimeException ex) {
@@ -1753,7 +1785,7 @@ class Game {
         for (int i = 1; i < this.getCivsSize(); ++i) {
             this.getCiv(i).clearCivRegions();
         }
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             if (this.getProvince(i).getCivID() != 0 && !this.getCiv(this.getProvince(i).getCivID()).civRegionsContainsProvince(i)) {
                 this.getCiv(this.getProvince(i).getCivID()).createCivilizationRegion(i);
             }
@@ -2075,7 +2107,7 @@ class Game {
         this.lCivs.add(this.getNeutralCivilization());
         this.getCiv(0).setCivID(0);
 
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             this.getProvince(i).setCivID_LoadScenario(0);
             this.getProvince(i).setFromCivID(-1);
             this.getProvince(i).setIsCapital(false);
@@ -2594,7 +2626,7 @@ class Game {
         catch (final Exception ex8) {}
         CFG.eventsManager.updateEventsAferRemoveCiv(nRemoveCivID);
         try {
-            for (int i = 0; i < this.iProvincesSize; ++i) {
+            for (int i = 0; i < this.getProvincesSize(); ++i) {
                 if (this.getProvince(i).getCivID() > nRemoveCivID) {
                     this.getProvince(i).setCivID_Just(this.getProvince(i).getCivID() - 1);
                     if (this.getProvince(i).getCore() != null) {
@@ -6461,7 +6493,7 @@ class Game {
     }
     
     protected final void drawProvinces(final SpriteBatch oSB, final int nPosX, final int nPosY, final float scale, final int nAlpha) {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             if (this.getProvince(i).getCivID() != 0) {
                 this.getProvince(i).draw(oSB, nPosX, nPosY, scale, nAlpha);
             }
@@ -6473,7 +6505,7 @@ class Game {
     }
     
     protected final void drawProvinces_FogOfWarDiscovery(final SpriteBatch oSB, final int nPosX, final int nPosY, final float scale, final int nAlpha) {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             if (this.getProvince(i).getCivID() != 0) {
                 this.getProvince(i).draw_FogOfWarDiscovery(oSB, nPosX, nPosY, scale, nAlpha);
             }
@@ -7209,7 +7241,7 @@ class Game {
         else {
             int i = 0;
             int tPosX = 0;
-            while (i < this.iProvincesSize) {
+            while (i < this.getProvincesSize()) {
                 tPosX = (int)Math.abs(this.checkPosOfClickX((float)(CFG.map.getMapCoordinates().getPosX() - nPosX)));
                 if (this.getProvince(i).getMinX() <= tPosX && this.getProvince(i).getMaxX() >= tPosX && this.getProvince(i).getMinY() <= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.getProvince(i).getMaxY() >= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.pathContains(i, tPosX, -CFG.map.getMapCoordinates().getPosY() + nPosY)) {
                     if (i != this.iActiveProvince) {
@@ -7223,7 +7255,7 @@ class Game {
             if (Math.abs(this.checkPosOfClickX((float)(CFG.map.getMapCoordinates().getPosX() - nPosX))) + -Game.MAX_BELOW_ZERO_POINT_X * CFG.map.getMapBG().getMapScale() / CFG.map.getMapScale().getCurrentScale() > CFG.map.getMapBG().getWidth()) {
                 i = 0;
                 tPosX = 0;
-                while (i < this.iProvincesSize) {
+                while (i < this.getProvincesSize()) {
                     if (this.getProvince(i).getBelowZero()) {
                         tPosX = (int)Math.abs(this.checkPosOfClickX((float)(CFG.map.getMapCoordinates().getPosX() - nPosX)));
                         if (this.getProvince(i).getMinX() <= tPosX - CFG.map.getMapBG().getWidth() && this.getProvince(i).getMaxX() >= tPosX - CFG.map.getMapBG().getWidth() && this.getProvince(i).getMinY() <= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.getProvince(i).getMaxY() >= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.pathContains(i, tPosX - CFG.map.getMapBG().getWidth(), -CFG.map.getMapCoordinates().getPosY() + nPosY)) {
@@ -7244,7 +7276,7 @@ class Game {
     protected final int setProvinceID_HoverAProvince(final int nPosX, final int nPosY) {
         int i = 0;
         int tPosX = 0;
-        while (i < this.iProvincesSize) {
+        while (i < this.getProvincesSize()) {
             tPosX = (int)Math.abs(this.checkPosOfClickX((float)(CFG.map.getMapCoordinates().getPosX() - nPosX)));
             if (this.getProvince(i).getMinX() <= tPosX && this.getProvince(i).getMaxX() >= tPosX && this.getProvince(i).getMinY() <= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.getProvince(i).getMaxY() >= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.pathContains(i, tPosX, -CFG.map.getMapCoordinates().getPosY() + nPosY)) {
                 return i;
@@ -7254,7 +7286,7 @@ class Game {
         if (Math.abs(this.checkPosOfClickX((float)(CFG.map.getMapCoordinates().getPosX() - nPosX))) + -Game.MAX_BELOW_ZERO_POINT_X * CFG.map.getMapBG().getMapScale() / CFG.map.getMapScale().getCurrentScale() > CFG.map.getMapBG().getWidth()) {
             i = 0;
             tPosX = 0;
-            while (i < this.iProvincesSize) {
+            while (i < this.getProvincesSize()) {
                 if (this.getProvince(i).getBelowZero()) {
                     tPosX = (int)Math.abs(this.checkPosOfClickX((float)(CFG.map.getMapCoordinates().getPosX() - nPosX)));
                     if (this.getProvince(i).getMinX() <= tPosX - CFG.map.getMapBG().getWidth() && this.getProvince(i).getMaxX() >= tPosX - CFG.map.getMapBG().getWidth() && this.getProvince(i).getMinY() <= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.getProvince(i).getMaxY() >= -CFG.map.getMapCoordinates().getPosY() + nPosY && this.pathContains(i, tPosX - CFG.map.getMapBG().getWidth(), -CFG.map.getMapCoordinates().getPosY() + nPosY)) {
@@ -7280,7 +7312,7 @@ class Game {
     }
     
     protected final int setProvinceID_Point(final int nPosX, final int nPosY) {
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             if (this.getProvince(i).getMinX() <= nPosX && this.getProvince(i).getMaxX() >= nPosX && this.getProvince(i).getMinY() <= nPosY && this.getProvince(i).getMaxY() >= nPosY && this.pathContains(i, nPosX, nPosY)) {
                 return i;
             }
@@ -7288,7 +7320,7 @@ class Game {
         if (Math.abs(this.checkPosOfClickX((float)nPosX)) + -Game.MAX_BELOW_ZERO_POINT_X * CFG.map.getMapBG().getMapScale() / CFG.map.getMapScale().getCurrentScale() > CFG.map.getMapBG().getWidth()) {
             int i = 0;
             int tPosX = 0;
-            while (i < this.iProvincesSize) {
+            while (i < this.getProvincesSize()) {
                 if (this.getProvince(i).getBelowZero()) {
                     tPosX = (int)Math.abs(this.checkPosOfClickX((float)nPosX));
                     if (this.getProvince(i).getMinX() <= tPosX - CFG.map.getMapBG().getWidth() && this.getProvince(i).getMaxX() >= tPosX - CFG.map.getMapBG().getWidth() && this.getProvince(i).getMinY() <= nPosY && this.getProvince(i).getMaxY() >= nPosY && this.pathContains(i, tPosX - CFG.map.getMapBG().getWidth(), nPosY)) {
@@ -8449,10 +8481,10 @@ class Game {
     
     protected final void buildSeaPaths() {
         final List<Boolean> was = new ArrayList<Boolean>();
-        for (int j = 0; j < this.iProvincesSize; ++j) {
+        for (int j = 0; j < this.getProvincesSize(); ++j) {
             was.add(false);
         }
-        for (int i = 0; i < this.iProvincesSize; ++i) {
+        for (int i = 0; i < this.getProvincesSize(); ++i) {
             if (this.getProvince(i).getSeaProvince()) {
                 boolean seaFounds = false;
                 boolean landFound = false;
@@ -8469,7 +8501,7 @@ class Game {
                 }
                 if (landFound) {
                     if (seaFounds) {
-                        for (int k = i + 1; k < this.iProvincesSize; ++k) {
+                        for (int k = i + 1; k < this.getProvincesSize(); ++k) {
                             seaFounds = false;
                             landFound = false;
                             for (int l = 0; l < this.getProvince(k).getNeighboringProvincesSize(); ++l) {
@@ -8485,7 +8517,7 @@ class Game {
                             }
                             if (seaFounds) {
                                 if (landFound) {
-                                    for (int l = 0; l < this.iProvincesSize; ++l) {
+                                    for (int l = 0; l < this.getProvincesSize(); ++l) {
                                         was.set(l, false);
                                     }
                                     was.set(i, true);
@@ -9490,7 +9522,7 @@ class Game {
                     file = Gdx.files.internal("map/" + CFG.map.getFile_ActiveMap_Path() + "data/" + "cities/" + "Age_of_Civilizations");
                 }
                 final String tempTags = file.readString();
-                if (tempTags.indexOf(CFG.EDITOR_ACTIVE_GAMEDATA_TAG) < 0) {
+                if (!tempTags.contains(CFG.EDITOR_ACTIVE_GAMEDATA_TAG)) {
                     final FileHandle fileSave = Gdx.files.local("map/" + CFG.map.getFile_ActiveMap_Path() + "data/" + "cities/" + "Age_of_Civilizations");
                     fileSave.writeString(tempTags + CFG.EDITOR_ACTIVE_GAMEDATA_TAG + ";", false);
                 }
@@ -9562,12 +9594,19 @@ class Game {
         return (int)(this.getProvince(nProvinceID).getDevelopmentLevel() * 4.0f);
     }
     
-    protected final Province getProvince(final int ID) {
+    protected final Province getProvince(int ID) {
+        if (!CFG.menuManager.getInGameView() && !ghostProvinces.isEmpty()) {
+            for (int x : ghostProvinces) {
+                if (x < ID) {
+                    ID -= 1;
+                }
+            }
+        }
         return lProvinces[ID];
     }
     
     protected final int getProvincesSize() {
-        return this.iProvincesSize;
+        return lProvinces.length;
     }
     
     protected final int countLandProvinces_NotWasteland() {
