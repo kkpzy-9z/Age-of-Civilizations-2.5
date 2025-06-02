@@ -25,6 +25,9 @@ class Turn_NewTurn extends Thread {
    }
 
    protected static final void checkOccupiedProvincesIfAreAtWar() {
+      //change scope (memory efficiency) and reuse list instead of reallocating
+      List<Integer> tempCivsLostAccess = new ArrayList<>();
+
       if (Game_Calendar.TURN_ID % 5 == 0) {
          for(int i = 0; i < CFG.game.getProvincesSize(); ++i) {
             if (!CFG.game.getProvince(i).getSeaProvince()
@@ -44,7 +47,8 @@ class Turn_NewTurn extends Thread {
                CFG.game.getProvince(i).setCivID(CFG.game.getProvince(i).getTrueOwnerOfProvince(), false);
                CFG.game.getProvince(i).updateArmy(tempCiv0, tempArmy0);
                CFG.game.getProvince(i).updateArmy(CFG.game.getProvince(i).getTrueOwnerOfProvince(), tempArmyNewOwner);
-               List<Integer> tempCivsLostAccess = new ArrayList<>();
+               //List<Integer> tempCivsLostAccess = new ArrayList<>();
+               tempCivsLostAccess.clear();
 
                for(int j = 0; j < CFG.game.getProvince(i).getCivsSize(); ++j) {
                   tempCivsLostAccess.add(CFG.game.getProvince(i).getCivID(j));
@@ -540,12 +544,20 @@ class Turn_NewTurn extends Thread {
 
    protected static final void updateGameData() {
       if (CFG.isDesktop()) {
-         tempCivs = new ArrayList<>();
-         happinessChange_ByTaxation = new ArrayList<>();
-         happinessChange_ByTaxation_Occupied = new ArrayList<>();
-         goodsUpdate = new ArrayList<>();
-         devUpdate = new ArrayList<>();
-         ecoUpdate = new ArrayList<>();
+         //instead of reallocating, clear and reuse lists for memory
+         //tempCivs = new ArrayList<>();
+         //happinessChange_ByTaxation = new ArrayList<>();
+         //happinessChange_ByTaxation_Occupied = new ArrayList<>();
+         //goodsUpdate = new ArrayList<>();
+         //devUpdate = new ArrayList<>();
+         //ecoUpdate = new ArrayList<>();
+         tempCivs.clear();
+         happinessChange_ByTaxation.clear();
+         happinessChange_ByTaxation_Occupied.clear();
+         goodsUpdate.clear();
+         devUpdate.clear();
+         ecoUpdate.clear();
+
          ageRiskModifier = CFG.gameAges.getAge_RevolutionaryRiskModifier(Game_Calendar.CURRENT_AGEID);
          ageDevMod = CFG.gameAges.getAge_DevelopmentLevel_Increase(Game_Calendar.CURRENT_AGEID);
 
@@ -919,7 +931,7 @@ class Turn_NewTurn extends Thread {
          }
 
          tempCivs.clear();
-         tempCivs = null;
+         //tempCivs = null;
          happinessChange_ByTaxation.clear();
          happinessChange_ByTaxation_Occupied.clear();
          goodsUpdate.clear();
@@ -1255,7 +1267,7 @@ class Turn_NewTurn extends Thread {
          }
 
          tempCivs.clear();
-         tempCivs = null;
+         //tempCivs = null;
          happinessChange_ByTaxation.clear();
          happinessChange_ByTaxation_Occupied.clear();
          goodsUpdate.clear();

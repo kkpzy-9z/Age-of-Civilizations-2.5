@@ -87,22 +87,30 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
         this.lScrollTime = 0L;
         AoCGame.mLinkHandler = nLinkHandler;
     }
-    
+
+    //static final instances for these no-ops for memory, avoid repeated allocations
+    private static final RequestRendering REQUEST_RENDERING = new RequestRendering() {
+        @Override
+        public void update() {
+        }
+    };
     private final void updateRequestRendering(final boolean enable) {
         if (enable) {
-            this.requestRendering = new RequestRendering() {
-                @Override
-                public void update() {
-                }
-            };
+            //this.requestRendering = new RequestRendering() {
+            //    @Override
+            //    public void update() {
+            //    }
+            //};
+            this.requestRendering = AoCGame.REQUEST_RENDERING;
             CFG.setRender_3(true);
         }
         else {
-            this.requestRendering = new RequestRendering() {
-                @Override
-                public void update() {
-                }
-            };
+            this.requestRendering = AoCGame.REQUEST_RENDERING;
+            //this.requestRendering = new RequestRendering() {
+            //    @Override
+            //    public void update() {
+            //    }
+            //};
         }
     }
     
