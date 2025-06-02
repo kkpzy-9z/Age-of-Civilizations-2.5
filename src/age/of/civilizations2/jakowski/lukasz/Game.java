@@ -12,7 +12,9 @@ import java.util.*;
 
 class Game {
     private int scenarioID;
-    private List<Province> lProvinces;
+    //lProvinces arrayList => fixed size array set whenever map is loaded
+    //fucking huge performance improvement
+    private Province[] lProvinces;
     private int iProvincesSize;
     private List<Region> lRegions;
     private int iRegionsSize;
@@ -226,7 +228,7 @@ class Game {
         this.iActiveProvince = -1;
         this.activeProvince_Animation_Data = new Province_Animation2();
         this.highlightedProvince_AnimationData = new Province_Animation_MoveUnits2();
-        this.lProvinces = new ArrayList<>();
+        //this.lProvinces = new ArrayList<>();
         this.lCivRegion_Styles = new ArrayList<>();
         this.lCivRegion_Styles.add(new Civilization_Region_Style());
         this.lCivRegion_Styles.add(new Civilization_Region_Style() {
@@ -456,6 +458,9 @@ class Game {
     }
 
     protected final void loadProvinces() {
+        this.lProvinces = new Province[CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID())];
+        this.iProvincesSize = CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID());
+
         for (int i = 0; i < CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID()); ++i) {
             this.loadProvince(i);
         }
@@ -463,9 +468,14 @@ class Game {
     }
 
     protected final void loadProvince(final int i) {
+        if (this.lProvinces == null) {
+            this.lProvinces = new Province[CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID())];
+            this.iProvincesSize = CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID());
+        }
+
         final FileHandle fileProvinceData = Gdx.files.internal("map/" + CFG.map.getFile_ActiveMap_Path() + "data/" + "provinces/" + i);
         try {
-            this.lProvinces.add(new Province(i, (Province_GameData2) CFG.deserialize(fileProvinceData.readBytes())));
+            this.lProvinces[i] = (new Province(i, (Province_GameData2) CFG.deserialize(fileProvinceData.readBytes())));
         } catch (final ClassNotFoundException e) {
             if (CFG.LOGS) {
                 CFG.exceptionStack(e);
@@ -489,7 +499,7 @@ class Game {
             tempPointsX.add((short) Integer.parseInt(tempX[j]));
             tempPointsY.add((short) Integer.parseInt(tempY[j]));
         }
-        this.lProvinces.add(new Province(i, new Province_GameData2(-1, tempPointsX, tempPointsY, null, new ArrayList<Short>(), new ArrayList<Short>())));
+        this.lProvinces[i] = (new Province(i, new Province_GameData2(-1, tempPointsX, tempPointsY, null, new ArrayList<Short>(), new ArrayList<Short>())));
         this.saveProvince_Info_GameData(i);
         this.buildGameProvinceData(i);
     }
@@ -641,7 +651,7 @@ class Game {
     }
 
     protected final void updateProvincesSize() {
-        this.iProvincesSize = this.lProvinces.size();
+        this.iProvincesSize = this.lProvinces.length;
     }
 
     protected final void disposeMapData() {
@@ -655,8 +665,7 @@ class Game {
         }
         this.lRegions.clear();
         this.iRegionsSize = 0;
-        this.lProvinces = null;
-        this.lProvinces = new ArrayList<Province>();
+        this.lProvinces = new Province[CFG.map.getMapNumOfProvinces(CFG.map.getActiveMapID())];
         this.iProvincesSize = 0;
         this.scenarioID = -1;
         this.gameScenarios.disposeScenarios();
@@ -9554,7 +9563,7 @@ class Game {
     }
     
     protected final Province getProvince(final int ID) {
-        return this.lProvinces.get(ID);
+        return lProvinces[ID];
     }
     
     protected final int getProvincesSize() {

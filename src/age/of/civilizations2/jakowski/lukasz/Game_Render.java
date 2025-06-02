@@ -17,8 +17,8 @@ class Game_Render {
    protected static float CIVILIZATION_NAMES_ALPHA = 1.0F;
    private static long CIVILIZATIONS_NAMES_TIME = 0L;
    private static Renderer_CivRegionNames oRenderer_CivRegionNames;
-   private static List lRegions_Civs = new ArrayList();
-   private static List lRegions_Civs_RegionsID = new ArrayList();
+   private static List<Integer> lRegions_Civs = new ArrayList<Integer>();
+   private static List<List<Integer>> lRegions_Civs_RegionsID = new ArrayList<>();
 
    private static final void updateRegionsInView() {
       if (CIVILIZATIONS_NAMES_TIME == 0L) {
