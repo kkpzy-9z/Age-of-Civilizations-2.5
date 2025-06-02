@@ -136,7 +136,11 @@ class Game_NextTurnUpdate
                 //admin * (n stability + (globilization * distance percent))
                 //civ3.iAdministrationCosts += (int) CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost * ((1.0F - CFG.game.getCiv(nCivID).getStability()) +
                 //        ((1.25F - CFG.gameAges.getAge_FogOfWarDiscovery_MetProvinces(Game_Calendar.CURRENT_AGEID)) * CFG.game_NextTurnUpdate.getDistanceFromCapital_PercOfMax(CFG.game.getCiv(nCivID).getProvinceID(i), CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getCapitalProvinceID())));
-                civ3.iAdministrationCosts += (int) (0.5F * CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost * ((1.25F - CFG.game.getCiv(nCivID).getStability())));
+
+                //new equation w distance percent, still to expensive
+                //civ3.iAdministrationCosts += (int) (0.5F * CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost * ((1.25F - CFG.game.getCiv(nCivID).getStability())));
+                //fuck it
+                civ3.iAdministrationCosts = 0;
             } else {
                 civ3.iAdministrationCosts += (int) CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost;
             }
@@ -354,6 +358,8 @@ class Game_NextTurnUpdate
 
     protected final float getExpensesIsVassal(final int nCivID) {
         float tempTotal = 0.0f;
+        //admin cost is bloated for some reason
+
         //admin * (n stability + distance percent)
         tempTotal += CFG.game.getCiv(nCivID).iAdministrationCosts;
         tempTotal += this.getMilitaryUpkeep_Total(nCivID);
@@ -375,8 +381,8 @@ class Game_NextTurnUpdate
     protected final float getExpense_FromVassalsOfCiv(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = CFG.game.getCiv(nCivID).civGameData.lVassals.size() - 1; i >= 0; --i) {
-            //if int eco add total income of civ
-            //else add tribute
+            //if integrated eco add total income of civ
+            //tribute added already in admin cost (?), getBalance_UpdateBudget_Prepare function
             if (!CFG.game.getCiv(nCivID).civGameData.lVassals.get(i).autonomyStatus.isEconomicControl()) {
                 //add this vassals expenses
                 tempTotal += this.getExpensesIsVassal(CFG.game.getCiv(nCivID).civGameData.lVassals.get(i).iCivID);

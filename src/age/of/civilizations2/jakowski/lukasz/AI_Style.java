@@ -4337,9 +4337,6 @@ class AI_Style
 
    protected final void respondToMessages(final int nCivID) {
       try {
-         if (Objects.equals(CFG.game.getCiv(nCivID).getCivName(), "Oregon")) {
-            CFG.toast.setInView("Bastards");
-         }
          for (int i = CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessagesSize() - 1; i >= 0; --i) {
             //if is puppet, message sent from lord, and no trade perms, accept
             if (CFG.game.getCiv(nCivID).getIsPupet() &&
@@ -4470,6 +4467,7 @@ class AI_Style
                      if (!CFG.game.getWar(nWarID).canEnd) break;
                      //if puppet and lord in war, break
                      if (CFG.game.getCiv(nCivID).getIsPupet() && (CFG.game.getWar(nWarID).getIsAggressor(CFG.game.getCiv(nCivID).getPuppetOfCivID()) || CFG.game.getWar(nWarID).getIsDefender(CFG.game.getCiv(nCivID).getPuppetOfCivID()))) break;
+                     if (CFG.game.getCiv(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID).getIsPupet() && (CFG.game.getWar(nWarID).getIsAggressor(CFG.game.getCiv(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID).getPuppetOfCivID()) || CFG.game.getWar(nWarID).getIsDefender(CFG.game.getCiv(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID).getPuppetOfCivID()))) break;
 
                      //if (CFG.game.getPeaceTreaty_GameData_AlreadySent(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID)) {
                      //   break;
