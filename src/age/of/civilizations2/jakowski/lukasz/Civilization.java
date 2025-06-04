@@ -428,6 +428,8 @@ class Civilization {
     protected final void updateVassalCivilizationsColor() {
         //update vassal colors
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
+            if (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2) continue;
+            //don't apply if dominion
             CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus());
         }
     }
@@ -1838,24 +1840,22 @@ class Civilization {
             case 2: {
                 //load unified flag (1/4 owner, rest this)
                 try {
-                    CFG.unionFlagsToGenerate_Manager.lFlags.add(new UnionFlagsToGenerate());
+                    CFG.unionFlagsToGenerate_Manager.lFlags.add(new VassalFlagsToGenerate());
                     int tGenerateID = CFG.unionFlagsToGenerate_Manager.lFlags.size() - 1;
                     String[] tempD = this.getCivTag().split(";");
 
-                    ((UnionFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getCivTag().split(";")[0]);
+                    ((VassalFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lordID = (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getCivID());
                     for(int i = 0; i < tempD.length; ++i) {
-                        ((UnionFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[i]);
+                        (CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[i]);
                         if (i >= 2) break;
                     }
-                    while (((UnionFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.size() < 4) {
-                        ((UnionFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[0]);
+                    while ((CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.size() < 4) {
+                        (CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[0]);
                     }
 
-                    ((UnionFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).typeOfAction = UnionFlagsToGenerate_TypesOfAction.CIV_ID_SMALL;
-                    ((UnionFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).iID = this.getCivID();
+                    (CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).typeOfAction = UnionFlagsToGenerate_TypesOfAction.CIV_ID_SMALL;
+                    (CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).iID = this.getCivID();
                     //this.civFlag = new Image(new Texture(Gdx.files.internal("game/flags/ran.png")), Texture.TextureFilter.Nearest);
-                } catch (GdxRuntimeException var5) {
-                    CFG.exceptionStack(var5);
                 } catch (RuntimeException var6) {
                     CFG.exceptionStack(var6);
                 }

@@ -1172,17 +1172,17 @@ class CFG {
             case 2: {
                 //load unified flag (1/4 owner, rest this)
                 try {
-                    unionFlagsToGenerate_Manager.lFlags.add(new UnionFlagsToGenerate());
+                    unionFlagsToGenerate_Manager.lFlags.add(new VassalFlagsToGenerate());
                     int tGenerateID = unionFlagsToGenerate_Manager.lFlags.size() - 1;
                     String[] tempD = game.getCiv(activeCivInfo).getCivTag().split(";");
 
-                    ((UnionFlagsToGenerate)unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(game.getCiv(game.getCiv(activeCivInfo).getPuppetOfCivID()).getCivTag().split(";")[0]);
+                    ((VassalFlagsToGenerate)CFG.unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lordID = (game.getCiv(activeCivInfo).getPuppetOfCivID());
                     for(int i = 0; i < tempD.length; ++i) {
-                        ((UnionFlagsToGenerate)unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[i]);
+                        (unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[i]);
                         if (i >= 2) break;
                     }
-                    while (((UnionFlagsToGenerate)unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.size() < 4) {
-                        ((UnionFlagsToGenerate)unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[0]);
+                    while ((unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.size() < 4) {
+                        (unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).lTags.add(tempD[0]);
                     }
 
                     ((UnionFlagsToGenerate)unionFlagsToGenerate_Manager.lFlags.get(tGenerateID)).typeOfAction = UnionFlagsToGenerate_TypesOfAction.ACTIVE_CIV_INFO;

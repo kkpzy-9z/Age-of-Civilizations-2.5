@@ -232,9 +232,27 @@ class FlagManager {
             this.endClip(oSB);
          }
       }
-
    }
 
+   protected final void drawLordFlag(SpriteBatch oSB, int xD, int yD, int id) {
+      Rectangle clipBounds = new Rectangle(
+              (float)0,
+              (float)(CFG.GAME_HEIGHT),
+              xD,
+              -yD);
+      oSB.flush();
+      ScissorStack.pushScissors(clipBounds);
+
+      oSB.setColor(Color.WHITE);
+      CFG.game.getCiv(id).getFlag().draw(
+              oSB,
+              0,
+              (yD / 2) + 3,
+              xD / 2,
+              -yD / 2);
+      //oSB.setColor(Color.WHITE);
+      this.endClip(oSB);
+   }
 
    private final void beginClip(SpriteBatch oSB, int nPosX, int nPosY) {
       Rectangle clipBounds = new Rectangle((float)nPosX, (float)(CFG.GAME_HEIGHT - nPosY), 68.0F, -44.0F);
