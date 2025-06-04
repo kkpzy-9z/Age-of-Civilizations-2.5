@@ -49,6 +49,7 @@ class SettingsManager implements Serializable {
    protected boolean loadCursor = false;
    protected boolean gameRated = false;
    protected boolean randomLeaders = false;
+   protected boolean autoskipEvents = true;
    //width text setting
    protected int CIV_INFO_MENU_WIDTH = 240;
    //border width setting

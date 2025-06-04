@@ -884,6 +884,17 @@ class CFG {
             FileHandle file = Gdx.files.local(FILE_SETTINGS);
             file.writeBytes(CFG.serialize(settingsManager), false);
         }
+        catch (GdxRuntimeException e) {
+            try {
+                FileHandle file = Gdx.files.internal(FILE_SETTINGS);
+                file.writeBytes(CFG.serialize(settingsManager), false);
+            }
+            catch (GdxRuntimeException | IOException gdxRuntimeException) {
+                if (LOGS) {
+                    CFG.exceptionStack(e);
+                }
+            }
+        }
         catch (IOException ex) {
             if (LOGS) {
                 CFG.exceptionStack(ex);

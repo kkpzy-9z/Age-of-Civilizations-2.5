@@ -68,7 +68,7 @@ class Game_Action {
 
    protected final void tryToTakeNexTurn() {
       if (CFG.menuManager.getVisibleInGame_Event()) {
-         boolean skipEvents = true;
+         boolean skipEvents = CFG.settingsManager.autoskipEvents;
          while (skipEvents) {
             skipEvents = CFG.menuManager.closeInGame_Event();
             CFG.toast.setInView(CFG.langManager.get("SkippedSingleEvent") + "!");
