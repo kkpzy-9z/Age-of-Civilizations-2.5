@@ -9597,13 +9597,21 @@ class Game {
     }
     
     protected final Province getProvince(int ID) {
-        if (!CFG.menuManager.getInGameView() && !ghostProvinces.isEmpty()) {
-            for (int x : ghostProvinces) {
-                if (x < ID) {
-                    ID -= 1;
-                }
-            }
-        }
+        //adjust for null provinces when loading
+        //maybe not necessary ??
+
+        //if (CFG.menuManager.getInLoadMap() && !ghostProvinces.isEmpty()) {
+        //    for (int x : ghostProvinces) {
+        //        if (x < ID) {
+        //            ID -= 1;
+        //        }
+        //    }
+        //    try {
+        //        return lProvinces[ID];
+        //    } catch (ArrayIndexOutOfBoundsException e) {
+        //        return lProvinces[0];
+        //    }
+        //}
         return lProvinces[ID];
     }
     

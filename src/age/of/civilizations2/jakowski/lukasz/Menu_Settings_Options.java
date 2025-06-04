@@ -140,6 +140,12 @@ class Menu_Settings_Options extends SliderMenu {
          }
       });
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
+      menuElements.add(new Button_Menu_LR_Line((String)null, (int)(50.0F * CFG.GUI_SCALE), 0, tY, Menu_InGame_FlagAction.getWindowWidth(), CFG.BUTTON_HEIGHT, true, CFG.settingsManager.autoskipEvents) {
+         protected boolean getCheckboxState() {
+            return CFG.settingsManager.autoskipEvents;
+         }
+      });
+      tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
       menuElements.add(new Button_Menu_LR_Line((String)null, -1, 0, tY, Menu_InGame_FlagAction.getWindowWidth(), CFG.BUTTON_HEIGHT, true));
       int var10000 = tY + ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
       this.initMenu((SliderMenuTitle)null, 0 + AoCGame.LEFT, CFG.BUTTON_HEIGHT * 3 / 4, Menu_InGame_FlagAction.getWindowWidth(), CFG.GAME_HEIGHT - CFG.BUTTON_HEIGHT * 3 / 4 - CFG.BUTTON_HEIGHT - CFG.PADDING, menuElements);
@@ -170,18 +176,9 @@ class Menu_Settings_Options extends SliderMenu {
       this.getMenuElement(23).setText(CFG.langManager.get("InvertYAxis"));
       this.getMenuElement(24).setText(CFG.langManager.get("TranslationKeys"));
       this.getMenuElement(25).setText(CFG.langManager.get("CustomCursor"));
-      this.getMenuElement(26).setText(CFG.langManager.get("Defaults"));
-
-      //this.getMenuElement(14).setText(CFG.langManager.get("ShowNextPlayerTurnView"));
-      //this.getMenuElement(15).setText(CFG.langManager.get("OrderOfMoves"));
-      //this.getMenuElement(16).setText(CFG.langManager.get("ContinuousRendering"));
-      //this.getMenuElement(17).setText(CFG.langManager.get("ConfirmEndTurn"));
-      //this.getMenuElement(18).setText(CFG.langManager.get("ConfirmNoOrders"));
-      //this.getMenuElement(19).setText(CFG.langManager.get("InvertXAxis"));
-      //this.getMenuElement(20).setText(CFG.langManager.get("InvertYAxis"));
-      //this.getMenuElement(21).setText(CFG.langManager.get("TranslationKeys"));
-      //this.getMenuElement(22).setText(CFG.langManager.get("CustomCursor"));
-      //this.getMenuElement(23).setText(CFG.langManager.get("Defaults"));
+      //autoskip events setting
+      this.getMenuElement(26).setText(CFG.langManager.get("AutoSkipEvents"));
+      this.getMenuElement(27).setText(CFG.langManager.get("Defaults"));
    }
 
    protected void draw(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean sliderMenuIsActive) {
@@ -348,6 +345,9 @@ class Menu_Settings_Options extends SliderMenu {
             if (CFG.settingsManager.loadCursor) {
                CFG.toast.setInView(" --- The cursor may disappear during video recording --- ", CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
             }
+         case 26:
+            CFG.settingsManager.autoskipEvents = !CFG.settingsManager.autoskipEvents;
+            break;
       }
 
       CFG.saveSettings();
