@@ -9,6 +9,10 @@ Pull requests, issue/bug reporting, and general suggestions are greatly apprecia
 If you are wish to make fork and make significant alterations, please give credit as one of the base authors if possible.
 I have spent quite some excruciating hours of my life creating this mod.
 
+Good guides for getting started on AoC2 modding -
+https://vk.com/@bloodyeurope2-gpk-1-zapusk-ishodnogo-koda (Bloody Europe)
+https://docs.google.com/document/d/1eI23RKEo6jWwcAI4V6LiXc8XPcFafj1cE6tEWPbx7z4/edit?usp=sharing (yours truely)
+
 Thanks!
 
 Official installation guides and downloads for playthrough are on both the discord and youtube.
