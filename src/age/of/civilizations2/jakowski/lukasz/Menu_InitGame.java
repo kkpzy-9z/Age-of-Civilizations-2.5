@@ -142,6 +142,7 @@ extends SliderMenu {
                     CFG.DYNAMIC_EVENTS = true; //2.5 init eventmanager change//
                     CFG.PLAYER_PEACE = false; //2.5 init playerpeace change//
                     CFG.AI_VASSALS = false; //2.5 init AIVassals change//
+                    CFG.AI_DIPLOMACY = true;
                     CFG.sLoading = CFG.langManager.get("LoadingGameData");
                     ++this.iStepID;
                     break block50;

@@ -363,8 +363,8 @@ class Game_NextTurnUpdate
         //admin * (n stability + distance percent)
         tempTotal += CFG.game.getCiv(nCivID).iAdministrationCosts;
         tempTotal += this.getMilitaryUpkeep_Total(nCivID);
-        tempTotal += this.getInvestments_Total(nCivID, CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).iBudget/2);
-        tempTotal += this.getGoodsSpendings(nCivID, CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).iBudget/2);
+        tempTotal += this.getInvestments_Total(nCivID, CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).iBudget)/2;
+        tempTotal += this.getGoodsSpendings(nCivID, CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).iBudget)/2;
         //tempTotal += this.getInterestCost(nCivID);
         //tempTotal += this.getInflation(nCivID);
         //tempTotal += CFG.game.getCiv(nCivID).getLoans_GoldTotalPerTurn();

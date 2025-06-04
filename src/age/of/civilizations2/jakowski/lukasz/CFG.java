@@ -332,6 +332,7 @@ class CFG {
     protected static boolean SPECTATOR_MODE;
     protected static boolean DYNAMIC_EVENTS;
     protected static boolean AI_VASSALS;
+    protected static boolean AI_DIPLOMACY;
     protected static boolean PLAYER_PEACE;
     protected static int DEFAULT_ARMY_NOT_SET_UPED = -1;
     protected static boolean TOTAL_WAR_MODE;

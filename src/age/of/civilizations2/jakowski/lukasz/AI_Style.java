@@ -216,6 +216,8 @@ class AI_Style
    }
 
    protected void diplomacyActions(final int nCivID) {
+      if (!CFG.AI_DIPLOMACY) return; //2.5 change
+
       if (CFG.game.getCiv(nCivID).getNumOfProvinces() > 0) {
          Gdx.app.log("AoC", "diplomacyActions - > " + CFG.game.getCiv(nCivID).getCivName());
          this.diplomacyActions_BuildCivsInRange(nCivID);
@@ -531,7 +533,7 @@ class AI_Style
       
       //new alliance ai system change//
       //if time to scan
-      if (CFG.game.getCiv(nCivID).civGameData.allianceCheck_TurnID <= Game_Calendar.TURN_ID) {
+      if (CFG.game.getCiv(nCivID).civGameData.allianceCheck_TurnID <= Game_Calendar.TURN_ID && !CFG.game.getCiv(nCivID).getIsPupet()) {
          //if (CFG.game.getCiv(nCivID).getNumOfProvinces() < 4 && CFG.game.getCiv(nCivID).getPuppetOfCivID() == nCivID && CFG.game.getCiv(nCivID).getAllianceID() == 0 && CFG.oR.nextInt(100) < 12 && CFG.game.getCiv(nCivID).getFriendlyCivsSize() > 0) {
          //top prestiges
          final ArrayList<Integer> topPrestige = getTopPrestige();
@@ -546,9 +548,9 @@ class AI_Style
             weight = Math.max((weight - (float)CFG.game.getCiv(nCivID).civGameData.lVassals.size() * 15.0F), 15.0F);
          }
 
-         //if not in alliance, significantly increase weight, decrease by factor of prestige
+         //if not in alliance, increase weight, decrease by factor of prestige
          if (CFG.game.getCiv(nCivID).getAllianceID() == 0) {
-            weight += 25.0F;
+            weight += 15.0F;
          }
 
          weight += ((float)topPrestige.indexOf(nCivID) / (float)topPrestige.size()) * 25.0F;
@@ -559,13 +561,13 @@ class AI_Style
             int iBestCiv = 0;
 
             float iBestWeight = 0;
-            //if friendly civs, scan, else scan bordering civs with 1/5 chance if exists
+            //if friendly civs, scan, else scan bordering civs with 1/3 chance if exists
             if (CFG.game.getCiv(nCivID).getFriendlyCivsSize() > 0) {
-               iBestCiv = CFG.game.getCiv(nCivID).getFriendlyCiv(CFG.oR.nextInt(CFG.game.getCiv(nCivID).getFriendlyCivsSize())).iCivID;
+                iBestCiv = CFG.game.getCiv(nCivID).getFriendlyCiv(CFG.oR.nextInt(CFG.game.getCiv(nCivID).getFriendlyCivsSize())).iCivID;
 
                for (int i = 0; i < CFG.game.getCiv(nCivID).getFriendlyCivsSize(); i++) {
                   //if in alliance or puppet of civ, or no provinces/neutral, skip
-                  if (CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID) || CFG.game.getCiv(CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID).getNumOfProvinces() < 1 || CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID < 1) continue;
+                  if (CFG.game.getCiv(CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID).getIsPupet() || CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID) || CFG.game.getCiv(CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID).getNumOfProvinces() < 1 || CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID < 1) continue;
 
                   int iCivID = CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID;
                   //weight starts at absolute of 120 / relation, so higher prob for lower values
@@ -583,12 +585,12 @@ class AI_Style
                      iBestWeight = iWeight;
                   }
                }
-            } else if ((CFG.oR.nextInt(7) == 0) && CFG.game.getCiv(nCivID).iBorderWithCivsSize > 9991) {
+            } else if ((CFG.oR.nextInt(3) == 0) && CFG.game.getCiv(nCivID).iBorderWithCivsSize > 1) {
                iBestCiv = CFG.game.getCiv(nCivID).lBorderWithCivs.get(CFG.oR.nextInt(CFG.game.getCiv(nCivID).iBorderWithCivsSize)).iWithCivID;
 
                for (int i = 0; i < CFG.game.getCiv(nCivID).iBorderWithCivsSize; i++) {
                   //if in alliance or puppet of civ, or no provinces/neutral, skip
-                  if (CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getFriendlyCiv(i).iCivID) || CFG.game.getCiv(CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID).getNumOfProvinces() < 1 || CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID < 1) continue;
+                  if (CFG.game.getCiv(CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID).getIsPupet() || CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID) || CFG.game.getCiv(CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID).getNumOfProvinces() < 1 || CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID < 1) continue;
 
                   int iCivID = CFG.game.getCiv(nCivID).lBorderWithCivs.get(i).iWithCivID;
                   //weight starts at absolute of 120 / relation, so higher prob for lower values
@@ -606,7 +608,7 @@ class AI_Style
                }
             }
 
-            //if not nuetral send alliance
+            //if not neutral send alliance
             if (iBestCiv > 0) {
                DiplomacyManager.sendAllianceProposal(iBestCiv, nCivID);
                Gdx.app.log("AoC2.5", "AI Alliance Matched: " + CFG.game.getCiv(nCivID).getCivName() + " " + CFG.game.getCiv(iBestCiv).getCivName());
@@ -622,7 +624,7 @@ class AI_Style
       this.diplomacyActions_InfluencedCiv_Update(nCivID);
       if (Game_Calendar.TURN_ID >= CFG.game.getCiv(nCivID).civGameData.holdLookingForFriends_UntilTurnID) {
          //if civs in range
-         if (CFG.game.getCiv(nCivID).civGameData.civsInRange.size() > 0) {
+         if (!CFG.game.getCiv(nCivID).civGameData.civsInRange.isEmpty()) {
             final ArrayList<Integer> possibleCivs = new ArrayList<Integer>();
             ArrayList<Float> lScores = new ArrayList<Float>();
             final ArrayList<Integer> topPrestige = getTopPrestige();
@@ -694,9 +696,9 @@ class AI_Style
    }
 
    protected final ArrayList<Integer> getTopPrestige() {
-      ArrayList<Integer> tSorted = new ArrayList<Integer>();
-      ArrayList<Integer> tempIDS = new ArrayList<Integer>();
-      ArrayList<Integer> tempScore = new ArrayList<Integer>();
+      int[] tempIDS = new int[CFG.game.getCivsSize()];
+      int[] tempScore = new int[CFG.game.getCivsSize()];
+      int count = 0;
 
       //safecheck
       if (CFG.game.getSortedCivsSize() != CFG.game.getCivsSize()) {
@@ -704,22 +706,34 @@ class AI_Style
       }
 
       for (int j = 1; j < CFG.game.getCivsSize(); ++j) {
-         tempIDS.add(CFG.game.getSortedCivsAZ(j - 1));
-         tempScore.add(CFG.gameAction.buildRank_Score_Prestige(CFG.game.getSortedCivsAZ(j - 1)));
+         tempIDS[count] = CFG.game.getSortedCivsAZ(j - 1);
+         tempScore[count] = CFG.gameAction.buildRank_Score_Prestige(CFG.game.getSortedCivsAZ(j - 1));
+         count++;
       }
-      int tAddID = 0;
-      while (tempIDS.size() > 0) {
-         tAddID = 0;
-         for (int k = 1; k < tempIDS.size(); ++k) {
-            if (tempScore.get(tAddID) < tempScore.get(k)) {
-               tAddID = k;
+
+      // Selection sort both arrays in descending order of tempScore
+      for (int i = 0; i < count; ++i) {
+         int maxIdx = i;
+         for (int k = i + 1; k < count; ++k) {
+            if (tempScore[k] > tempScore[maxIdx]) {
+               maxIdx = k;
             }
          }
-         tSorted.add(tempIDS.get(tAddID));
-         tempIDS.remove(tAddID);
-         tempScore.remove(tAddID);
+         // Swap IDs
+         int tmpID = tempIDS[i];
+         tempIDS[i] = tempIDS[maxIdx];
+         tempIDS[maxIdx] = tmpID;
+         // Swap Scores
+         int tmpScore = tempScore[i];
+         tempScore[i] = tempScore[maxIdx];
+         tempScore[maxIdx] = tmpScore;
       }
-      return tSorted;
+
+      ArrayList<Integer> result = new ArrayList<Integer>(count);
+      for (int i = 0; i < count; ++i) {
+         result.add(tempIDS[i]);
+      }
+      return result;
    }
 
    protected final float diplomacyActions_FriendlyCiv_Score(final int civBudget, final int nCivID, final AI_CivsInRange withCiv, final float modifier_Budget, final float modifier_CivsSize) {
@@ -4546,6 +4560,10 @@ class AI_Style
                   break;
                }
                case JOIN_ALLIANCE: {
+                  if (CFG.game.getCiv(nCivID).getIsPupet()) {
+                     break;
+                  }
+
                   ArrayList<Integer> topPrestige = getTopPrestige();
                   int iCivID = CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID;
                   //weight starts at relation / 2, higher for higher rel
@@ -4995,7 +5013,8 @@ class AI_Style
                   CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.removeMessage(i);
                   break;
                }
-               case DECLARATION_OF_INDEPENDENCE: {
+               case DECLARATION_OF_INDEPENDENCE:
+                case DECLARATION_OF_INDEPENDENCE_BYVASSAl: {
                   if (CFG.game.getCiv(nCivID).iBudget > CFG.game.getCiv(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID).iBudget * 0.25f) {
                      CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
                   }
@@ -5018,16 +5037,6 @@ class AI_Style
                   break;
                }
                case RELATIONS_INSULT: {
-                  CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.removeMessage(i);
-                  break;
-               }
-               case DECLARATION_OF_INDEPENDENCE_BYVASSAl: {
-                  if (CFG.game.getCiv(nCivID).iBudget > CFG.game.getCiv(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID).iBudget * 0.25f) {
-                     CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
-                  }
-                  else {
-                     CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
-                  }
                   CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.removeMessage(i);
                   break;
                }
@@ -5844,7 +5853,7 @@ class AI_Style
    protected void armyOverBudget_Disband(final int nCivID) {
       if (CFG.game.getCiv(nCivID).getMovePoints() >= CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).COST_OF_DISBAND) {
          boolean atWar = false;
-         if ((CFG.game.getCiv(nCivID).isAtWar() || CFG.game.getCiv(nCivID).civGameData.civPlans.isPreparingForTheWar()) && CFG.game.getCiv(nCivID).iBudget > 0 && CFG.game.getCiv(nCivID).getMoney() + CFG.game.getCiv(nCivID).iBudget * 3 > 0L) {
+         if ((CFG.game.getCiv(nCivID).isAtWar() || CFG.game.getCiv(nCivID).civGameData.civPlans.isPreparingForTheWar()) && CFG.game.getCiv(nCivID).iBudget > 0 && CFG.game.getCiv(nCivID).getMoney() + CFG.game.getCiv(nCivID).iBudget * 3L > 0L) {
             Gdx.app.log("AoC", "armyOverBudget_Disband -> 000, DONT DISBAND ARMY, WE NEEED IT!!!1");
             atWar = true;
             return;

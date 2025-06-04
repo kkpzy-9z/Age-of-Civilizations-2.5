@@ -1451,6 +1451,7 @@ class Game {
                 }
                 CFG.PLAYER_PEACE = tempDataSav.PLAYER_PEACE;
                 CFG.AI_VASSALS = tempDataSav.AI_VASSALS;
+                CFG.AI_DIPLOMACY = tempDataSav.AI_DIPLOMACY;
 
                 Gdx.app.log("LOADSAVE", String.valueOf(CFG.DYNAMIC_EVENTS));
                 Gdx.app.log("LOADSAVE", String.valueOf(CFG.dynamicEventManager.eventManagerWar.lLargeWars));
@@ -1459,6 +1460,7 @@ class Game {
                 CFG.DYNAMIC_EVENTS = !CFG.SPECTATOR_MODE;
                 CFG.PLAYER_PEACE = false;
                 CFG.AI_VASSALS = false;
+                CFG.AI_DIPLOMACY = true;
                 CFG.dynamicEventManager = new DynamicEventManager();
                 CFG.exceptionStack(ex);
             }
@@ -2601,9 +2603,9 @@ class Game {
             for (int i = 1; i < this.iCivsSize; ++i) {
                 if (this.getCiv(i).getCivID() != this.getCiv(i).getPuppetOfCivID()) {
                     if (this.getCiv(i).getPuppetOfCivID() > nRemoveCivID) {
-                        this.getCiv(i).civGameData.iPuppetOfCivID -= 1;
+                        //this.getCiv(i).civGameData.iPuppetOfCivID -= 1;
 
-                        //this.getCiv(i).setPuppetOfCivID(this.getCiv(i).getPuppetOfCivID() - 1);
+                        this.getCiv(i).setPuppetOfCivID(this.getCiv(i).getPuppetOfCivID() - 1);
                     }
                     else if (this.getCiv(i).getPuppetOfCivID() == nRemoveCivID) {
                         this.getCiv(i).setPuppetOfCivID(this.getCiv(i).getCivID());

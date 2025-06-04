@@ -9,6 +9,7 @@ class Save_GameData2 implements Serializable {
    protected boolean DYNAMIC_EVENTS = true;
    protected boolean PLAYER_PEACE = false;
    protected boolean AI_VASSALS = false;
+   protected boolean AI_DIPLOMACY = true;
    protected DynamicEventManager dynamicEventManager;
 
    protected final void buildData() {
@@ -16,6 +17,7 @@ class Save_GameData2 implements Serializable {
       this.DYNAMIC_EVENTS = CFG.DYNAMIC_EVENTS;
       this.PLAYER_PEACE = CFG.PLAYER_PEACE;
       this.AI_VASSALS = CFG.AI_VASSALS;
+      this.AI_DIPLOMACY = CFG.AI_DIPLOMACY;
       this.dynamicEventManager = CFG.dynamicEventManager;
    }
 }

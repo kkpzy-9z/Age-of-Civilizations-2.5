@@ -2057,6 +2057,9 @@ class Civilization {
         int index = CFG.game.getCiv(this.civGameData.iPuppetOfCivID).addVassal(this.iCivID);
         CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).setAutonomyStatus(iAutonomyStatus);
 
+        //set color
+        this.updateCivilizationColor(CFG.game.getCiv(iPuppetOfCivID).getR(), CFG.game.getCiv(iPuppetOfCivID).getG(), CFG.game.getCiv(iPuppetOfCivID).getB(), CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.getColorStatus());
+
         //set this civ's vassals to be overseen by new lord
         if (CFG.menuManager.getInManageDiplomacy() || CFG.menuManager.getInCreateScenario_Civilizations()) {
             return;
@@ -2112,8 +2115,6 @@ class Civilization {
             this.setStability(this.fStability / (float) this.getNumOfProvinces());
         }
 
-        //set color
-        this.updateCivilizationColor(CFG.game.getCiv(iPuppetOfCivID).getR(), CFG.game.getCiv(iPuppetOfCivID).getG(), CFG.game.getCiv(iPuppetOfCivID).getB(), CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.getColorStatus());
         //load flag
         this.loadFlag(CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getFlagStatus());
     }

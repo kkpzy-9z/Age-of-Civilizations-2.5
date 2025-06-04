@@ -171,6 +171,8 @@ class Menu_Games extends SliderMenu {
       CFG.RANDOM_FILL = false;
       CFG.DYNAMIC_EVENTS = true; //auto set CFG DYNAMIC EVENTS on start change//
       CFG.PLAYER_PEACE = false;
+      CFG.AI_VASSALS = false;
+      CFG.AI_DIPLOMACY = true;
       Game_Calendar.GAME_SPEED = 1.0F;
       Game_Calendar.AI_AGGRESSIVNESS = 1.25F;
       CFG.menuManager.setViewID(Menu.eCREATE_NEW_GAME);

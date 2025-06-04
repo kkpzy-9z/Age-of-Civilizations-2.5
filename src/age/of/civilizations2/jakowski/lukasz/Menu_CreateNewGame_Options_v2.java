@@ -432,6 +432,21 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
+      //ai diplomacy toggle change//
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 23, tempW, tempElemH, true, CFG.AI_DIPLOMACY) {
+         protected boolean getCheckboxState() {
+            return CFG.AI_DIPLOMACY;
+         }
+
+         protected void buildElementHover() {
+            List nElements = new ArrayList();
+            List nData = new ArrayList();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("AIDiplomacyToolTip"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+            this.menuElementHover = new MenuElement_Hover_v2(nElements);
+         }
+      });
 
       this.initMenu(new SliderMenuTitle((String)null, CFG.BUTTON_HEIGHT * 3 / 4, false, false) {
          protected void draw(SpriteBatch oSB, int iTranslateX, int nPosX, int nPosY, int nWidth, boolean sliderMenuIsActive) {
@@ -482,6 +497,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
       this.getMenuElement(20).setText(CFG.langManager.get("PlayerPeace"));
       this.getMenuElement(21).setText(CFG.langManager.get("DynamicEvents"));
       this.getMenuElement(22).setText(CFG.langManager.get("AIVassalization"));
+      this.getMenuElement(23).setText(CFG.langManager.get("AIDiplomacy"));
    }
 
    protected void draw(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean sliderMenuIsActive) {
@@ -655,6 +671,10 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
          case 22:
             CFG.AI_VASSALS = !CFG.AI_VASSALS;
             this.getMenuElement(iID).setCheckboxState(CFG.AI_VASSALS);
+            break;
+         case 23:
+            CFG.AI_DIPLOMACY = !CFG.AI_DIPLOMACY;
+            this.getMenuElement(iID).setCheckboxState(CFG.AI_DIPLOMACY);
             break;
       }
 
