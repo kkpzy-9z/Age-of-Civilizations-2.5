@@ -428,7 +428,7 @@ class Civilization {
     protected final void updateVassalCivilizationsColor() {
         //update vassal colors
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
-            if (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2) continue;
+            if (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID) != null && CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2) continue;
             //don't apply if dominion
             CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus());
         }
@@ -2095,12 +2095,13 @@ class Civilization {
             this.buildNumOfUnits();
         }
 
-        //if no eco control transfer money
+        //if no eco control transfer money, remove tribute
         if (!CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.isEconomicControl()) {
             this.clearLoans();
             CFG.oAI.getAI_Style(this.civGameData.iAI_Style).manageBudget(this.iCivID);
             CFG.game.getCiv(iPuppetOfCivID).setMoney(CFG.game.getCiv(iPuppetOfCivID).getMoney() + this.getMoney());
             this.setMoney(0L);
+            CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).setTribute(0);
         }
 
         //update stab if in game
@@ -2112,7 +2113,7 @@ class Civilization {
                 CFG.game.getProvince(i).updateProvinceStability();
                 this.fStability += CFG.game.getProvince(i).getProvinceStability();
             }
-            this.setStability(this.fStability / (float) this.getNumOfProvinces());
+            this.setStability(this.fStability);
         }
 
         //load flag

@@ -134,13 +134,11 @@ class Game_NextTurnUpdate
             //new vassal order
             if (CFG.game.getCiv(nCivID).getIsPupet() && !CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getVassal_AutonomyStatus(nCivID).isEconomicControl()) {
                 //admin * (n stability + (globilization * distance percent))
-                //civ3.iAdministrationCosts += (int) CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost * ((1.0F - CFG.game.getCiv(nCivID).getStability()) +
-                //        ((1.25F - CFG.gameAges.getAge_FogOfWarDiscovery_MetProvinces(Game_Calendar.CURRENT_AGEID)) * CFG.game_NextTurnUpdate.getDistanceFromCapital_PercOfMax(CFG.game.getCiv(nCivID).getProvinceID(i), CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getCapitalProvinceID())));
+                civ3.iAdministrationCosts += (int) ((int) CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost * ((1.0F - CFG.game.getCiv(nCivID).getStability()) +
+                                        ((1.25F - CFG.gameAges.getAge_FogOfWarDiscovery_MetProvinces(Game_Calendar.CURRENT_AGEID)) * CFG.game_NextTurnUpdate.getDistanceFromCapital_PercOfMax(CFG.game.getCiv(nCivID).getProvinceID(i), CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getCapitalProvinceID()))));
 
-                //new equation w distance percent, still to expensive
+                //new equation w distance percent, still too expensive
                 //civ3.iAdministrationCosts += (int) (0.5F * CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost * ((1.25F - CFG.game.getCiv(nCivID).getStability())));
-                //fuck it
-                civ3.iAdministrationCosts = 0;
             } else {
                 civ3.iAdministrationCosts += (int) CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).iAdministrationCost;
             }
@@ -279,7 +277,11 @@ class Game_NextTurnUpdate
     
     protected final float getIncome_Vassals(final int nForCivID, final int nIsVassal) {
         if (CFG.game.getCiv(nIsVassal).getPuppetOfCivID() == nForCivID) {
-            return this.getVassalizationMoney(nIsVassal);
+            //only add tribute if unintegrated vassal economy
+            if (CFG.game.getCiv(nForCivID).getVassal_AutonomyStatus(nIsVassal) == null ||
+                CFG.game.getCiv(nForCivID).getVassal_AutonomyStatus(nIsVassal).isEconomicControl()) {
+                return this.getVassalizationMoney(nIsVassal);
+            }
         }
         return 0.0f;
     }
@@ -363,8 +365,9 @@ class Game_NextTurnUpdate
         //admin * (n stability + distance percent)
         tempTotal += CFG.game.getCiv(nCivID).iAdministrationCosts;
         tempTotal += this.getMilitaryUpkeep_Total(nCivID);
-        tempTotal += this.getInvestments_Total(nCivID, CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).iBudget)/2;
-        tempTotal += this.getGoodsSpendings(nCivID, CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).iBudget)/2;
+        //reduced by factor now directly in get spendings functions
+        tempTotal += this.getInvestments_Total(nCivID, CFG.game.getCiv(nCivID).iBudget);
+        tempTotal += this.getGoodsSpendings(nCivID, CFG.game.getCiv(nCivID).iBudget);
         //tempTotal += this.getInterestCost(nCivID);
         //tempTotal += this.getInflation(nCivID);
         //tempTotal += CFG.game.getCiv(nCivID).getLoans_GoldTotalPerTurn();
@@ -544,14 +547,14 @@ class Game_NextTurnUpdate
         return 0.008f * CFG.game.getProvince(nProvinceID).getDefensivePosition();
     }
     
-    protected final float getInvestments_Total(final int nCivID, final int iBudget) {
-        return this.getResearchSpendings(nCivID, iBudget) + this.getInvestmentsSpendings(nCivID, iBudget);
-    }
-    
     protected final float getResearchSpendings(final int nCivID, final int iBudget) {
         return iBudget * CFG.game.getCiv(nCivID).getSpendings_Research();
     }
-    
+
+    protected final float getInvestments_Total(final int nCivID, final int iBudget) {
+        return this.getResearchSpendings(nCivID, iBudget) + this.getInvestmentsSpendings(nCivID, iBudget);
+    }
+
     protected final float getGoodsSpendings(final int nCivID, final int iBudget) {
         return iBudget * CFG.game.getCiv(nCivID).getSpendings_Goods();
     }
@@ -598,11 +601,13 @@ class Game_NextTurnUpdate
     }
 
     protected final void updateSpendingsOfVassals(final int iLordID) {
-        final int iBudget = CFG.game.getCiv(iLordID).iBudget/2;
 
         for (int i = 0; i < CFG.game.getCiv(iLordID).civGameData.iVassalsSize; i++) {
             if (!CFG.game.getCiv(iLordID).civGameData.lVassals.get(i).autonomyStatus.isEconomicControl()) {
+
                 int nCivID = CFG.game.getCiv(iLordID).civGameData.lVassals.get(i).iCivID;
+                final int iBudget = CFG.game.getCiv(nCivID).iBudget;
+
                 //update vassal if no eco control
                 if (CFG.game.getCiv(nCivID).getCapitalProvinceID() >= 0 && CFG.game.getCiv(nCivID).getNumOfProvinces() > 0) {
                     if (CFG.game.getCiv(iLordID).getMoney() < -500L) {

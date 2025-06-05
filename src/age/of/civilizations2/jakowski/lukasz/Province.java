@@ -4019,7 +4019,8 @@ class Province {
             this.fProvinceStability -= this.updateStability_Score_RevRisk();
             this.fProvinceStability += this.updateStability_Score_Core();
             this.fProvinceStability += this.updateStability_Score_Occupied();
-            this.fProvinceStability *= this.updateStability_Score_Puppet();
+            //decrease stability based on perms as vassal (if applicable)
+            this.fProvinceStability *= this.updateStability_Score_Puppet(); //this is fucked up need to fix
             if (this.fProvinceStability < 1.0F) {
                 this.fProvinceStability += this.updateStability_Score_Army();
             }
@@ -4048,12 +4049,14 @@ class Province {
         float iStab = 1.0F;
 
         if (!CFG.gameAutonomy.lAutonomy.get(iAutonomyStatus).isMilitaryControl()) {
-            iStab /= (CFG.gameAction.buildRank_Score_Prestige(this.getCivID())/5F);
+            //iStab /= (CFG.gameAction.buildRank_Score_Prestige(this.getCivID())/5F);
+            iStab *= 0.9F;
         } else {
             iStab *= 1.025F;
         }
         if (!CFG.gameAutonomy.lAutonomy.get(iAutonomyStatus).isEconomicControl()) {
-            iStab /= (CFG.gameAction.buildRank_Score_Economy(this.getCivID())/5F);
+            //iStab /= (CFG.gameAction.buildRank_Score_Economy(this.getCivID())/5F);
+            iStab *= 0.9F;
         } else {
             iStab *= 1.025F;
         }

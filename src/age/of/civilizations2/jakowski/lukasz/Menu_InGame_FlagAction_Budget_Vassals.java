@@ -149,16 +149,6 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nData.clear();
 
             int i;
-            if (CFG.game.getCiv(iCivID).getCivID() != CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()) {
-               nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Lord") + ": "));
-               nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getCivName(), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
-               nData.add(new MenuElement_Hover_v2_Element_Type_Flag(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), CFG.PADDING, CFG.PADDING));
-               nData.add(new MenuElement_Hover_v2_Element_Type_Text("-" + (int)CFG.game_NextTurnUpdate.getIncome_Vassals(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), iCivID), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
-               nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
-               nData.add(new MenuElement_Hover_v2_Element_Type_Text(" [" + CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getVassal_Tribute(iCivID) + "%]", CFG.COLOR_TEXT_MODIFIER_NEUTRAL));
-               nElements.add(new MenuElement_Hover_v2_Element2(nData));
-               nData.clear();
-            }
 
             if (CFG.game.getCiv(iCivID).getWarReparationsGetsSize() > 0 || CFG.game.getCiv(iCivID).getWarReparationsPaysSize() > 0) {
                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("WarReparations"), CFG.COLOR_TEXT_NUM_OF_PROVINCES));
@@ -270,7 +260,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("BudgetSpendings") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) + "%", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) + "%", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
@@ -278,23 +268,23 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
       });
       ((MenuElement)menuElements.get(menuElements.size() - 1)).setMax(tempValue);
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight();
-      tempValue = (int)CFG.game_NextTurnUpdate.getInvestments_Total(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) + (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2);
+      tempValue = (int)CFG.game_NextTurnUpdate.getInvestments_Total(iCivID, CFG.game.getCiv(iCivID).iBudget) + (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget);
       menuElements.add(new Text_Economy_Value("" + Math.abs(tempValue), CFG.langManager.get("Spendings"), CFG.PADDING * 2 + (tempWidth - CFG.PADDING * 4) / 2, tY, (tempWidth - CFG.PADDING * 4) / 2, CFG.TEXT_HEIGHT + CFG.PADDING * 2) {
          protected void buildElementHover() {
             List nElements = new ArrayList();
             List nData = new ArrayList();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Goods") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2), (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) > 0 ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_NEUTRAL2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget), (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) > 0 ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_NEUTRAL2));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Research") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (int)CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2), (int)CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) > 0 ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_NEUTRAL2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (int)CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget), (int)CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) > 0 ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_NEUTRAL2));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Investments") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (int)CFG.game_NextTurnUpdate.getInvestmentsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2), (int)CFG.game_NextTurnUpdate.getInvestmentsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) > 0 ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_NEUTRAL2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (int)CFG.game_NextTurnUpdate.getInvestmentsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget), (int)CFG.game_NextTurnUpdate.getInvestmentsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) > 0 ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_NEUTRAL2));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
@@ -351,7 +341,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Budget") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2), CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2 > 0 ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : (CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2 == 0 ? CFG.COLOR_TEXT_MODIFIER_NEUTRAL2 : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2)));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + CFG.game.getCiv(iCivID).iBudget), CFG.game.getCiv(iCivID).iBudget > 0 ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : (CFG.game.getCiv(iCivID).iBudget == 0 ? CFG.COLOR_TEXT_MODIFIER_NEUTRAL2 : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2)));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
@@ -359,7 +349,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MilitarySpendings") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) + "%", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) + "%", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("GoodsSpendings") + ": "));
@@ -426,7 +416,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Spendings") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
@@ -484,7 +474,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Spendings") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (int)CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (int)CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
@@ -495,7 +485,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             return SoundsManager.SOUND_TECHNOLOGY;
          }
       });
-      ((MenuElement)menuElements.get(menuElements.size() - 1)).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
+      ((MenuElement)menuElements.get(menuElements.size() - 1)).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING * 2;
       menuElements.add(new Slider_FlagAction_Investments(CFG.langManager.get("Investments"), CFG.PADDING * 3, tY, tempWidth - CFG.PADDING * 6, CFG.TEXT_HEIGHT + CFG.PADDING * 2 + CFG.PADDING * 5, 0, 100, (int)(CFG.game.getCiv(iCivID).getSpendings_Investments() * 100.0F)) {
          protected String getDrawText() {
@@ -553,7 +543,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Spendings") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (int)CFG.game_NextTurnUpdate.getInvestmentsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (int)CFG.game_NextTurnUpdate.getInvestmentsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
             nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
@@ -561,7 +551,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
          }
       });
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING * 2;
-      menuElements.add(new Slider_FlagAction_Military(CFG.langManager.get("Military"), CFG.PADDING * 3, tY, tempWidth - CFG.PADDING * 6, CFG.TEXT_HEIGHT + CFG.PADDING * 2 + CFG.PADDING * 4, 0, 100, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2 < 0 && CFG.game.getCiv(iCivID).getNumOfUnits() > 0 ? 100 : CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2)) {
+      menuElements.add(new Slider_FlagAction_Military(CFG.langManager.get("Military"), CFG.PADDING * 3, tY, tempWidth - CFG.PADDING * 6, CFG.TEXT_HEIGHT + CFG.PADDING * 2 + CFG.PADDING * 4, 0, 100, CFG.game.getCiv(iCivID).iBudget < 0 && CFG.game.getCiv(iCivID).getNumOfUnits() > 0 ? 100 : CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(iCivID).iBudget)) {
          protected String getDrawText() {
             return this.getCurrent() + "%";
          }
@@ -582,7 +572,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("BudgetSpendings") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) + "%", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) + "%", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MilitaryUpkeep") + ": "));
@@ -682,7 +672,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
       tempValue = -CFG.game.getCiv(iCivID).iAdministrationCosts - (int)CFG.game_NextTurnUpdate.getInterestCost(iCivID) - (int)CFG.game_NextTurnUpdate.getInflation(iCivID) - CFG.game.getCiv(iCivID).getLoans_GoldTotalPerTurn();
       this.getMenuElement(6).setText("" + Math.abs(tempValue));
       this.getMenuElement(6).setMax(tempValue);
-      tempValue = -((int)CFG.game_NextTurnUpdate.getInvestments_Total(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2)) - (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2);
+      tempValue = -((int)CFG.game_NextTurnUpdate.getInvestments_Total(iCivID, CFG.game.getCiv(iCivID).iBudget)) - (int)CFG.game_NextTurnUpdate.getGoodsSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget);
       this.getMenuElement(8).setText("" + Math.abs(tempValue));
       this.getMenuElement(8).setMax(tempValue);
       tempValue = -((int)CFG.game_NextTurnUpdate.getExpensesIsVassal(iCivID));
@@ -699,10 +689,10 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
       Gdx.app.log("AoC", "" + tFValue);
       this.getMenuElement(11).setText("" + (tFValue > 0.0F ? "+" : "") + tFValue);
       this.getMenuElement(11).setMax(tFValue >= 0.0F ? 0 : (tFValue <= -0.8F ? 2 : 1));
-      this.getMenuElement(19).setCurrent(CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2 < 0 && CFG.game.getCiv(iCivID).getNumOfUnits() > 0 ? 100 : CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2));
+      this.getMenuElement(19).setCurrent(CFG.game.getCiv(iCivID).iBudget < 0 && CFG.game.getCiv(iCivID).getNumOfUnits() > 0 ? 100 : CFG.game_NextTurnUpdate.getMilitarySpendings(iCivID, CFG.game.getCiv(iCivID).iBudget));
       this.getMenuElement(13).setCurrent((int)(CFG.game.getCiv(iCivID).getSpendings_Goods() * 100.0F));
       this.getMenuElement(15).setCurrent((int)(CFG.game.getCiv(iCivID).getSpendings_Research() * 100.0F));
-      this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
+      this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
       this.getMenuElement(17).setCurrent((int)(CFG.game.getCiv(iCivID).getSpendings_Investments() * 100.0F));
       Menu_InGame.updateOverBudget();
    }
@@ -746,7 +736,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             }
             break;
          case 12:
-            CFG.toast.setInView(CFG.langManager.get("Budget") + ": " + CFG.getNumberWithSpaces("" + CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE);
+            CFG.toast.setInView(CFG.langManager.get("Budget") + ": " + CFG.getNumberWithSpaces("" + CFG.game.getCiv(iCivID).iBudget), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE);
             CFG.toast.setTimeInView(6000);
             break;
          case 13:
@@ -768,7 +758,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
             this.updateResearchAndIvestments();
             this.getMenuElement(13).setCurrent(this.getMenuElement(13).getCurrent());
             this.getMenuElement(17).setCurrent(this.getMenuElement(17).getCurrent());
-            this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
+            this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
             break;
          case 15:
             if (this.getMenuElement(15).getCurrent() + this.getMenuElement(19).getCurrent() + this.getMenuElement(13).getCurrent() > 200) {
@@ -781,7 +771,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
 
             this.updateResearchAndIvestments();
             this.getMenuElement(17).setCurrent(this.getMenuElement(17).getCurrent());
-            this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
+            this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
             break;
          case 17:
             if (this.getMenuElement(17).getCurrent() + this.getMenuElement(19).getCurrent() + this.getMenuElement(13).getCurrent() > 200) {
@@ -794,7 +784,7 @@ class Menu_InGame_FlagAction_Budget_Vassals extends SliderMenu {
 
             this.updateResearchAndIvestments();
             this.getMenuElement(17).setCurrent(this.getMenuElement(17).getCurrent());
-            this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(CFG.game.getCiv(iCivID).getPuppetOfCivID()).iBudget/2) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
+            this.getMenuElement(16).setMin((int)(CFG.game_NextTurnUpdate.getResearchSpendings(iCivID, CFG.game.getCiv(iCivID).iBudget) * (1.0F + CFG.game.getCiv(iCivID).getModifier_Research())));
       }
 
    }
