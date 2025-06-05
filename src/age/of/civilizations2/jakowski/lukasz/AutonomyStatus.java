@@ -9,7 +9,7 @@ class AutonomyStatus extends Object implements Serializable {
    private boolean militaryControl;
    private boolean economicControl;
    private boolean tradeType;
-   private double colorStatus;
+   private double colorRange;
    private int flagStatus;
    private int ageID;
    private int diploCost;
@@ -25,7 +25,7 @@ class AutonomyStatus extends Object implements Serializable {
       this.militaryControl = milControl;
       this.economicControl = ecoControl;
       this.tradeType = trading;
-      this.colorStatus = Math.max(Math.min(color, 2.0), -1.0);
+      this.colorRange = Math.max(Math.min(color, 2.0), -1.0);
       this.flagStatus = flagStat;
       this.ageID = age;
       this.diploCost = diplo * 10;
@@ -88,7 +88,7 @@ class AutonomyStatus extends Object implements Serializable {
       return this.tradeType;
    }
    protected final double getColorStatus() {
-      return this.colorStatus;
+      return this.colorRange;
    }
    protected final int getFlagStatus() {
       return this.flagStatus;

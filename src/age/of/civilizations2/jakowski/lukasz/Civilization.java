@@ -412,9 +412,13 @@ class Civilization {
     protected final void updateVassalCivilizationsColor() {
         //update vassal colors
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
-            if (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID) != null && CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2) continue;
-            //don't apply if dominion
-            CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus());
+            try {
+                //don't apply if dominion
+                if (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2.0) continue;
+                CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus());
+            } catch (NullPointerException exception) {
+                CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, CFG.gameAutonomy.getAutonomy(0).getColorStatus());
+            }
         }
     }
 
