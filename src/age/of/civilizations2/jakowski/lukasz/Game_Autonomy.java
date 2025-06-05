@@ -38,11 +38,11 @@ class Game_Autonomy
         }
         catch (final GdxRuntimeException ex) {
             Gdx.app.log("AoC2.5", "Vassal JSON not detected!");
-            this.lAutonomy.add(new AutonomyStatus(0,"DependantState", true, true, true, true, 1, 1, 0, 10, 3, 4));
-            this.lAutonomy.add(new AutonomyStatus(1,"DirectlyControlledZone", true, false, false, true, 1, 3, 1, 25, 1, 2));
-            this.lAutonomy.add(new AutonomyStatus(2,"AutonomousRegion", true, false, true, true, 3, 2, 0, 20, 1, 3));
-            this.lAutonomy.add(new AutonomyStatus(3,"ColonialMandate", true, true, false, false, 2, 1, 5, 16, 2, 4));
-            this.lAutonomy.add(new AutonomyStatus(4,"Dominion", false, true, true, false, 0, 1, 6, 10, 0, 4));
+            this.lAutonomy.add(new AutonomyStatus(0,"DependantState", true, true, true, true, 0.5, 1, 0, 10, 3, 4));
+            this.lAutonomy.add(new AutonomyStatus(1,"DirectlyControlledZone", true, false, false, true, 0.0, 3, 1, 25, 1, 2));
+            this.lAutonomy.add(new AutonomyStatus(2,"AutonomousRegion", true, false, true, true, 0.25, 2, 0, 20, 1, 3));
+            this.lAutonomy.add(new AutonomyStatus(3,"ColonialMandate", true, true, false, false, -0.25, 1, 5, 16, 2, 4));
+            this.lAutonomy.add(new AutonomyStatus(4,"Dominion", false, true, true, false, 2.0, 1, 6, 10, 0, 4));
         }
         for (AutonomyStatus autonomyStatus : this.lAutonomy) {
             autonomyStatus.setName(CFG.langManager.get(autonomyStatus.getName()));
@@ -108,7 +108,7 @@ class Game_Autonomy
         protected boolean CAN_CONTROL_MILITARY;
         protected boolean CAN_CONTROL_ECONOMY;
         protected boolean AUTO_ACCEPT_TRADE;
-        protected int COLOR_STATUS;
+        protected double COLOR_STATUS;
         protected int FLAG_STATUS;
         protected int AVAILABLE_SINCE_AGE_ID;
         protected int DIPLOMACY_COST;

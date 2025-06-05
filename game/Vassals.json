@@ -1,0 +1,86 @@
+{
+	Vassals: [
+		{
+			Name: "DependantState",
+			
+			AUTO_JOIN_WAR: true,
+			CAN_CONTROL_MILITARY: true,
+			CAN_CONTROL_ECONOMY: true,
+			AUTO_ACCEPT_TRADE: false,
+			COLOR_STATUS: 0.5,
+			FLAG_STATUS: 3,
+
+			AVAILABLE_SINCE_AGE_ID: 0,
+			DIPLOMACY_COST: 10,
+
+			PRECEDING: 3,
+			FOLLOWING: 4
+		},
+		{
+			Name: "DirectlyControlledZone",
+			
+			AUTO_JOIN_WAR: true,
+			CAN_CONTROL_MILITARY: false,
+			CAN_CONTROL_ECONOMY: false,
+			AUTO_ACCEPT_TRADE: true,
+			COLOR_STATUS: 0.0,
+			FLAG_STATUS: 1,
+
+			AVAILABLE_SINCE_AGE_ID: 1,
+			DIPLOMACY_COST: 17,
+
+			PRECEDING: 1,
+			FOLLOWING: 2
+		},
+		{
+			Name: "AutonomousRegion",
+			
+			AUTO_JOIN_WAR: true,
+			CAN_CONTROL_MILITARY: false,
+			CAN_CONTROL_ECONOMY: true,
+			AUTO_ACCEPT_TRADE: true,
+			COLOR_STATUS: 0.25,
+			FLAG_STATUS: 2,
+
+			AVAILABLE_SINCE_AGE_ID: 0,
+			DIPLOMACY_COST: 15,
+
+			PRECEDING: 1,
+			FOLLOWING: 3
+		},
+		{
+			Name: "ColonialMandate",
+			
+			AUTO_JOIN_WAR: true,
+			CAN_CONTROL_MILITARY: true,
+			CAN_CONTROL_ECONOMY: false,
+			AUTO_ACCEPT_TRADE: false,
+			COLOR_STATUS: -0.25,
+			FLAG_STATUS: 2,
+
+			AVAILABLE_SINCE_AGE_ID: 5,
+			DIPLOMACY_COST: 12,
+
+			PRECEDING: 2,
+			FOLLOWING: 4
+		},
+		{
+			Name: "Dominion",
+			
+			AUTO_JOIN_WAR: false,
+			CAN_CONTROL_MILITARY: true,
+			CAN_CONTROL_ECONOMY: true,
+			AUTO_ACCEPT_TRADE: false,
+			COLOR_STATUS: 2.0,
+			FLAG_STATUS: 3,
+
+			AVAILABLE_SINCE_AGE_ID: 6,
+			DIPLOMACY_COST: 10,
+
+			PRECEDING: 0,
+			FOLLOWING: 4
+		},
+	],
+	
+	Age_of_Civilizations: Autonomy
+}

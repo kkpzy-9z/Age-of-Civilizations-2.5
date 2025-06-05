@@ -9,7 +9,7 @@ class AutonomyStatus extends Object implements Serializable {
    private boolean militaryControl;
    private boolean economicControl;
    private boolean tradeType;
-   private int colorStatus;
+   private double colorStatus;
    private int flagStatus;
    private int ageID;
    private int diploCost;
@@ -17,7 +17,7 @@ class AutonomyStatus extends Object implements Serializable {
    private int preIndex;
    private int afterIndex;
 
-   protected AutonomyStatus(int index, String sName, boolean joinWar, boolean milControl, boolean ecoControl, boolean trading, int color, int flagStat, int age, int diplo, int precede, int follow) {
+   protected AutonomyStatus(int index, String sName, boolean joinWar, boolean milControl, boolean ecoControl, boolean trading, double color, int flagStat, int age, int diplo, int precede, int follow) {
       this.index = index;
 
       this.sName = sName;
@@ -25,7 +25,7 @@ class AutonomyStatus extends Object implements Serializable {
       this.militaryControl = milControl;
       this.economicControl = ecoControl;
       this.tradeType = trading;
-      this.colorStatus = color;
+      this.colorStatus = Math.max(Math.min(color, 2.0), -1.0);
       this.flagStatus = flagStat;
       this.ageID = age;
       this.diploCost = diplo * 10;
@@ -87,7 +87,7 @@ class AutonomyStatus extends Object implements Serializable {
    protected final boolean isTradeIntegration() {
       return this.tradeType;
    }
-   protected final int getColorStatus() {
+   protected final double getColorStatus() {
       return this.colorStatus;
    }
    protected final int getFlagStatus() {

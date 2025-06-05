@@ -393,30 +393,14 @@ class Civilization {
         this.iCivRegionsSize = 0;
     }
 
-    protected final void updateCivilizationColor(final int iR, final int iG, final int iB, final int amount) {
-        switch (amount) {
-            case 0: {
-                this.civGameData.iR = (short) iR;
-                this.civGameData.iG = (short) iG;
-                this.civGameData.iB = (short) iB;
-                break;
-            }
-            case 1: {
-                this.civGameData.iR = (short) (iR / 1.2);
-                this.civGameData.iG = (short) (iG / 1.2);
-                this.civGameData.iB = (short) (iB / 1.2);
-                break;
-            }
-            case 2: {
-                this.civGameData.iR = (short) (iR / 1.6);
-                this.civGameData.iG = (short) (iG / 1.6);
-                this.civGameData.iB = (short) (iB / 1.6);
-                break;
-            }
-            default: {
-                CFG.palletManager.loadCivilizationStandardColor(this.iCivID);
-                break;
-            }
+    private final double COLOR_SCALE_FACTOR = 95.625;
+    protected final void updateCivilizationColor(final int iR, final int iG, final int iB, final double scale) {
+        if (scale == 2.0) {
+            CFG.palletManager.loadCivilizationStandardColor(this.iCivID);
+        } else {
+            this.civGameData.iR = (short) (iR + (scale * COLOR_SCALE_FACTOR));
+            this.civGameData.iG = (short) (iG + (scale * COLOR_SCALE_FACTOR));
+            this.civGameData.iB = (short) (iB + (scale * COLOR_SCALE_FACTOR));
         }
 
         //clear civtag, change ideology
