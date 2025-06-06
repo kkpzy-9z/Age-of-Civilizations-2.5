@@ -49,6 +49,10 @@ class PeaceTreaty_Data
       this.prepareDemansVassalsData();
    }
 
+   protected static boolean isPlayerInvolved() {
+      return ((CFG.PLAYER_PEACE || CFG.SPECTATOR_MODE) && (CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY));
+   }
+
    protected PeaceTreaty_Data(final int iWarID, final boolean scoreCountDefenders) {
       super();
       this.peaceTreatyGameData = new PeaceTreaty_GameData();
@@ -113,7 +117,7 @@ class PeaceTreaty_Data
             Gdx.app.log("AoC", "AI_UseVictoryPoints -> iBestCivID: " + iBestCivID + ((iBestCivID >= 0) ? (", " + CFG.game.getCiv(iBestCivID).getCivName()) : "") + ", tBestPoints: " + tBestPoints);
             //if optimal civ to take optimal province, and civ both not controlled by player, make AI choose provinces
             //if player led peace conferences, don't let AI take provinces change//
-            if (iBestCivID > 0 && tBestPoints > 0 && !CFG.game.getCiv(iBestCivID).getControlledByPlayer() && (!CFG.PLAYER_PEACE && !(CFG.SPECTATOR_MODE && CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY))) {
+            if (iBestCivID > 0 && tBestPoints > 0 && !CFG.game.getCiv(iBestCivID).getControlledByPlayer() && (!isPlayerInvolved())) {
                Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE");
                this.AI_UseVictoryPoints_CivID(iBestCivID, tBestPoints);
             }
@@ -368,7 +372,7 @@ class PeaceTreaty_Data
          this.iPlayerTurnID = CFG.PLAYER_TURNID;
 
          //give unlimited warscore and skip player addition
-         if (CFG.PLAYER_PEACE || (CFG.SPECTATOR_MODE && CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY)) {
+         if (isPlayerInvolved()) {
             //if player-led peace, give player infinite points on both sides
             //this.peaceTreatyGameData.lCivsData_Defenders.add(new PeaceTreaty_Civs(iBrushCivID));
             //this.peaceTreatyGameData.lCivsDemands_Defenders.add(new PeaceTreaty_Demands(iBrushCivID, 999999));
@@ -460,7 +464,7 @@ class PeaceTreaty_Data
          }
       }
       //add all provinces to be taken
-      if (CFG.PLAYER_PEACE || (CFG.SPECTATOR_MODE && CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY)) {
+      if (isPlayerInvolved()) {
          try {
             for (int i = this.peaceTreatyGameData.lCivsData_Defenders.size() - 1; i >= 0; --i) {
                //this.peaceTreatyGameData.lCivsData_Defenders.get(i).lProvincesLost.clear();

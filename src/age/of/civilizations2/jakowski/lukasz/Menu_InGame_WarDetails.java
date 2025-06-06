@@ -435,20 +435,18 @@ class Menu_InGame_WarDetails extends SliderMenu {
             }
 
             protected void actionElement(int iID) {
-               if (CFG.SPECTATOR_MODE) {
+               if (CFG.PLAYER_PEACE || CFG.SPECTATOR_MODE) {
                   CFG.sandbox_task = Menu.eINGAME_PEACE_TREATY;
                }
 
-               //if (!CFG.SPECTATOR_MODE) {
-                  CFG.game.getPlayer(CFG.PLAYER_TURNID).iBefore_ActiveProvince = CFG.game.getActiveProvinceID();
-                  CFG.game.getPlayer(CFG.PLAYER_TURNID).iACTIVE_VIEW_MODE = CFG.viewsManager.getActiveViewID();
-                  CFG.viewsManager.disableAllViews();
-                  Menu_PeaceTreaty.WAR_ID = Menu_InGame_WarDetails.WAR_ID;
-                  CFG.peaceTreatyData = new PeaceTreaty_Data(Menu_PeaceTreaty.WAR_ID, CFG.game.getWar(Menu_InGame_WarDetails.WAR_ID).getIsAggressor(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()));
-                  CFG.game.resetChooseProvinceData_Immediately();
-                  CFG.game.resetRegroupArmyData();
-                  CFG.menuManager.setViewID(Menu.eINGAME_PEACE_TREATY);
-               //}
+               CFG.game.getPlayer(CFG.PLAYER_TURNID).iBefore_ActiveProvince = CFG.game.getActiveProvinceID();
+               CFG.game.getPlayer(CFG.PLAYER_TURNID).iACTIVE_VIEW_MODE = CFG.viewsManager.getActiveViewID();
+               CFG.viewsManager.disableAllViews();
+               Menu_PeaceTreaty.WAR_ID = Menu_InGame_WarDetails.WAR_ID;
+               CFG.peaceTreatyData = new PeaceTreaty_Data(Menu_PeaceTreaty.WAR_ID, CFG.game.getWar(Menu_InGame_WarDetails.WAR_ID).getIsAggressor(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()));
+               CFG.game.resetChooseProvinceData_Immediately();
+               CFG.game.resetRegroupArmyData();
+               CFG.menuManager.setViewID(Menu.eINGAME_PEACE_TREATY);
             }
 
             protected int getSFX() {

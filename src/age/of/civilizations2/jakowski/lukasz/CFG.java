@@ -4674,7 +4674,7 @@ class CFG {
                     return;
                 case SEND_DEMANDS:
                     //if spec mode, auto accept with forced
-                    if (CFG.PLAYER_PEACE || (CFG.SPECTATOR_MODE && CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY)) {
+                    if ((CFG.PLAYER_PEACE || CFG.SPECTATOR_MODE) && CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY) {
                         CFG.game.lPeaceTreaties.add(new PeaceTreaty_GameData_MessageData(peaceTreatyData.peaceTreatyGameData));
                         DiplomacyManager.acceptPeaceTreaty(game.getPlayer(PLAYER_TURNID).getCivID(), CFG.game.lPeaceTreaties.get(CFG.game.lPeaceTreaties.size() - 1).PEACE_TREATY_TAG, true);
                         CFG.sandbox_task = null;

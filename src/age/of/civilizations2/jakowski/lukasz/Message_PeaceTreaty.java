@@ -60,6 +60,7 @@ class Message_PeaceTreaty extends Message
             final ArrayList<Integer> topPrestige = CFG.oAI.getAI_Style(CFG.game.getCiv(iCivID).getAI_Style()).getTopPrestige();
             if (CFG.PLAYER_PEACE && (CFG.getMetCiv(iCivID) || CFG.getMetCiv(iSenderID)) && (topPrestige.indexOf(iCivID) < 12 || topPrestige.indexOf(iSenderID) < 12) && (!CFG.menuManager.getInGame_PeaceTreaty() || !CFG.menuManager.getInGame_PeaceTreaty_Response())) {
                 topPrestige.clear();
+                CFG.sandbox_task = Menu.eINGAME_PEACE_TREATY;
 
                 CFG.game.getPlayer(CFG.PLAYER_TURNID).iBefore_ActiveProvince = CFG.game.getActiveProvinceID();
                 CFG.game.getPlayer(CFG.PLAYER_TURNID).iACTIVE_VIEW_MODE = CFG.viewsManager.getActiveViewID();

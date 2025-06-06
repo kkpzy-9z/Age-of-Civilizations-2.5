@@ -395,7 +395,7 @@ class Civilization {
 
     private final double COLOR_SCALE_FACTOR = 95.625;
     protected final void updateCivilizationColor(final int iR, final int iG, final int iB, final double scale) {
-        if (scale == 2.0) {
+        if (scale >= 2.0) {
             CFG.palletManager.loadCivilizationStandardColor(this.iCivID);
         } else {
             this.civGameData.iR = (short) (iR + (scale * COLOR_SCALE_FACTOR));
@@ -414,7 +414,7 @@ class Civilization {
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
             try {
                 //don't apply if dominion
-                if (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2.0) continue;
+                if (this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus() >= 2.0) continue;
                 CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus());
             } catch (NullPointerException exception) {
                 CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, CFG.gameAutonomy.getAutonomy(0).getColorStatus());
@@ -426,7 +426,7 @@ class Civilization {
     protected final void updateCivilizationIdeology(String nCivTag, int iR, int iG, int iB) {
         this.setCivTag(nCivTag);
         //if not puppet, or puppet but color more than 2, change
-        if (!this.getIsPupet() || (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() > 2)) {
+        if (!this.getIsPupet() || (CFG.game.getCiv(this.civGameData.iPuppetOfCivID).getVassal_AutonomyStatus(this.iCivID).getColorStatus() >= 2.0)) {
             this.civGameData.iR = (short) iR;
             this.civGameData.iG = (short) iG;
             this.civGameData.iB = (short) iB;

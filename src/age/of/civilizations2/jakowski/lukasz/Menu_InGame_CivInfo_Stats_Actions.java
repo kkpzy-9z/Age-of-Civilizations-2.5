@@ -241,6 +241,9 @@ class Menu_InGame_CivInfo_Stats_Actions extends SliderMenu {
             protected void actionElement(int iID) {
                int nWarID = CFG.game.getWarID(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), CFG.getActiveCivInfo());
                if (nWarID >= 0) {
+                  if (CFG.PLAYER_PEACE || CFG.SPECTATOR_MODE) {
+                     CFG.sandbox_task = Menu.eINGAME_PEACE_TREATY;
+                  }
                   CFG.game.getPlayer(CFG.PLAYER_TURNID).iBefore_ActiveProvince = CFG.game.getActiveProvinceID();
                   CFG.game.getPlayer(CFG.PLAYER_TURNID).iACTIVE_VIEW_MODE = CFG.viewsManager.getActiveViewID();
                   CFG.viewsManager.disableAllViews();
