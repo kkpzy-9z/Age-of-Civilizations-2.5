@@ -710,14 +710,9 @@ class Game_NextTurnUpdate
         try {
             CFG.game.getProvince(CFG.game.getCiv(nCivID).getCapitalProvinceID()).getCity(0).setCityLevel(CFG.getEditorCityLevel(0));
         }
-        catch (final IndexOutOfBoundsException ex) {
+        catch (final IndexOutOfBoundsException | NullPointerException ex) {
             if (CFG.LOGS) {
                 CFG.exceptionStack(ex);
-            }
-        }
-        catch (final NullPointerException ex2) {
-            if (CFG.LOGS) {
-                CFG.exceptionStack(ex2);
             }
         }
     }

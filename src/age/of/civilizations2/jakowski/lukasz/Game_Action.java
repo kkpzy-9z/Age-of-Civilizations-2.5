@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class Game_Action {
    private TurnStates activeTurnAction;
@@ -289,9 +290,8 @@ class Game_Action {
    }
 
    protected final void updateIsSupplied() {
-      int i;
       try {
-         for(i = 1; i < CFG.game.getCivsSize(); ++i) {
+         for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
             if (CFG.game.getCiv(i).getNumOfProvinces() > 0) {
                for(int j = 0; j < CFG.game.getCiv(i).getCivRegionsSize(); ++j) {
                   if (!CFG.game.getCiv(i).getCivRegion(j).setIsSupplied(CFG.game.getCiv(i).getCivRegion(j).getSeaAccess() || CFG.game.getCiv(i).getCivRegion(j).getHaveNotOccupiedProvince())) {
@@ -323,7 +323,7 @@ class Game_Action {
       } catch (IndexOutOfBoundsException var6) {
       }
 
-      for(i = 0; i < CFG.game.getProvincesSize(); ++i) {
+      for(int i = 0; i < CFG.game.getProvincesSize(); ++i) {
          if (!CFG.game.getProvince(i).getSeaProvince() && CFG.game.getProvince(i).getWasteland() < 0 && CFG.game.getProvince(i).getCivID() > 0) {
             CFG.game.getProvince(i).updateIsNotSuppliedForXTurns();
             CFG.game.getProvince(i).updateDefensivePosition();
@@ -347,15 +347,14 @@ class Game_Action {
       float tHappiness = 0.0F;
       CFG.game.getCiv(nCivID).lProvincesWithLowHappiness.clear();
 
-      int i;
-      for(i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
+      for(int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
          tHappiness += CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getHappiness();
          if (CFG.game.getCiv(nCivID).civGameData.civPersonality.MIN_PROVINCE_HAPPINESS_RUN_FESTIVAL > CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getHappiness()) {
             CFG.game.getCiv(nCivID).lProvincesWithLowHappiness.add(CFG.game.getCiv(nCivID).getProvinceID(i));
          }
       }
 
-      for(i = CFG.game.getCiv(nCivID).lProvincesWithLowHappiness.size() - 1; i >= 0; --i) {
+      for(int i = CFG.game.getCiv(nCivID).lProvincesWithLowHappiness.size() - 1; i >= 0; --i) {
          if (CFG.game.getCiv(nCivID).isFestivalOrganized((Integer)CFG.game.getCiv(nCivID).lProvincesWithLowHappiness.get(i))) {
             CFG.game.getCiv(nCivID).lProvincesWithLowHappiness.remove(i);
          }
@@ -775,9 +774,8 @@ class Game_Action {
                lNumOfVotes.add(0);
             }
 
-            int i;
             for(maxVotes = 0; maxVotes < CFG.holyRomanEmpire_Manager.getHRE().getElectorsSize(); ++maxVotes) {
-               for(i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getPrincesSize(); ++i) {
+               for(int i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getPrincesSize(); ++i) {
                   if (CFG.holyRomanEmpire_Manager.getHRE().getPrince(i) == (Integer)CFG.holyRomanEmpire_Manager.getHRE().lVotesFor.get(maxVotes)) {
                      lNumOfVotes.set(i, (Integer)lNumOfVotes.get(i) + 1);
                      break;
@@ -787,7 +785,7 @@ class Game_Action {
 
             maxVotes = 0;
 
-            for(i = 0; i < lNumOfVotes.size(); ++i) {
+            for(int i = 0; i < lNumOfVotes.size(); ++i) {
                if ((Integer)lNumOfVotes.get(i) > maxVotes) {
                   maxVotes = (Integer)lNumOfVotes.get(i);
                }
@@ -795,7 +793,7 @@ class Game_Action {
 
             ArrayList<Integer> nCivsWithMaxVotes = new ArrayList<Integer>();
 
-            for(i = 0; i < lNumOfVotes.size(); ++i) {
+            for(int i = 0; i < lNumOfVotes.size(); ++i) {
                if ((Integer)lNumOfVotes.get(i) == maxVotes) {
                   nCivsWithMaxVotes.add(i);
                }
@@ -822,7 +820,7 @@ class Game_Action {
                   if (!emperorVoted) {
                      tBest = 0;
 
-                     for(i = tBest + 1; i < nCivsWithMaxVotes.size(); ++i) {
+                     for(int i = tBest + 1; i < nCivsWithMaxVotes.size(); ++i) {
                         if (CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince((Integer)nCivsWithMaxVotes.get(tBest))).countPopulation() < CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince((Integer)nCivsWithMaxVotes.get(i))).countPopulation()) {
                            tBest = i;
                         }
@@ -838,7 +836,7 @@ class Game_Action {
                }
             }
 
-            for(i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getPrincesSize(); ++i) {
+            for(int i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getPrincesSize(); ++i) {
                if (CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince(i)).getControlledByPlayer()) {
                   CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince(i)).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_HRE_Elections_NewEmperor(CFG.holyRomanEmpire_Manager.getHRE().getEmperor()));
                }
@@ -874,8 +872,7 @@ class Game_Action {
       nMaxProvinces = 1;
       int nMaxScore = 1;
 
-      int i;
-      for(i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getPrincesSize(); ++i) {
+      for(int i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getPrincesSize(); ++i) {
          if (nMaxProvinces < CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince(i)).getNumOfProvinces()) {
             nMaxProvinces = CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince(i)).getNumOfProvinces();
          }
@@ -886,7 +883,7 @@ class Game_Action {
       }
 
       try {
-         for(i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getElectorsSize(); ++i) {
+         for(int i = 0; i < CFG.holyRomanEmpire_Manager.getHRE().getElectorsSize(); ++i) {
             if (!CFG.game.getCiv(CFG.holyRomanEmpire_Manager.getHRE().getPrince(CFG.holyRomanEmpire_Manager.getHRE().getElector(i))).getControlledByPlayer()) {
                ArrayList<Float> tempScores = new ArrayList<Float>();
                int tBestID;
@@ -1111,12 +1108,11 @@ class Game_Action {
 
    }
 
-   protected final void rebels_DeclareIndependence_Civ(int nCivID, int declareCivID, List joinProvinces, boolean newCivilization) {
+   protected final void rebels_DeclareIndependence_Civ(int nCivID, int declareCivID, List<Integer> joinProvinces, boolean newCivilization) {
       try {
          boolean updateCapital = true;
-         int i;
          if (CFG.game.getCiv(declareCivID).getCapitalProvinceID() >= 0) {
-            for(i = 0; i < joinProvinces.size(); ++i) {
+            for(int i = 0; i < joinProvinces.size(); ++i) {
                if ((Integer)joinProvinces.get(i) == CFG.game.getCiv(declareCivID).getCapitalProvinceID()) {
                   updateCapital = false;
                   break;
@@ -1124,20 +1120,17 @@ class Game_Action {
             }
          }
 
-         int j;
          if (updateCapital) {
-            i = 0;
-
-            for(j = 1; j < joinProvinces.size(); ++j) {
-               if (CFG.game.getProvince((Integer)joinProvinces.get(j)).getPopulationData().getPopulationOfCivID(declareCivID) > CFG.game.getProvince((Integer)joinProvinces.get(i)).getPopulationData().getPopulationOfCivID(declareCivID)) {
-                  i = j;
+            int newCapital = 0;
+            for (int j = 1; j < joinProvinces.size(); ++j) {
+               if (CFG.game.getProvince(joinProvinces.get(j)).getPopulationData().getPopulationOfCivID(declareCivID) > CFG.game.getProvince(joinProvinces.get(newCapital)).getPopulationData().getPopulationOfCivID(declareCivID)) {
+                  newCapital = j;
                }
             }
-
-            CFG.game.getCiv(declareCivID).setCapitalProvinceID((Integer)joinProvinces.get(i));
+            CFG.game.getCiv(declareCivID).setCapitalProvinceID(joinProvinces.get(newCapital));
          }
 
-         for(i = 0; i < CFG.game.getCivsSize(); ++i) {
+         for(int i = 0; i < CFG.game.getCivsSize(); ++i) {
             if (i != nCivID && CFG.game.getCivsAtWar(i, nCivID)) {
                CFG.game.whitePeace(nCivID, i);
                CFG.game.getCiv(i).civGameData.civilization_Diplomacy_GameData.messageBox.addMessage(new Message_DeclarationOfIndependence(declareCivID, CFG.game.getCiv(declareCivID).getCapitalProvinceID()));
@@ -1146,7 +1139,7 @@ class Game_Action {
 
          int tempPop;
          if (joinProvinces.size() > 1) {
-            for(i = joinProvinces.size() - 1; i >= 0; --i) {
+            for(int i = joinProvinces.size() - 1; i >= 0; --i) {
                boolean removeNotConnected = (Integer)joinProvinces.get(i) != CFG.game.getCiv(declareCivID).getCapitalProvinceID();
                if (removeNotConnected) {
                   for(tempPop = 0; tempPop < CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvincesSize(); ++tempPop) {
@@ -1166,7 +1159,7 @@ class Game_Action {
          }
 
          int tempPopCiv;
-         for(i = 0; i < joinProvinces.size(); ++i) {
+         for(int i = 0; i < joinProvinces.size(); ++i) {
             CFG.game.getProvince((Integer)joinProvinces.get(i)).setTrueOwnerOfProvince(declareCivID);
             if (CFG.game.getProvince((Integer)joinProvinces.get(i)).getCivID() != declareCivID) {
                CFG.game.getProvince((Integer)joinProvinces.get(i)).setCivID(declareCivID, false, true);
@@ -1179,7 +1172,7 @@ class Game_Action {
             }
 
             if (newCivilization) {
-               j = 0;
+               int j = 0;
 
                try {
                   for(tempPop = CFG.game.getProvince((Integer)joinProvinces.get(i)).getPopulationData().getNationalitiesSize() - 1; i >= 0; --tempPop) {
@@ -1203,13 +1196,13 @@ class Game_Action {
             }
          }
 
-         for(i = 0; i < CFG.game.getCiv(declareCivID).getNumOfProvinces(); ++i) {
+         for(int i = 0; i < CFG.game.getCiv(declareCivID).getNumOfProvinces(); ++i) {
             CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).updateDrawArmy();
             if (!CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).getCore().getHaveACore(declareCivID)) {
                CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).getCore().addNewCore(declareCivID, Game_Calendar.TURN_ID);
             }
 
-            for(j = CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).getPopulationData().getNationalitiesSize() - 1; j >= 0; --j) {
+            for(int j = CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).getPopulationData().getNationalitiesSize() - 1; j >= 0; --j) {
                tempPop = CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).getPopulationData().getPopulationOfCivID(j);
                tempPopCiv = CFG.game.getProvince(CFG.game.getCiv(declareCivID).getProvinceID(i)).getPopulationData().getCivID(j);
                int tRand = (int)Math.floor((double)(0.0625F + (float)CFG.oR.nextInt(63) / 100.0F * (float)tempPop));
@@ -1221,9 +1214,9 @@ class Game_Action {
          }
 
          if (CFG.FOG_OF_WAR == 2) {
-            for(i = 0; i < CFG.game.getPlayersSize(); ++i) {
-               for(j = 0; j < CFG.game.getCiv(declareCivID).getNumOfProvinces(); ++j) {
-                  if (CFG.game.getPlayer(i).getMetProvince(CFG.game.getCiv(declareCivID).getProvinceID(j))) {
+            for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+               for (int l = 0; l < CFG.game.getCiv(declareCivID).getNumOfProvinces(); ++l) {
+                  if (CFG.game.getPlayer(i).getMetProvince(CFG.game.getCiv(declareCivID).getProvinceID(l))) {
                      CFG.game.getPlayer(i).setMetCivilization(declareCivID, true);
                      break;
                   }
@@ -1262,8 +1255,7 @@ class Game_Action {
             overMin.clear();
             numOfTrueOwnerProvinces = 0;
 
-            int j;
-            for(j = 0; j < CFG.game.getCiv(i).getNumOfProvinces(); ++j) {
+            for(int j = 0; j < CFG.game.getCiv(i).getNumOfProvinces(); ++j) {
                if (CFG.game.getProvince(CFG.game.getCiv(i).getProvinceID(j)).getCivID() == CFG.game.getProvince(CFG.game.getCiv(i).getProvinceID(j)).getTrueOwnerOfProvince()) {
                   ++numOfTrueOwnerProvinces;
                   if (CFG.game.getProvince(CFG.game.getCiv(i).getProvinceID(j)).getRevolutionaryRisk() > 0.16F && !CFG.game.getProvince(CFG.game.getCiv(i).getProvinceID(j)).getIsCapital()) {
@@ -1281,7 +1273,7 @@ class Game_Action {
             }
 
             if (tempPossibleUprising.size() == 0 && tempPossibleUprising_CheckSuggest.size() > 0) {
-               for(j = tempPossibleUprising_CheckSuggest.size() - 1; j >= 0; --j) {
+               for(int j = tempPossibleUprising_CheckSuggest.size() - 1; j >= 0; --j) {
                   try {
                      FileHandle file = Gdx.files.internal("map/" + CFG.map.getFile_ActiveMap_Path() + "suggested_owners/" + tempPossibleUprising_CheckSuggest.get(j));
                      String sOwners = file.readString();
@@ -1329,15 +1321,14 @@ class Game_Action {
       return CFG.game.getProvince(nProvinceID).getRevolutionaryRisk() * (1.0F + (float)CFG.game.getProvince(nProvinceID).getCore().getCivsSize() / 10.0F) - (float)CFG.game.getProvinceArmy(nProvinceID) / (float)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation() * 50.0F;
    }
 
-   protected final void spawnRevolution(int nCivID, List nProvinces, List nOverMin, int numOfTrueOwnerProvinces) {
+   protected final void spawnRevolution(int nCivID, List nProvinces, List<Integer> nOverMin, int numOfTrueOwnerProvinces) {
       Gdx.app.log("AoC", "GA -> spawnRevolution: BEGIN: " + CFG.game.getCiv(nCivID).getCivName());
       ArrayList<Integer> tempSorted = new ArrayList<Integer>();
 
-      int revoltCivID;
       while(nProvinces.size() > 0) {
          int tBest = 0;
 
-         for(revoltCivID = nProvinces.size() - 1; revoltCivID > 0; --revoltCivID) {
+         for(int revoltCivID = nProvinces.size() - 1; revoltCivID > 0; --revoltCivID) {
             if (CFG.game.getProvince((Integer)nProvinces.get(revoltCivID)).getRevolutionaryRisk() > CFG.game.getProvince((Integer)nProvinces.get(tBest)).getRevolutionaryRisk()) {
                tBest = revoltCivID;
             }
@@ -1348,10 +1339,7 @@ class Game_Action {
       }
 
       Gdx.app.log("AoC", "GA -> spawnRevolution: 000");
-      int i;
       int numOfRevoltProvincesMax;
-      int a;
-      int nRand;
       int theBestProvinceID;
       int theBestConnections;
       if ((float)numOfTrueOwnerProvinces * 0.63F < (float)nOverMin.size() && CFG.oR.nextInt(1000) < 47) {
@@ -1360,7 +1348,7 @@ class Game_Action {
          ArrayList<Integer> possibleCivsExisting = new ArrayList<Integer>();
 
          boolean wasAdded;
-         for(i = 0; i < CFG.ideologiesManager.getIdeologiesSize(); ++i) {
+         for(int i = 0; i < CFG.ideologiesManager.getIdeologiesSize(); ++i) {
             if (CFG.ideologiesManager.getIdeology(i).CAN_BECOME_CIVILIZED < 0 && !CFG.ideologiesManager.getIdeology(i).REVOLUTIONARY && Game_Calendar.CURRENT_AGEID >= CFG.ideologiesManager.getIdeology(i).AVAILABLE_SINCE_AGE_ID) {
                String tempTag = CFG.ideologiesManager.getRealTag(CFG.game.getCiv(nCivID).getCivTag()) + CFG.ideologiesManager.getIdeology(i).getExtraTag();
                wasAdded = CFG.game.getCiv(nCivID).getCivTag().equals(tempTag);
@@ -1421,14 +1409,14 @@ class Game_Action {
             numOfRevoltProvincesMax = (int)((float)theBestConnections * (0.3F + (float)CFG.oR.nextInt(25) / 100.0F));
             if (numOfRevoltProvincesMax > 0 && allProvincesSorted.size() > 0) {
                Gdx.app.log("AoC", "GA -> spawnRevolution: 666");
-               a = (Integer)allProvincesSorted.get(CFG.oR.nextInt(allProvincesSorted.size()));
+               int a = (Integer)allProvincesSorted.get(CFG.oR.nextInt(allProvincesSorted.size()));
                revoltProvinces.add(a);
                Gdx.app.log("AoC", "GA -> spawnRevolution: 777");
                int nRebelsCivID;
                if (numOfRevoltProvincesMax > revoltProvinces.size()) {
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 888");
 
-                  for(i = 0; i < CFG.game.getProvince(a).getNeighboringProvincesSize(); ++i) {
+                  for(int i = 0; i < CFG.game.getProvince(a).getNeighboringProvincesSize(); ++i) {
                      if (CFG.game.getProvince(CFG.game.getProvince(a).getNeighboringProvinces(i)).getCivID() == nCivID && CFG.game.getProvince(CFG.game.getProvince(a).getNeighboringProvinces(i)).getCivID() == CFG.game.getProvince(CFG.game.getProvince(a).getNeighboringProvinces(i)).getTrueOwnerOfProvince() && !CFG.game.getProvince(CFG.game.getProvince(a).getNeighboringProvinces(i)).getIsCapital() && CFG.game.getProvince(CFG.game.getProvince(a).getNeighboringProvinces(i)).getRevolutionaryRisk() > 0.16F) {
                         revoltProvinces.add(CFG.game.getProvince(a).getNeighboringProvinces(i));
                         if (numOfRevoltProvincesMax <= revoltProvinces.size()) {
@@ -1440,52 +1428,38 @@ class Game_Action {
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 999");
                   if (numOfRevoltProvincesMax > revoltProvinces.size()) {
                      Gdx.app.log("AoC", "GA -> spawnRevolution: 10");
-                     i = allProvincesSorted.size() - 1;
-
-                     while(true) {
-                        if (i < 0) {
-                           Gdx.app.log("AoC", "GA -> spawnRevolution: 11");
-
-                           while(numOfRevoltProvincesMax > revoltProvinces.size() && allProvincesSorted.size() > 0) {
-                              i = 0;
-                              nRand = 0;
-
-                              while(i++ < 8) {
-                                 nRand = CFG.oR.nextInt(allProvincesSorted.size());
-                                 boolean endRand = false;
-
-                                 for(int o = revoltProvinces.size() - 1; o >= 0; --o) {
-                                    for(nRebelsCivID = 0; nRebelsCivID < CFG.game.getProvince((Integer)allProvincesSorted.get(nRand)).getNeighboringProvincesSize(); ++nRebelsCivID) {
-                                       if (CFG.game.getProvince((Integer)allProvincesSorted.get(nRand)).getNeighboringProvinces(nRebelsCivID) == (Integer)revoltProvinces.get(o)) {
-                                          endRand = true;
-                                          o = -1;
-                                          break;
-                                       }
-                                    }
-                                 }
-
-                                 if (endRand) {
-                                    break;
-                                 }
-                              }
-
-                              revoltProvinces.add((Integer)allProvincesSorted.get(nRand));
-                              allProvincesSorted.remove(nRand);
-                           }
-
-                           Gdx.app.log("AoC", "GA -> spawnRevolution: 12");
-                           break;
-                        }
-
-                        for(nRand = revoltProvinces.size() - 1; nRand >= 0; --nRand) {
-                           if (allProvincesSorted.get(i) == revoltProvinces.get(nRand)) {
-                              allProvincesSorted.remove(i);
+                     for (int i2 = allProvincesSorted.size() - 1; i2 >= 0; --i2) {
+                        for (int j3 = revoltProvinces.size() - 1; j3 >= 0; --j3) {
+                           if (Objects.equals(allProvincesSorted.get(i2), revoltProvinces.get(j3))) {
+                              allProvincesSorted.remove(i2);
                               break;
                            }
                         }
-
-                        --i;
                      }
+                     Gdx.app.log("AoC", "GA -> spawnRevolution: 11");
+                     while (numOfRevoltProvincesMax > revoltProvinces.size() && !allProvincesSorted.isEmpty()) {
+                        int counter = 0;
+                        int nRand = 0;
+                        while (counter++ < 8) {
+                           nRand = CFG.oR.nextInt(allProvincesSorted.size());
+                           boolean endRand = false;
+                           for (int o = revoltProvinces.size() - 1; o >= 0; --o) {
+                              for (int p = 0; p < CFG.game.getProvince(allProvincesSorted.get(nRand)).getNeighboringProvincesSize(); ++p) {
+                                 if (CFG.game.getProvince(allProvincesSorted.get(nRand)).getNeighboringProvinces(p) == revoltProvinces.get(o)) {
+                                    endRand = true;
+                                    o = -1;
+                                    break;
+                                 }
+                              }
+                           }
+                           if (endRand) {
+                              break;
+                           }
+                        }
+                        revoltProvinces.add(allProvincesSorted.get(nRand));
+                        allProvincesSorted.remove(nRand);
+                     }
+                     Gdx.app.log("AoC", "GA -> spawnRevolution: 12");
                   }
                }
 
@@ -1494,38 +1468,35 @@ class Game_Action {
                if (revoltProvinces.size() > 0) {
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 14");
                   String nRevTag = "";
-                  ArrayList<Province_Army> tempArmies = new ArrayList<Province_Army>();
-                  ArrayList<Integer> tempArmiesProvinces = new ArrayList<Integer>();
-                  if (possibleCivsExisting.size() <= 0 || CFG.oR.nextInt(10) >= 5 && possibleIdeologies.size() != 0) {
-                     if (possibleIdeologies.size() > 0) {
-                        Gdx.app.log("AoC", "GA -> spawnRevolution: 17");
-                        nRevTag = CFG.ideologiesManager.getRealTag(CFG.game.getCiv(nCivID).getCivTag()) + CFG.ideologiesManager.getIdeology((Integer)possibleIdeologies.get(CFG.oR.nextInt(possibleIdeologies.size()))).getExtraTag();
-                        if (CFG.game.getProvince((Integer)revoltProvinces.get(0)).getArmy(0) > 0) {
-                           tempArmies.add(new Province_Army(nCivID, CFG.game.getProvince((Integer)revoltProvinces.get(0)).getArmy(0), (Integer)revoltProvinces.get(0)));
-                           tempArmiesProvinces.add((Integer)revoltProvinces.get(0));
-                        }
-
-                        CFG.game.createScenarioAddCivilization(nRevTag, (Integer)revoltProvinces.get(0), false, false, true);
-                        spawnedCivWithDifferentGovernment = true;
-                        Gdx.app.log("AoC", "GA -> spawnRevolution: 18");
-                     }
-                  } else {
+                  final List<Province_Army> tempArmies = new ArrayList<Province_Army>();
+                  final List<Integer> tempArmiesProvinces = new ArrayList<Integer>();
+                  if (possibleCivsExisting.size() > 0 && (CFG.oR.nextInt(10) < 5 || possibleIdeologies.size() == 0)) {
                      Gdx.app.log("AoC", "GA -> spawnRevolution: 15");
-                     nRebelsCivID = CFG.oR.nextInt(possibleCivsExisting.size());
-                     nRevTag = CFG.game.getCiv((Integer)possibleCivsExisting.get(nRebelsCivID)).getCivTag();
-                     CFG.game.getCiv((Integer)possibleCivsExisting.get(nRebelsCivID)).setCapitalProvinceID((Integer)revoltProvinces.get(0));
-                     if (CFG.game.getProvince((Integer)revoltProvinces.get(0)).getArmy(0) > 0) {
-                        tempArmies.add(new Province_Army(nCivID, CFG.game.getProvince((Integer)revoltProvinces.get(0)).getArmy(0), (Integer)revoltProvinces.get(0)));
-                        tempArmiesProvinces.add((Integer)revoltProvinces.get(0));
+                     final int randCiv = CFG.oR.nextInt(possibleCivsExisting.size());
+                     nRevTag = CFG.game.getCiv(possibleCivsExisting.get(randCiv)).getCivTag();
+                     CFG.game.getCiv(possibleCivsExisting.get(randCiv)).setCapitalProvinceID(revoltProvinces.get(0));
+                     if (CFG.game.getProvince(revoltProvinces.get(0)).getArmy(0) > 0) {
+                        tempArmies.add(new Province_Army(nCivID, CFG.game.getProvince(revoltProvinces.get(0)).getArmy(0), revoltProvinces.get(0)));
+                        tempArmiesProvinces.add(revoltProvinces.get(0));
                      }
-
                      Gdx.app.log("AoC", "GA -> spawnRevolution: 16");
+                  }
+                  else if (possibleIdeologies.size() > 0) {
+                     Gdx.app.log("AoC", "GA -> spawnRevolution: 17");
+                     nRevTag = CFG.ideologiesManager.getRealTag(CFG.game.getCiv(nCivID).getCivTag()) + CFG.ideologiesManager.getIdeology(possibleIdeologies.get(CFG.oR.nextInt(possibleIdeologies.size()))).getExtraTag();
+                     if (CFG.game.getProvince(revoltProvinces.get(0)).getArmy(0) > 0) {
+                        tempArmies.add(new Province_Army(nCivID, CFG.game.getProvince(revoltProvinces.get(0)).getArmy(0), revoltProvinces.get(0)));
+                        tempArmiesProvinces.add(revoltProvinces.get(0));
+                     }
+                     CFG.game.createScenarioAddCivilization(nRevTag, revoltProvinces.get(0), false, false, true);
+                     spawnedCivWithDifferentGovernment = true;
+                     Gdx.app.log("AoC", "GA -> spawnRevolution: 18");
                   }
 
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 19");
                   nRebelsCivID = -1;
 
-                  for(i = CFG.game.getCivsSize() - 1; i > 0; --i) {
+                  for(int i = CFG.game.getCivsSize() - 1; i > 0; --i) {
                      if (CFG.game.getCiv(i).getCivTag().equals(nRevTag)) {
                         nRebelsCivID = i;
                         break;
@@ -1533,11 +1504,10 @@ class Game_Action {
                   }
 
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 20");
-                  int j;
                   if (nRebelsCivID > 0) {
                      Gdx.app.log("AoC", "GA -> spawnRevolution: 21");
 
-                     for(i = 0; i < revoltProvinces.size(); ++i) {
+                     for(int i = 0; i < revoltProvinces.size(); ++i) {
                         if (CFG.game.getProvince((Integer)revoltProvinces.get(i)).getCivID() != nRebelsCivID) {
                            if (CFG.game.getProvince((Integer)revoltProvinces.get(i)).getArmy(0) > 0) {
                               tempArmies.add(new Province_Army(nCivID, CFG.game.getProvince((Integer)revoltProvinces.get(i)).getArmy(0), (Integer)revoltProvinces.get(i)));
@@ -1558,14 +1528,12 @@ class Game_Action {
                      }
 
                      Gdx.app.log("AoC", "GA -> spawnRevolution: 22");
-
-                     for(i = 0; i < tempArmies.size(); ++i) {
-                        CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).updateArmy(((Province_Army)tempArmies.get(i)).getCivID(), ((Province_Army)tempArmies.get(i)).getArmy());
-                        CFG.game.getCiv(((Province_Army)tempArmies.get(i)).getCivID()).newMove((Integer)tempArmiesProvinces.get(i), (Integer)tempArmiesProvinces.get(i), ((Province_Army)tempArmies.get(i)).getArmy(), true);
-
-                        for(j = CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivsSize() - 1; j >= 0; --j) {
-                           if (CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivID(j) != nCivID && CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivID(j) != nRebelsCivID) {
-                              this.accessLost_MoveArmyToClosetsProvince(CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivID(j), (Integer)tempArmiesProvinces.get(i));
+                     for (int i3 = 0; i3 < tempArmies.size(); ++i3) {
+                        CFG.game.getProvince(tempArmiesProvinces.get(i3)).updateArmy(tempArmies.get(i3).getCivID(), tempArmies.get(i3).getArmy());
+                        CFG.game.getCiv(tempArmies.get(i3).getCivID()).newMove(tempArmiesProvinces.get(i3), tempArmiesProvinces.get(i3), tempArmies.get(i3).getArmy(), true);
+                        for (a = CFG.game.getProvince(tempArmiesProvinces.get(i3)).getCivsSize() - 1; a >= 0; --a) {
+                           if (CFG.game.getProvince(tempArmiesProvinces.get(i3)).getCivID(a) != nCivID && CFG.game.getProvince(tempArmiesProvinces.get(i3)).getCivID(a) != nRebelsCivID) {
+                              this.accessLost_MoveArmyToClosetsProvince(CFG.game.getProvince(tempArmiesProvinces.get(i3)).getCivID(a), tempArmiesProvinces.get(i3));
                            }
                         }
                      }
@@ -1585,11 +1553,11 @@ class Game_Action {
                      }
 
                      try {
-                        for(j = 0; j < CFG.game.getPlayersSize(); ++j) {
-                           if (!CFG.game.getPlayer(j).getMetCivilization(nRebelsCivID)) {
-                              for(int o = 0; o < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++o) {
-                                 if (CFG.game.getPlayer(j).getMetProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(o))) {
-                                    CFG.game.getPlayer(j).setMetCivilization(nRebelsCivID, true);
+                        for (int p2 = 0; p2 < CFG.game.getPlayersSize(); ++p2) {
+                           if (!CFG.game.getPlayer(p2).getMetCivilization(nRebelsCivID)) {
+                              for (int o2 = 0; o2 < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++o2) {
+                                 if (CFG.game.getPlayer(p2).getMetProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(o2))) {
+                                    CFG.game.getPlayer(p2).setMetCivilization(nRebelsCivID, true);
                                     break;
                                  }
                               }
@@ -1606,40 +1574,39 @@ class Game_Action {
                      Gdx.app.log("AoC", "GA -> spawnRevolution: 24");
                   }
 
-                  for(i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
+                  for(int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
                      CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).setRevolutionaryRisk(CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getRevolutionaryRisk() * (0.7F + (float)CFG.oR.nextInt(300) / 1000.0F));
                   }
 
-                  for(i = 0; i < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++i) {
+                  for(int i = 0; i < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++i) {
                      CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).setRevolutionaryRisk(0.0F);
                      CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).setHappiness(Math.max(0.66F + (float)CFG.oR.nextInt(24) / 100.0F, CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).getHappiness()));
                   }
 
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 25");
                   if (spawnedCivWithDifferentGovernment) {
-                     for(i = 0; i < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++i) {
-                        if (!CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).getCore().getHaveACore(nRebelsCivID)) {
-                           CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).getCore().addNewCore(nRebelsCivID, Game_Calendar.TURN_ID);
+                     for (int i3 = 0; i3 < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++i3) {
+                        if (!CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i3)).getCore().getHaveACore(nRebelsCivID)) {
+                           CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i3)).getCore().addNewCore(nRebelsCivID, Game_Calendar.TURN_ID);
                         }
-
-                        j = CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).getPopulationData().getPopulationOfCivID(nCivID);
-                        if (j > 0) {
-                           float randPerc = (float)CFG.oR.nextInt(625) / 1000.0F;
-                           CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).getPopulationData().setPopulationOfCivID(nCivID, (int)((float)j * randPerc));
-                           CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).getPopulationData().setPopulationOfCivID(nRebelsCivID, (int)((float)j * (1.0F - randPerc)));
+                        final int popOfNativeCiv = CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i3)).getPopulationData().getPopulationOfCivID(nCivID);
+                        if (popOfNativeCiv > 0) {
+                           final float randPerc = CFG.oR.nextInt(625) / 1000.0f;
+                           CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i3)).getPopulationData().setPopulationOfCivID(nCivID, (int)(popOfNativeCiv * randPerc));
+                           CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i3)).getPopulationData().setPopulationOfCivID(nRebelsCivID, (int)(popOfNativeCiv * (1.0f - randPerc)));
                         }
                      }
                   }
 
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 26");
 
-                  for(i = 0; i < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++i) {
+                  for(int i = 0; i < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++i) {
                      CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(i)).updateDrawArmy();
                   }
 
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 27");
 
-                  for(i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
+                  for(int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
                      if (CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getCivID() == CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getTrueOwnerOfProvince()) {
                         CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).setRevolutionaryRisk(CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getRevolutionaryRisk() * 0.645F);
                         CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).setHappiness((CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getHappiness() + 0.08F) * 1.124F);
@@ -1656,7 +1623,7 @@ class Game_Action {
                      CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getCapitalProvinceID()).setIsCapital(true);
                      boolean updateCapitalLevel = true;
 
-                     for(j = 0; j < CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getCapitalProvinceID()).getCitiesSize(); ++j) {
+                     for(int j = 0; j < CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getCapitalProvinceID()).getCitiesSize(); ++j) {
                         if (CFG.game.getProvince(CFG.game.getCiv(nRebelsCivID).getCapitalProvinceID()).getCity(j).getCityLevel() == CFG.getEditorCityLevel(0)) {
                            updateCapitalLevel = false;
                            break;
@@ -1670,10 +1637,10 @@ class Game_Action {
 
                   Gdx.app.log("AoC", "GA -> spawnRevolution: 29");
                   if (CFG.FOG_OF_WAR == 2) {
-                     for(i = 0; i < CFG.game.getPlayersSize(); ++i) {
-                        for(j = 0; j < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++j) {
-                           if (CFG.game.getPlayer(i).getMetProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(j))) {
-                              CFG.game.getPlayer(i).setMetCivilization(nRebelsCivID, true);
+                     for (int i3 = 0; i3 < CFG.game.getPlayersSize(); ++i3) {
+                        for (int j4 = 0; j4 < CFG.game.getCiv(nRebelsCivID).getNumOfProvinces(); ++j4) {
+                           if (CFG.game.getPlayer(i3).getMetProvince(CFG.game.getCiv(nRebelsCivID).getProvinceID(j4))) {
+                              CFG.game.getPlayer(i3).setMetCivilization(nRebelsCivID, true);
                               break;
                            }
                         }
@@ -1689,9 +1656,9 @@ class Game_Action {
 
       Gdx.app.log("AoC", "GA -> spawnRevolution: SECOND 0000");
       String nRevTag = CFG.ideologiesManager.getRealTag(CFG.game.getCiv(nCivID).getCivTag()) + CFG.ideologiesManager.getIdeology(CFG.ideologiesManager.REBELS_ID).getExtraTag();
-      revoltCivID = -1;
+      int revoltCivID = -1;
 
-      for(i = 1; i < CFG.game.getCivsSize(); ++i) {
+      for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
          if (CFG.game.getCiv(i).getIdeologyID() == CFG.ideologiesManager.REBELS_ID && this.getSpawnRebels_CivRebelsTag(i).equals(nRevTag)) {
             if (CFG.game.getCiv(i).getNumOfProvinces() == 0) {
                revoltCivID = i;
@@ -1700,56 +1667,54 @@ class Game_Action {
                   theBestProvinceID = -1;
                   theBestConnections = 0;
 
-                  for(numOfRevoltProvincesMax = 0; numOfRevoltProvincesMax < tempSorted.size(); ++numOfRevoltProvincesMax) {
-                     a = 0;
-                     i = 0;
-
-                     for(nRand = 0; nRand < CFG.game.getProvince((Integer)tempSorted.get(numOfRevoltProvincesMax)).getNeighboringProvincesSize(); ++nRand) {
-                        if (CFG.game.getProvince(CFG.game.getProvince((Integer)tempSorted.get(numOfRevoltProvincesMax)).getNeighboringProvinces(nRand)).getCivID() == i) {
-                           ++a;
-                        } else if (CFG.game.getProvince(CFG.game.getProvince((Integer)tempSorted.get(numOfRevoltProvincesMax)).getNeighboringProvinces(nRand)).getCivID() == CFG.game.getProvince((Integer)tempSorted.get(numOfRevoltProvincesMax)).getCivID()) {
-                           ++i;
+                  for (int k = 0; k < tempSorted.size(); ++k) {
+                     int currentConnections = 0;
+                     int ownProvincesConnection = 0;
+                     for (int k2 = 0; k2 < CFG.game.getProvince(tempSorted.get(k)).getNeighboringProvincesSize(); ++k2) {
+                        if (CFG.game.getProvince(CFG.game.getProvince(tempSorted.get(k)).getNeighboringProvinces(k2)).getCivID() == i) {
+                           ++currentConnections;
+                        }
+                        else if (CFG.game.getProvince(CFG.game.getProvince(tempSorted.get(k)).getNeighboringProvinces(k2)).getCivID() == CFG.game.getProvince(tempSorted.get(k)).getCivID()) {
+                           ++ownProvincesConnection;
                         }
                      }
-
-                     if (a > 0) {
-                        if (i == 0) {
-                           a += 2;
-                        } else if (i == 1) {
-                           ++a;
+                     if (currentConnections > 0) {
+                        if (ownProvincesConnection == 0) {
+                           currentConnections += 2;
+                        }
+                        else if (ownProvincesConnection == 1) {
+                           ++currentConnections;
                         }
                      }
-
-                     if (a > theBestConnections || a > 0 && a == theBestConnections && CFG.oR.nextInt(150) % 2 == 1) {
-                        theBestProvinceID = (Integer)tempSorted.get(numOfRevoltProvincesMax);
-                        theBestConnections = a;
+                     if (currentConnections > theBestConnections || (currentConnections > 0 && currentConnections == theBestConnections && CFG.oR.nextInt(150) % 2 == 1)) {
+                        theBestProvinceID = tempSorted.get(k);
+                        theBestConnections = currentConnections;
                      }
                   }
 
                   if (theBestProvinceID < 0) {
-                     for(numOfRevoltProvincesMax = 0; numOfRevoltProvincesMax < nOverMin.size(); ++numOfRevoltProvincesMax) {
-                        a = 0;
-                        i = 0;
-
-                        for(nRand = 0; nRand < CFG.game.getProvince((Integer)nOverMin.get(numOfRevoltProvincesMax)).getNeighboringProvincesSize(); ++nRand) {
-                           if (CFG.game.getProvince(CFG.game.getProvince((Integer)nOverMin.get(numOfRevoltProvincesMax)).getNeighboringProvinces(nRand)).getCivID() == i) {
-                              ++a;
-                           } else if (CFG.game.getProvince(CFG.game.getProvince((Integer)nOverMin.get(numOfRevoltProvincesMax)).getNeighboringProvinces(nRand)).getCivID() == CFG.game.getProvince((Integer)nOverMin.get(numOfRevoltProvincesMax)).getCivID()) {
-                              ++i;
+                     for (int k = 0; k < nOverMin.size(); ++k) {
+                        int currentConnections = 0;
+                        int ownProvincesConnection = 0;
+                        for (int k2 = 0; k2 < CFG.game.getProvince(nOverMin.get(k)).getNeighboringProvincesSize(); ++k2) {
+                           if (CFG.game.getProvince(CFG.game.getProvince(nOverMin.get(k)).getNeighboringProvinces(k2)).getCivID() == i) {
+                              ++currentConnections;
+                           }
+                           else if (CFG.game.getProvince(CFG.game.getProvince(nOverMin.get(k)).getNeighboringProvinces(k2)).getCivID() == CFG.game.getProvince(nOverMin.get(k)).getCivID()) {
+                              ++ownProvincesConnection;
                            }
                         }
-
-                        if (a > 0) {
-                           if (i == 0) {
-                              a += 2;
-                           } else if (i == 1) {
-                              ++a;
+                        if (currentConnections > 0) {
+                           if (ownProvincesConnection == 0) {
+                              currentConnections += 2;
+                           }
+                           else if (ownProvincesConnection == 1) {
+                              ++currentConnections;
                            }
                         }
-
-                        if (a > theBestConnections || a > 0 && a == theBestConnections && CFG.oR.nextInt(150) % 2 == 1) {
-                           theBestProvinceID = (Integer)nOverMin.get(numOfRevoltProvincesMax);
-                           theBestConnections = a;
+                        if (currentConnections > theBestConnections || (currentConnections > 0 && currentConnections == theBestConnections && CFG.oR.nextInt(150) % 2 == 1)) {
+                           theBestProvinceID = nOverMin.get(k);
+                           theBestConnections = currentConnections;
                         }
                      }
                   }
@@ -1770,7 +1735,7 @@ class Game_Action {
                         CFG.game.getProvince(theBestProvinceID).updateArmy(nCivID, numOfRevoltProvincesMax);
                         CFG.game.getCiv(nCivID).newMove(theBestProvinceID, theBestProvinceID, numOfRevoltProvincesMax, true);
 
-                        for(a = CFG.game.getProvince(theBestProvinceID).getCivsSize() - 1; a >= 0; --a) {
+                        for(int a = CFG.game.getProvince(theBestProvinceID).getCivsSize() - 1; a >= 0; --a) {
                            if (CFG.game.getProvince(theBestProvinceID).getCivID(a) != nCivID && CFG.game.getProvince(theBestProvinceID).getCivID(a) != i) {
                               this.accessLost_MoveArmyToClosetsProvince(CFG.game.getProvince(theBestProvinceID).getCivID(a), theBestProvinceID);
                            }
@@ -1790,9 +1755,9 @@ class Game_Action {
 
       if (tempSorted.size() != 0) {
          if (revoltCivID <= 0) {
-            for(i = 1; i < CFG.game.getCivsSize(); ++i) {
-               if (CFG.game.getCiv(i).getIdeologyID() == CFG.ideologiesManager.REBELS_ID && CFG.game.getCiv(i).getNumOfProvinces() == 0) {
-                  revoltCivID = i;
+            for (int j = 1; j < CFG.game.getCivsSize(); ++j) {
+               if (CFG.game.getCiv(j).getIdeologyID() == CFG.ideologiesManager.REBELS_ID && CFG.game.getCiv(j).getNumOfProvinces() == 0) {
+                  revoltCivID = j;
                }
             }
          }
@@ -1951,32 +1916,28 @@ class Game_Action {
             }
          }
       } else {
-         ArrayList<Integer> tempPossibleToAdd = new ArrayList<Integer>();
-
-         for(i = 0; i < joinProvinces.size(); ++i) {
-            for(j = 0; j < CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvincesSize(); ++j) {
-               for(i = 0; i < tempRevCivsIDs.size(); ++i) {
-                  if (CFG.game.getProvince(CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvinces(j)).getCivID() == nCivID && CFG.game.getProvince(CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvinces(j)).getCore().getHaveACore((Integer)tempRevCivsIDs.get(i))) {
-                     boolean canBeAdded = CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvinces(j) != nProvinceID;
+         final List<Integer> tempPossibleToAdd = new ArrayList<Integer>();
+         for (int i3 = 0; i3 < joinProvinces.size(); ++i3) {
+            for (int j2 = 0; j2 < CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvincesSize(); ++j2) {
+               for (int k2 = 0; k2 < tempRevCivsIDs.size(); ++k2) {
+                  if (CFG.game.getProvince(CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvinces(j2)).getCivID() == nCivID && CFG.game.getProvince(CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvinces(j2)).getCore().getHaveACore(tempRevCivsIDs.get(k2))) {
+                     boolean canBeAdded = CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvinces(j2) != nProvinceID;
                      if (canBeAdded) {
-                        int o;
-                        for(o = 0; o < joinProvinces.size(); ++o) {
-                           if (CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvinces(j) == (Integer)joinProvinces.get(o)) {
+                        for (int o = 0; o < joinProvinces.size(); ++o) {
+                           if (CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvinces(j2) == joinProvinces.get(o)) {
                               canBeAdded = false;
                               break;
                            }
                         }
-
                         if (canBeAdded) {
-                           for(o = 0; o < tempPossibleToAdd.size(); ++o) {
-                              if ((Integer)tempPossibleToAdd.get(o) == CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvinces(j)) {
+                           for (int o = 0; o < tempPossibleToAdd.size(); ++o) {
+                              if (tempPossibleToAdd.get(o) == CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvinces(j2)) {
                                  canBeAdded = false;
                                  break;
                               }
                            }
-
                            if (canBeAdded) {
-                              tempPossibleToAdd.add(CFG.game.getProvince((Integer)joinProvinces.get(i)).getNeighboringProvinces(j));
+                              tempPossibleToAdd.add(CFG.game.getProvince(joinProvinces.get(i3)).getNeighboringProvinces(j2));
                            }
                         }
                      }
@@ -1984,24 +1945,20 @@ class Game_Action {
                }
             }
          }
+         final List<Integer> sortedPossibleToAdd = new ArrayList<Integer>();
 
-         ArrayList<Integer>  sortedPossibleToAdd = new  ArrayList<Integer> ();
-
-         while(tempPossibleToAdd.size() > 0) {
-            j = 0;
-
-            for(i = 1; i < tempPossibleToAdd.size(); ++i) {
-               if ((float)CFG.game.getProvince((Integer)tempPossibleToAdd.get(i)).getPopulationData().getPopulation() * CFG.game.getProvince((Integer)tempPossibleToAdd.get(i)).getRevolutionaryRisk() > (float)CFG.game.getProvince((Integer)tempPossibleToAdd.get(j)).getPopulationData().getPopulation() * CFG.game.getProvince((Integer)tempPossibleToAdd.get(j)).getRevolutionaryRisk()) {
-                  j = i;
+         while (tempPossibleToAdd.size() > 0) {
+            int tBest = 0;
+            for (int i4 = 1; i4 < tempPossibleToAdd.size(); ++i4) {
+               if (CFG.game.getProvince(tempPossibleToAdd.get(i4)).getPopulationData().getPopulation() * CFG.game.getProvince(tempPossibleToAdd.get(i4)).getRevolutionaryRisk() > CFG.game.getProvince(tempPossibleToAdd.get(tBest)).getPopulationData().getPopulation() * CFG.game.getProvince(tempPossibleToAdd.get(tBest)).getRevolutionaryRisk()) {
+                  tBest = i4;
                }
             }
-
-            sortedPossibleToAdd.add((Integer)tempPossibleToAdd.get(j));
-            tempPossibleToAdd.remove(j);
+            sortedPossibleToAdd.add(tempPossibleToAdd.get(tBest));
+            tempPossibleToAdd.remove(tBest);
          }
-
-         for(j = 0; j < sortedPossibleToAdd.size() && revelsMaxPercOfProvinces > joinProvinces.size() + 1; ++j) {
-            joinProvinces.add((Integer)sortedPossibleToAdd.get(j));
+         for (int i5 = 0; i5 < sortedPossibleToAdd.size() && revelsMaxPercOfProvinces > joinProvinces.size() + 1; ++i5) {
+            joinProvinces.add(sortedPossibleToAdd.get(i5));
          }
       }
 
@@ -2021,13 +1978,12 @@ class Game_Action {
 
       CFG.game.getCiv(nRebelsCivID).buildCivPersonality();
 
-      for(i = 0; i < tempArmies.size(); ++i) {
-         CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).updateArmy(((Province_Army)tempArmies.get(i)).getCivID(), ((Province_Army)tempArmies.get(i)).getArmy());
-         CFG.game.getCiv(((Province_Army)tempArmies.get(i)).getCivID()).newMove((Integer)tempArmiesProvinces.get(i), (Integer)tempArmiesProvinces.get(i), ((Province_Army)tempArmies.get(i)).getArmy(), true);
-
-         for(i = CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivsSize() - 1; i >= 0; --i) {
-            if (CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivID(i) != nCivID && CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivID(i) != nRebelsCivID) {
-               this.accessLost_MoveArmyToClosetsProvince(CFG.game.getProvince((Integer)tempArmiesProvinces.get(i)).getCivID(i), (Integer)tempArmiesProvinces.get(i));
+      for (int i2 = 0; i2 < tempArmies.size(); ++i2) {
+         CFG.game.getProvince(tempArmiesProvinces.get(i2)).updateArmy(tempArmies.get(i2).getCivID(), tempArmies.get(i2).getArmy());
+         CFG.game.getCiv(tempArmies.get(i2).getCivID()).newMove(tempArmiesProvinces.get(i2), tempArmiesProvinces.get(i2), tempArmies.get(i2).getArmy(), true);
+         for (int a = CFG.game.getProvince(tempArmiesProvinces.get(i2)).getCivsSize() - 1; a >= 0; --a) {
+            if (CFG.game.getProvince(tempArmiesProvinces.get(i2)).getCivID(a) != nCivID && CFG.game.getProvince(tempArmiesProvinces.get(i2)).getCivID(a) != nRebelsCivID) {
+               this.accessLost_MoveArmyToClosetsProvince(CFG.game.getProvince(tempArmiesProvinces.get(i2)).getCivID(a), tempArmiesProvinces.get(i2));
             }
          }
       }
@@ -2103,7 +2059,12 @@ class Game_Action {
 
    protected final void moveRegroupArmy() {
       for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
-         CFG.game.getCiv(i).moveRegroupArmy();
+         try {
+            CFG.game.getCiv(i).moveRegroupArmy();
+         } catch (IndexOutOfBoundsException e) {
+            Gdx.app.log("AoC", "GA -> moveRegroupArmy: IndexOutOfBoundsException for civID=" + i);
+            CFG.exceptionStack(e);
+         }
       }
 
    }
@@ -3169,8 +3130,7 @@ class Game_Action {
 
       float fBest = 0.0F;
 
-      int i;
-      for(i = 0; i < this.currentMoveUnits.getMoveUnitsSize(); ++i) {
+      for(int i = 0; i < this.currentMoveUnits.getMoveUnitsSize(); ++i) {
          if (CFG.game.getCiv(this.currentMoveUnits.getCivID(i)).getModifier_AttackBonus() > fBest) {
             fBest = CFG.game.getCiv(this.currentMoveUnits.getCivID(i)).getModifier_AttackBonus();
          }
@@ -3179,7 +3139,7 @@ class Game_Action {
       fDefensiveArmyModifiers += fBest;
       fBest = 0.0F;
 
-      for(i = 0; i < this.currentMoveUnits.getMoveUnitsSize(); ++i) {
+      for(int i = 0; i < this.currentMoveUnits.getMoveUnitsSize(); ++i) {
          if (this.getAttackersBonusFromTechnology(this.currentMoveUnits.getCivID(i)) / 100.0F > fBest) {
             fBest = this.getAttackersBonusFromTechnology(this.currentMoveUnits.getCivID(i)) / 100.0F;
          }
@@ -3200,16 +3160,15 @@ class Game_Action {
    protected final void loadActivePlayerData() {
       Gdx.app.log("AoC", "loadActivePlayerData: 00000");
       if (CFG.FOG_OF_WAR > 0) {
-         int i;
          if (CFG.FOG_OF_WAR == 2) {
-            for(i = 0; i < CFG.game.getProvincesSize(); ++i) {
+            for(int i = 0; i < CFG.game.getProvincesSize(); ++i) {
                CFG.game.getProvince(i).updateProvinceBorder();
             }
 
             Game_Render.updateDrawCivRegionNames_FogOfWar();
          }
 
-         for(i = 0; i < CFG.game.getProvincesSize(); ++i) {
+         for(int i = 0; i < CFG.game.getProvincesSize(); ++i) {
             CFG.game.getProvince(i).updateDrawArmy();
          }
       }
@@ -3259,14 +3218,13 @@ class Game_Action {
             int numOfProvinces = CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getNumOfProvinces();
             Gdx.app.log("AoC", "checkGameEnd: numOfProvinces1: " + numOfProvinces);
 
-            int z;
-            for(z = 0; z < CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.iVassalsSize; ++z) {
+            for(int z = 0; z < CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.iVassalsSize; ++z) {
                numOfProvinces += CFG.game.getCiv(((Vassal_GameData)CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.lVassals.get(z)).iCivID).getNumOfProvinces();
             }
 
             Gdx.app.log("AoC", "checkGameEnd: numOfProvinces2: " + numOfProvinces);
             if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getAllianceID() > 0) {
-               for(z = 0; z < CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getAllianceID()).getCivilizationsSize(); ++z) {
+               for(int z = 0; z < CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getAllianceID()).getCivilizationsSize(); ++z) {
                   if (CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getAllianceID()).getCivilization(z) != CFG.game.getPlayer(i).getCivID() && CFG.game.getCiv(CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getAllianceID()).getCivilization(z)).getPuppetOfCivID() != CFG.game.getPlayer(i).getCivID()) {
                      numOfProvinces += CFG.game.getCiv(CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getAllianceID()).getCivilization(z)).getNumOfProvinces();
                   }
@@ -3286,7 +3244,7 @@ class Game_Action {
             } else if (CFG.oAI.PLAYABLE_PROVINCES > numOfProvinces && !((float)CFG.oAI.PLAYABLE_PROVINCES <= (float)numOfProvinces * ((float)VicotryManager.VICTORY_CONTROL_PROVINCES_PERC / 100.0F)) && CFG.oAI.NUM_OF_CIVS_IN_THE_GAME >= 2) {
                Gdx.app.log("AoC", "checkGameEnd: VIC 2222");
                if (VicotryManager.VICTORY_TECHNOLOGY > 0.0F) {
-                  for(z = 1; z < CFG.game.getCivsSize(); ++z) {
+                  for(int z = 1; z < CFG.game.getCivsSize(); ++z) {
                      Gdx.app.log("AoC", "checkGameEnd: VIC 222: CIV: " + CFG.game.getCiv(z).getCivName());
                      Gdx.app.log("AoC", "checkGameEnd: VIC 222: CFG.game.getCiv(z).getTechnologyLevel(): " + CFG.game.getCiv(z).getTechnologyLevel());
                      Gdx.app.log("AoC", "checkGameEnd: VIC 222:  VicotryManager.VICTORY_TECHNOLOGY: " + VicotryManager.VICTORY_TECHNOLOGY);
@@ -3355,27 +3313,26 @@ class Game_Action {
 
    protected final void buildFogOfWar(int nPlayerID) {
       try {
-         int i;
-         for(i = 0; i < CFG.game.getProvincesSize(); ++i) {
+         for(int i = 0; i < CFG.game.getProvincesSize(); ++i) {
             CFG.game.getPlayer(nPlayerID).setFogOfWar(i, false);
          }
 
          this.buildFogOfWar_CivID(nPlayerID, CFG.game.getPlayer(nPlayerID).getCivID());
          if (CFG.game.getCiv(CFG.game.getPlayer(nPlayerID).getCivID()).getAllianceID() > 0) {
-            for(i = 0; i < CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(nPlayerID).getCivID()).getAllianceID()).getCivilizationsSize(); ++i) {
+            for(int i = 0; i < CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(nPlayerID).getCivID()).getAllianceID()).getCivilizationsSize(); ++i) {
                if (CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(nPlayerID).getCivID()).getAllianceID()).getCivilization(i) != CFG.game.getPlayer(nPlayerID).getCivID()) {
                   this.buildFogOfWar_CivID(nPlayerID, CFG.game.getAlliance(CFG.game.getCiv(CFG.game.getPlayer(nPlayerID).getCivID()).getAllianceID()).getCivilization(i));
                }
             }
          }
 
-         for(i = 1; i < CFG.game.getCivsSize(); ++i) {
+         for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
             if (i != CFG.game.getPlayer(nPlayerID).getCivID() && CFG.game.getCiv(i).getPuppetOfCivID() == CFG.game.getPlayer(nPlayerID).getCivID()) {
                this.buildFogOfWar_CivID(nPlayerID, i);
             }
          }
 
-         for(i = 1; i < CFG.game.getCivsSize(); ++i) {
+         for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
             if (i != CFG.game.getPlayer(nPlayerID).getCivID() && CFG.game.getCiv(CFG.game.getPlayer(nPlayerID).getCivID()).getPuppetOfCivID() == i) {
                this.buildFogOfWar_CivID(nPlayerID, i);
             }
@@ -3387,22 +3344,20 @@ class Game_Action {
    }
 
    protected final void buildFogOfWar_CivID(int nPlayerID, int nCivID) {
-      int i;
-      int j;
-      for(i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
+      for(int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
          CFG.game.getPlayer(nPlayerID).setFogOfWar(CFG.game.getCiv(nCivID).getProvinceID(i), true);
 
-         for(j = 0; j < CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getNeighboringSeaProvincesSize(); ++j) {
+         for(int j = 0; j < CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getNeighboringSeaProvincesSize(); ++j) {
             CFG.game.getPlayer(nPlayerID).setFogOfWar(CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getNeighboringSeaProvinces(j), true);
          }
 
          this.buildFogOfWar_WatchTower(nPlayerID, CFG.game.getCiv(nCivID).getProvinceID(i));
       }
 
-      for(i = 0; i < CFG.game.getCiv(nCivID).getArmyInAnotherProvinceSize(); ++i) {
+      for(int i = 0; i < CFG.game.getCiv(nCivID).getArmyInAnotherProvinceSize(); ++i) {
          CFG.game.getPlayer(nPlayerID).setFogOfWar(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i), true);
          if (CFG.game.getProvince(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i)).getSeaProvince()) {
-            for(j = 0; j < CFG.game.getProvince(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i)).getNeighboringProvincesSize(); ++j) {
+            for(int j = 0; j < CFG.game.getProvince(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i)).getNeighboringProvincesSize(); ++j) {
                if (CFG.game.getProvince(CFG.game.getProvince(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i)).getNeighboringProvinces(j)).getSeaProvince()) {
                   CFG.game.getPlayer(nPlayerID).setFogOfWar(CFG.game.getProvince(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i)).getNeighboringProvinces(j), true);
                }
@@ -3414,15 +3369,14 @@ class Game_Action {
 
    protected final void buildFogOfWar_WatchTower(int nPlayerID, int nProvinceID) {
       if (CFG.game.getProvince(nProvinceID).getLevelOfWatchTower() > 0) {
-         int j;
          if (CFG.game.getProvince(nProvinceID).getLevelOfWatchTower() == 1) {
-            for(j = 0; j < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++j) {
+            for(int j = 0; j < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++j) {
                if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(j)).getLevelOfFort() < 1) {
                   CFG.game.getPlayer(nPlayerID).setFogOfWar(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(j), true);
                }
             }
          } else {
-            for(j = 0; j < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++j) {
+            for(int j = 0; j < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++j) {
                if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(j)).getLevelOfFort() < 1) {
                   CFG.game.getPlayer(nPlayerID).setFogOfWar(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(j), true);
 
@@ -3509,15 +3463,13 @@ class Game_Action {
    }
 
    protected final boolean canColonizieWasteland_BorderOrArmy(int nProvinceID, int nCivID) {
-      int i;
-      int j;
-      for(i = 0; i < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++i) {
+      for(int i = 0; i < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++i) {
          if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getWasteland() < 0) {
             if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivID() == nCivID) {
                return true;
             }
 
-            for(j = 0; j < CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivsSize(); ++j) {
+            for(int j = 0; j < CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivsSize(); ++j) {
                if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivID(j) == nCivID) {
                   return true;
                }
@@ -3525,8 +3477,8 @@ class Game_Action {
          }
       }
 
-      for(i = 0; i < CFG.game.getProvince(nProvinceID).getNeighboringSeaProvincesSize(); ++i) {
-         for(j = 1; j < CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringSeaProvinces(i)).getCivsSize(); ++j) {
+      for(int i = 0; i < CFG.game.getProvince(nProvinceID).getNeighboringSeaProvincesSize(); ++i) {
+         for(int j = 1; j < CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringSeaProvinces(i)).getCivsSize(); ++j) {
             if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringSeaProvinces(i)).getCivID(j) == nCivID) {
                return true;
             }
@@ -3595,9 +3547,8 @@ class Game_Action {
 
    protected final boolean moveArmy(int fromProvinceID, int toProvinceID, int nNumOfUnits, int iCivID, boolean regroupMode, boolean buildLine) {
       try {
-         int i;
          if (nNumOfUnits == 0) {
-            for(i = 0; i < CFG.game.getCiv(iCivID).getMoveUnitsSize(); ++i) {
+            for(int i = 0; i < CFG.game.getCiv(iCivID).getMoveUnitsSize(); ++i) {
                if (CFG.game.getCiv(iCivID).getMoveUnits(i).getFromProvinceID() == fromProvinceID && CFG.game.getCiv(iCivID).getMoveUnits(i).getToProvinceID() == toProvinceID) {
                   CFG.game.getProvince(fromProvinceID).updateArmy(iCivID, CFG.game.getProvince(fromProvinceID).getArmyCivID(iCivID) + CFG.game.getCiv(iCivID).getMoveUnits(i).getNumOfUnits());
                   CFG.game.getCiv(iCivID).removeMove(i);
@@ -3615,7 +3566,7 @@ class Game_Action {
 
             return false;
          } else {
-            for(i = 0; i < CFG.game.getCiv(iCivID).getMoveUnitsSize(); ++i) {
+            for(int i = 0; i < CFG.game.getCiv(iCivID).getMoveUnitsSize(); ++i) {
                if (CFG.game.getCiv(iCivID).getMoveUnits(i).getFromProvinceID() == fromProvinceID && CFG.game.getCiv(iCivID).getMoveUnits(i).getToProvinceID() == toProvinceID) {
                   if (regroupMode) {
                      if (CFG.game.getProvince(fromProvinceID).getArmyCivID(iCivID) < nNumOfUnits) {
@@ -3695,8 +3646,7 @@ class Game_Action {
    protected final void updatePopulationLosses(int nProvinceID, int iLosses) {
       int nRecuritedPop = CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation();
 
-      int i;
-      for(i = 0; i < CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize(); ++i) {
+      for(int i = 0; i < CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize(); ++i) {
          if (CFG.game.getProvince(nProvinceID).getPopulationData().getCivID(i) == 0) {
             if (CFG.game.getProvince(nProvinceID).getPopulationData().setPopulationOfCivID(CFG.game.getProvince(nProvinceID).getPopulationData().getCivID(i), (int)((double)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationID(i) - Math.floor((double)((float)iLosses * ((float)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationID(i) / (float)nRecuritedPop)))))) {
                --i;
@@ -3721,7 +3671,7 @@ class Game_Action {
       nRecuritedPop -= CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation();
       if (nRecuritedPop < iLosses) {
          nRecuritedPop = iLosses - nRecuritedPop;
-         i = 0;
+         int i = 0;
 
          for(int tPop = 0; i < CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize(); ++i) {
             tPop = Math.min(nRecuritedPop, CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationID(i));
@@ -3784,8 +3734,7 @@ class Game_Action {
          CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).setNumOfUnits(CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getNumOfUnits() + nNumOfUnits);
          nRecuritedPop = tempProvincePopulation;
 
-         int i;
-         for(i = 0; i < CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize(); ++i) {
+         for(int i = 0; i < CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize(); ++i) {
             if (CFG.game.getProvince(nProvinceID).getPopulationData().getCivID(i) == 0) {
                if (CFG.game.getProvince(nProvinceID).getPopulationData().setPopulationOfCivID(CFG.game.getProvince(nProvinceID).getPopulationData().getCivID(i), (int)((double)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationID(i) - Math.floor((double)((float)nNumOfUnits * ((float)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationID(i) / (float)nRecuritedPop)))))) {
                   --i;
@@ -3815,7 +3764,7 @@ class Game_Action {
          nRecuritedPop -= CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation();
          if (nRecuritedPop < nNumOfUnits) {
             nRecuritedPop = nNumOfUnits - nRecuritedPop;
-            i = 0;
+            int i = 0;
 
             for(int tPop = 0; i < CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize(); ++i) {
                tPop = Math.min(nRecuritedPop, CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationID(i));
@@ -3951,9 +3900,8 @@ class Game_Action {
             CFG.game.getProvince(nProvinceID).getPopulationData().setPopulationOfCivID(nCivID, CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationOfCivID(nCivID) + (int)Math.ceil((double)(nPop / nNeightboring)));
             nPop -= (int)Math.ceil((double)(nPop / nNeightboring));
             --nNeightboring;
-            int i;
             if (nNeightboring > 0) {
-               for(i = 0; i < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++i) {
+               for(int i = 0; i < CFG.game.getProvince(nProvinceID).getNeighboringProvincesSize(); ++i) {
                   if (CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivID() == nCivID) {
                      CFG.game.getProvince(nProvinceID).getPopulationData().setPopulationOfCivID(CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivID(), CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationOfCivID(CFG.game.getProvince(CFG.game.getProvince(nProvinceID).getNeighboringProvinces(i)).getCivID()) + nPop / nNeightboring);
                   }
@@ -3966,7 +3914,7 @@ class Game_Action {
                nPop = (int)Math.floor((double)(nNumOfUnits / CFG.game.getCiv(nCivID).getNumOfProvinces()));
                CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(0)).getPopulationData().setPopulationOfCivID(nCivID, CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(0)).getPopulationData().getPopulationOfCivID(nCivID) + (int)Math.ceil((double)(nNumOfUnits / CFG.game.getCiv(nCivID).getNumOfProvinces())));
 
-               for(i = 1; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
+               for(int i = 1; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
                   CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getPopulationData().setPopulationOfCivID(nCivID, CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getPopulationData().getPopulationOfCivID(nCivID) + nPop);
                }
             } else {
@@ -4453,32 +4401,31 @@ class Game_Action {
 
    protected final boolean abadonProvince(int nProvinceID, int nCivID) {
       if (CFG.game.getProvince(nProvinceID).getCivID() == nCivID && CFG.game.getCiv(nCivID).getCapitalProvinceID() != nProvinceID && !CFG.game.getProvince(nProvinceID).isOccupied() && CFG.game.getCiv(nCivID).getNumOfProvinces() > 1) {
-         int i;
-         for(i = 0; i < CFG.game.getCiv(nCivID).getMoveUnitsSize(); ++i) {
+         for(int i = 0; i < CFG.game.getCiv(nCivID).getMoveUnitsSize(); ++i) {
             if (CFG.game.getCiv(nCivID).getMoveUnits(i).getFromProvinceID() == nProvinceID) {
                CFG.game.getCiv(nCivID).removeMove(i--);
             }
          }
 
-         for(i = 0; i < CFG.game.getCiv(nCivID).getMoveUnitsPlunderSize(); ++i) {
+         for(int i = 0; i < CFG.game.getCiv(nCivID).getMoveUnitsPlunderSize(); ++i) {
             if (CFG.game.getCiv(nCivID).getMoveUnits_Plunder(i).getFromProvinceID() == nProvinceID) {
                CFG.game.getCiv(nCivID).removePlunder(i--);
             }
          }
 
-         for(i = 0; i < CFG.game.getCiv(nCivID).getMigrateSize(); ++i) {
+         for(int i = 0; i < CFG.game.getCiv(nCivID).getMigrateSize(); ++i) {
             if (CFG.game.getCiv(nCivID).getMigrate(i).getFromProvinceID() == nProvinceID) {
                CFG.game.getCiv(nCivID).removeMigrate(i--);
             }
          }
 
-         for(i = 0; i < CFG.game.getCiv(nCivID).getRecruitArmySize(); ++i) {
+         for(int i = 0; i < CFG.game.getCiv(nCivID).getRecruitArmySize(); ++i) {
             if (CFG.game.getCiv(nCivID).getRecruitArmy(i).getProvinceID() == nProvinceID) {
                CFG.game.getCiv(nCivID).removeRecruitArmy(i--);
             }
          }
 
-         for(i = CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize() - 1; i >= 0; --i) {
+         for(int i = CFG.game.getProvince(nProvinceID).getPopulationData().getNationalitiesSize() - 1; i >= 0; --i) {
             CFG.game.getProvince(nProvinceID).getPopulationData().setPopulationOfCivID(CFG.game.getProvince(nProvinceID).getPopulationData().getCivID(i), (int)((float)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulationOfCivID(CFG.game.getProvince(nProvinceID).getPopulationData().getCivID(i)) * (0.05F + (float)CFG.oR.nextInt(20) / 100.0F)));
          }
 
@@ -4502,21 +4449,20 @@ class Game_Action {
    protected final void accessLost_UpdateArmies(int inCivID, int nCivID) {
       ArrayList<Integer> tempProvincesToMove = new ArrayList<Integer>();
 
-      int i;
-      for(i = 0; i < CFG.game.getCiv(nCivID).getArmyInAnotherProvinceSize(); ++i) {
+      for(int i = 0; i < CFG.game.getCiv(nCivID).getArmyInAnotherProvinceSize(); ++i) {
          if (CFG.game.getProvince(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i)).getCivID() == inCivID) {
             tempProvincesToMove.add(CFG.game.getCiv(nCivID).getArmyInAnotherProvince(i));
          }
       }
 
-      for(i = CFG.game.getCiv(nCivID).getMoveUnitsSize() - 1; i >= 0; --i) {
+      for(int i = CFG.game.getCiv(nCivID).getMoveUnitsSize() - 1; i >= 0; --i) {
          if (CFG.game.getProvince(CFG.game.getCiv(nCivID).getMoveUnits(i).getFromProvinceID()).getCivID() == inCivID) {
             tempProvincesToMove.add(CFG.game.getCiv(nCivID).getMoveUnits(i).getFromProvinceID());
             this.moveArmy(CFG.game.getCiv(nCivID).getMoveUnits(i).getFromProvinceID(), CFG.game.getCiv(nCivID).getMoveUnits(i).getToProvinceID(), 0, nCivID, false, false);
          }
       }
 
-      for(i = 0; i < tempProvincesToMove.size(); ++i) {
+      for(int i = 0; i < tempProvincesToMove.size(); ++i) {
          this.accessLost_MoveArmyToClosetsProvince(nCivID, (Integer)tempProvincesToMove.get(i));
       }
 

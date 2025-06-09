@@ -1,11 +1,13 @@
 package age.of.civilizations2.jakowski.lukasz;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.sun.javaws.exceptions.CacheAccessException;
+import org.lwjgl.Sys;
 
 class PeaceTreaty_Data
 {
@@ -19,6 +21,8 @@ class PeaceTreaty_Data
    protected int iLastTakenID;
    protected static final float VASSALIZE_COST = 0.4f;
    protected static final float WAR_REPARATIONS_COST = 0.1f;
+   private int recursionDepth = 0;
+   private static final int MAX_RECURSION_DEPTH = 8500; // to prevent stack overflow
 
    protected PeaceTreaty_Data() {
       super();
@@ -118,7 +122,14 @@ class PeaceTreaty_Data
             //if optimal civ to take optimal province, and civ both not controlled by player, make AI choose provinces
             //if player led peace conferences, don't let AI take provinces change//
             if (iBestCivID > 0 && tBestPoints > 0 && !CFG.game.getCiv(iBestCivID).getControlledByPlayer() && (!isPlayerInvolved())) {
+               if (recursionDepth++ > MAX_RECURSION_DEPTH) {
+                  Gdx.app.log("AoC", "AI_UseVictoryPoints: Max recursion depth reached, aborting.");
+                  recursionDepth = 0;
+                  return;
+               }
                Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE");
+               recursionDepth++;
+               CFG.toast.setInView("Calculating Peace Treaty for " + CFG.game.getCiv(iBestCivID).getCivName() + ", %" + recursionDepth);
                this.AI_UseVictoryPoints_CivID(iBestCivID, tBestPoints);
             }
          }
@@ -181,134 +192,126 @@ class PeaceTreaty_Data
 
    protected final void AI_UseVictoryPoints_CivID(final int nCivID, final int pointsLeft) {
       try {
-         final List<Float> lScores = new ArrayList<Float>();
-         final List<Boolean> lNeigh = new ArrayList<Boolean>();
-         final List<Integer> toTake = new ArrayList<Integer>();
+         final int provincesSize = this.iProvincesLeftToTakeSize;
+         final int[] toTakeArr = new int[provincesSize];
+         final float[] lScoresArr = new float[provincesSize];
+         final boolean[] lNeighArr = new boolean[provincesSize];
+         int toTakeCount = 0;
          boolean canTakeNieghProvince = false;
          float maxDistance = 1.0E-4f;
-         for (int i = 0; i < this.iProvincesLeftToTakeSize; ++i) {
-            if (pointsLeft >= this.drawProvinceOwners.get(this.provincesLeftToTake.get(i)).iProvinceValue) {
-               maxDistance = Math.max(maxDistance, CFG.game_NextTurnUpdate.getDistanceFromCapital(CFG.game.getCiv(nCivID).getCapitalProvinceID(), this.provincesLeftToTake.get(i)));
-               if (CFG.game.getProvince(this.provincesLeftToTake.get(i)).getTrueOwnerOfProvince() == nCivID) {
-                  lScores.add(this.AI_UseVictoryPoints_CivID_Score(nCivID, this.provincesLeftToTake.get(i), 10.0f));
-                  lNeigh.add(true);
-                  toTake.add(this.provincesLeftToTake.get(i));
+         // Precompute province values and neighbors
+         for (int i = 0; i < provincesSize; ++i) {
+            int provinceIdx = this.provincesLeftToTake.get(i);
+            PeaceTreaty_DrawData provinceOwner = this.drawProvinceOwners.get(provinceIdx);
+            if (pointsLeft >= provinceOwner.iProvinceValue) {
+               float dist = CFG.game_NextTurnUpdate.getDistanceFromCapital(CFG.game.getCiv(nCivID).getCapitalProvinceID(), provinceIdx);
+               if (dist > maxDistance) maxDistance = dist;
+               if (CFG.game.getProvince(provinceIdx).getTrueOwnerOfProvince() == nCivID) {
+                  lScoresArr[toTakeCount] = this.AI_UseVictoryPoints_CivID_Score(nCivID, provinceIdx, 10.0f);
+                  lNeighArr[toTakeCount] = true;
+                  toTakeArr[toTakeCount++] = provinceIdx;
                   canTakeNieghProvince = true;
-               }
-               else {
+               } else {
                   boolean tempProvinceAdded = false;
-                  int j = 0;
-                  while (j < CFG.game.getProvince(this.provincesLeftToTake.get(i)).getNeighboringProvincesSize()) {
-                     if (this.drawProvinceOwners.get(CFG.game.getProvince(this.provincesLeftToTake.get(i)).getNeighboringProvinces(j)).iCivID == nCivID) {
-                        if (CFG.game.getProvince(this.provincesLeftToTake.get(i)).getCore().getHaveACore(nCivID)) {
+                  int neighSize = CFG.game.getProvince(provinceIdx).getNeighboringProvincesSize();
+                  for (int j = 0; j < neighSize; ++j) {
+                     int neighIdx = CFG.game.getProvince(provinceIdx).getNeighboringProvinces(j);
+                     if (this.drawProvinceOwners.get(neighIdx).iCivID == nCivID) {
+                        if (CFG.game.getProvince(provinceIdx).getCore().getHaveACore(nCivID)) {
                            tempProvinceAdded = true;
-                           lScores.add(this.AI_UseVictoryPoints_CivID_Score(nCivID, this.provincesLeftToTake.get(i), 5.0f));
-                           lNeigh.add(true);
-                           toTake.add(this.provincesLeftToTake.get(i));
+                           lScoresArr[toTakeCount] = this.AI_UseVictoryPoints_CivID_Score(nCivID, provinceIdx, 5.0f);
+                           lNeighArr[toTakeCount] = true;
+                           toTakeArr[toTakeCount++] = provinceIdx;
                            canTakeNieghProvince = true;
                            break;
                         }
-                        lScores.add(this.AI_UseVictoryPoints_CivID_Score(nCivID, this.provincesLeftToTake.get(i), 4.25f));
-                        lNeigh.add(true);
-                        toTake.add(this.provincesLeftToTake.get(i));
+                        lScoresArr[toTakeCount] = this.AI_UseVictoryPoints_CivID_Score(nCivID, provinceIdx, 4.25f);
+                        lNeighArr[toTakeCount] = true;
+                        toTakeArr[toTakeCount++] = provinceIdx;
                         tempProvinceAdded = true;
                         canTakeNieghProvince = true;
                         break;
                      }
-                     else {
-                        ++j;
-                     }
                   }
                   if (!tempProvinceAdded) {
-                     if (CFG.game.getProvince(this.provincesLeftToTake.get(i)).getCore().getHaveACore(nCivID)) {
-                        lScores.add(this.AI_UseVictoryPoints_CivID_Score(nCivID, this.provincesLeftToTake.get(i), 1.75f));
-                        lNeigh.add(true);
-                        toTake.add(this.provincesLeftToTake.get(i));
+                     if (CFG.game.getProvince(provinceIdx).getCore().getHaveACore(nCivID)) {
+                        lScoresArr[toTakeCount] = this.AI_UseVictoryPoints_CivID_Score(nCivID, provinceIdx, 1.75f);
+                        lNeighArr[toTakeCount] = true;
+                        toTakeArr[toTakeCount++] = provinceIdx;
                         canTakeNieghProvince = true;
                      }
-                     else if (CFG.game.getProvince(this.provincesLeftToTake.get(i)).getNeighboringSeaProvincesSize() > 0) {
-                        lScores.add(this.AI_UseVictoryPoints_CivID_Score(nCivID, this.provincesLeftToTake.get(i), 0.325f));
-                        lNeigh.add(true);
-                        toTake.add(this.provincesLeftToTake.get(i));
+                     else if (CFG.game.getProvince(provinceIdx).getNeighboringSeaProvincesSize() > 0) {
+                        lScoresArr[toTakeCount] = this.AI_UseVictoryPoints_CivID_Score(nCivID, provinceIdx, 0.325f);
+                        lNeighArr[toTakeCount] = true;
+                        toTakeArr[toTakeCount++] = provinceIdx;
                         canTakeNieghProvince = true;
                      }
                      else {
-                        lScores.add(this.AI_UseVictoryPoints_CivID_Score(nCivID, this.provincesLeftToTake.get(i), 0.025f));
-                        lNeigh.add(false);
-                        toTake.add(this.provincesLeftToTake.get(i));
+                        lScoresArr[toTakeCount] = this.AI_UseVictoryPoints_CivID_Score(nCivID, provinceIdx, 0.025f);
+                        lNeighArr[toTakeCount] = false;
+                        toTakeArr[toTakeCount++] = provinceIdx;
                      }
                   }
                }
             }
          }
-         if (lNeigh.size() == 0 || toTake.size() == 0) {
-            Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE -> lNeigh.size(): " + lNeigh.size());
+         if (toTakeCount == 0) {
+            Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE -> lNeigh.size(): 0");
             this.AI_UseVictoryPoints_CivID_TakeVassal(nCivID, pointsLeft, true);
             return;
          }
-         if (!canTakeNieghProvince) {
-            Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE -> canTakeNieghProvince: " + canTakeNieghProvince);
+         boolean hasNeigh = false;
+         for (int i = 0; i < toTakeCount; ++i) {
+            if (lNeighArr[i]) {
+               hasNeigh = true;
+               break;
+            }
+         }
+         if (!hasNeigh) {
+            Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE -> canTakeNieghProvince: false");
             this.AI_UseVictoryPoints_CivID_TakeVassal(nCivID, pointsLeft, true);
             return;
          }
+         // Score adjustment
+         for (int k = 0; k < toTakeCount; ++k) {
+            float dist = CFG.game_NextTurnUpdate.getDistanceFromCapital(CFG.game.getCiv(nCivID).getCapitalProvinceID(), toTakeArr[k]);
+            float distFactor = (0.8f + 0.2f * (1.0f - dist / maxDistance));
+            float lastTakenFactor = (this.iLastTakenID == toTakeArr[k]) ? 0.05f : 1.0f;
+            lScoresArr[k] = lScoresArr[k] * distFactor * lastTakenFactor;
+         }
+         // Find best
          int tBest = 0;
-         for (int k = lScores.size() - 1; k > 0; --k) {
-            lScores.set(k, lScores.get(k) * (0.8f + 0.2f * (1.0f - CFG.game_NextTurnUpdate.getDistanceFromCapital(CFG.game.getCiv(nCivID).getCapitalProvinceID(), toTake.get(k)) / maxDistance)) * ((this.iLastTakenID == toTake.get(k)) ? 0.05f : 1.0f));
-         }
-         for (int k = lScores.size() - 1; k > 0; --k) {
-            if (lScores.get(tBest) < lScores.get(k)) {
+         float bestScore = lScoresArr[0];
+         for (int k = 1; k < toTakeCount; ++k) {
+            if (lScoresArr[k] > bestScore) {
                tBest = k;
+               bestScore = lScoresArr[k];
             }
          }
-         if (lNeigh.get(tBest)) {
-            if (!this.takeProvince(toTake.get(tBest), nCivID, nCivID)) {
-               for (int k = 0; k < this.peaceTreatyGameData.lCivsDemands_Defenders.size(); ++k) {
-                  if (this.peaceTreatyGameData.lCivsDemands_Defenders.get(k).iCivID == nCivID) {
-                     this.peaceTreatyGameData.lCivsDemands_Defenders.get(k).iVictoryPointsLeft = 0;
-                     this.AI_UseVictoryPoints();
-                     return;
-                  }
-               }
-               for (int k = 0; k < this.peaceTreatyGameData.lCivsDemands_Aggressors.size(); ++k) {
-                  if (this.peaceTreatyGameData.lCivsDemands_Aggressors.get(k).iCivID == nCivID) {
-                     this.peaceTreatyGameData.lCivsDemands_Aggressors.get(k).iVictoryPointsLeft = 0;
-                     this.AI_UseVictoryPoints();
-                     return;
-                  }
-               }
-            }
+         boolean tookProvince = false;
+         if (lNeighArr[tBest]) {
+            tookProvince = this.takeProvince(toTakeArr[tBest], nCivID, nCivID);
+         } else if (toTakeCount == 1) {
+            tookProvince = this.takeProvince(toTakeArr[tBest], nCivID, nCivID);
          }
-         else if (toTake.size() == 1) {
-            if (!this.takeProvince(toTake.get(tBest), nCivID, nCivID)) {
-               for (int k = 0; k < this.peaceTreatyGameData.lCivsDemands_Defenders.size(); ++k) {
-                  if (this.peaceTreatyGameData.lCivsDemands_Defenders.get(k).iCivID == nCivID) {
-                     this.peaceTreatyGameData.lCivsDemands_Defenders.get(k).iVictoryPointsLeft = 0;
-                     this.AI_UseVictoryPoints();
-                     return;
-                  }
-               }
-               for (int k = 0; k < this.peaceTreatyGameData.lCivsDemands_Aggressors.size(); ++k) {
-                  if (this.peaceTreatyGameData.lCivsDemands_Aggressors.get(k).iCivID == nCivID) {
-                     this.peaceTreatyGameData.lCivsDemands_Aggressors.get(k).iVictoryPointsLeft = 0;
-                     this.AI_UseVictoryPoints();
-                     return;
-                  }
-               }
-            }
-         }
-         else {
-            for (int k = 0; k < this.peaceTreatyGameData.lCivsDemands_Defenders.size(); ++k) {
-               if (this.peaceTreatyGameData.lCivsDemands_Defenders.get(k).iCivID == nCivID) {
-                  this.peaceTreatyGameData.lCivsDemands_Defenders.get(k).iVictoryPointsLeft = 0;
+         if (!tookProvince) {
+            int i;
+            boolean found = false;
+            for (i = 0; i < this.peaceTreatyGameData.lCivsDemands_Defenders.size(); ++i) {
+               if (this.peaceTreatyGameData.lCivsDemands_Defenders.get(i).iCivID == nCivID) {
+                  this.peaceTreatyGameData.lCivsDemands_Defenders.get(i).iVictoryPointsLeft = 0;
                   this.AI_UseVictoryPoints();
-                  return;
+                  found = true;
+                  break;
                }
             }
-            for (int k = 0; k < this.peaceTreatyGameData.lCivsDemands_Aggressors.size(); ++k) {
-               if (this.peaceTreatyGameData.lCivsDemands_Aggressors.get(k).iCivID == nCivID) {
-                  this.peaceTreatyGameData.lCivsDemands_Aggressors.get(k).iVictoryPointsLeft = 0;
-                  this.AI_UseVictoryPoints();
-                  return;
+            if (!found) {
+               for (i = 0; i < this.peaceTreatyGameData.lCivsDemands_Aggressors.size(); ++i) {
+                  if (this.peaceTreatyGameData.lCivsDemands_Aggressors.get(i).iCivID == nCivID) {
+                     this.peaceTreatyGameData.lCivsDemands_Aggressors.get(i).iVictoryPointsLeft = 0;
+                     this.AI_UseVictoryPoints();
+                     break;
+                  }
                }
             }
          }
@@ -2725,10 +2728,12 @@ class PeaceTreaty_Data
             //   }
             //}
             //updateData = true;
-            for (int i = 0; i < 13; i++) {
-               //refine treaty up to 12 times or up to revoke
+
+            for (int i = 0; i < 11; i++) {
+               //refine treaty up to 10 times or up to revoke
                if (!this.purifyTreaty(iFromCivID)) break;
             }
+
          }
       }
 

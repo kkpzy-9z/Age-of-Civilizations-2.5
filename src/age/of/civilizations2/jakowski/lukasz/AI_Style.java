@@ -4373,9 +4373,9 @@ class AI_Style
 
                      if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).REVOLUTIONARY) {
                         final int peaceID = CFG.game.getPeaceTreaty_GameDataID(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
-                        if (peaceID >= 0) {
+                        final int warID = CFG.game.getWarID(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID);
+                        if (peaceID >= 0 && warID >= 0) {
                            final PeaceTreaty_Data tempData = new PeaceTreaty_Data(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData);
-                           final int warID = CFG.game.getWarID(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID);
 
                            boolean canEnd = (CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getNumOfProvinces() == 0 || CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID));
                            //if (!canEnd) {
