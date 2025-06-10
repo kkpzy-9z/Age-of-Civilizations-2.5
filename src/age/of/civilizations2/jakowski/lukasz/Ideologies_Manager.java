@@ -311,26 +311,27 @@ class Ideologies_Manager {
       return true;
    }
 
-   protected List canChangeToIdeology(int nCivID) {
-      List out = new ArrayList();
-
-      for(int i = 0; i < this.getIdeologiesSize(); ++i) {
+   protected List<Boolean> canChangeToIdeology(final int nCivID) {
+      final List<Boolean> out = new ArrayList<Boolean>();
+      for (int i = 0; i < this.getIdeologiesSize(); ++i) {
          if (i == CFG.game.getCiv(nCivID).getIdeologyID()) {
             out.add(false);
-         } else if (Game_Calendar.CURRENT_AGEID < CFG.ideologiesManager.getIdeology(i).AVAILABLE_SINCE_AGE_ID) {
+         }
+         else if (Game_Calendar.CURRENT_AGEID < CFG.ideologiesManager.getIdeology(i).AVAILABLE_SINCE_AGE_ID) {
             out.add(false);
-         } else if (!this.canBeAdded(nCivID, i)) {
+         }
+         else if (!this.canBeAdded(nCivID, i)) {
             out.add(false);
-         } else if (i == this.REBELS_ID) {
+         }
+         else if (i == this.REBELS_ID) {
             out.add(false);
-         } else {
+         }
+         else {
             out.add(true);
          }
       }
-
       return out;
    }
-
    protected final int getIdeologiesSize() {
       return this.lIdeologies.size();
    }

@@ -1787,6 +1787,13 @@ class CFG {
             menuManager.getCreateAVassal_Stats().getMenuElement(12).setCurrent(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getIdeologyID());
             menuManager.getCreateAVassal_Stats().getMenuElement(12).setText(ideologiesManager.getIdeology(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getIdeologyID()).getName());
         }
+        if (CFG.createVassal_Data.iAutonomyStatus >= 0) {
+            //menuManager.getCreateAVassal_Stats().getMenuElement(13).setCurrent(CFG.createVassal_Data.iAutonomyStatus);
+            menuManager.getCreateAVassal_Stats().getMenuElement(13).setText(langManager.get(gameAutonomy.getAutonomy(CFG.createVassal_Data.iAutonomyStatus).getName()));
+        } else {
+            //menuManager.getCreateAVassal_Stats().getMenuElement(13).setCurrent(0);
+            menuManager.getCreateAVassal_Stats().getMenuElement(13).setText(gameAutonomy.getAutonomy(0).getName());
+        }
     }
 
     protected static final void disposeActiveCivLeader() {
@@ -5417,7 +5424,7 @@ class CFG {
                             tempProvinces.add(game.getSelectedProvinces().getProvince(i));
                         }
 
-                        i = game.releaseAVasssal(createVassal_Data.sCivTag, tempProvinces, createVassal_Data.iCapitalProvinceID, game.getPlayer(PLAYER_TURNID).getCivID(), false);
+                        i = game.releaseAVasssal(createVassal_Data.sCivTag, tempProvinces, createVassal_Data.iCapitalProvinceID, game.getPlayer(PLAYER_TURNID).getCivID(), false, createVassal_Data.iAutonomyStatus);
                         if (i >= 0) {
                             menuManager.rebuildMenu_InGame_VassalReleased(i);
                         }

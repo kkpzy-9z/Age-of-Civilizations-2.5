@@ -2210,10 +2210,18 @@ class Game {
     }
 
     protected final int releaseAVasssal(String nTag, final List<Integer> nVassalProvinces, int nCapitalProvinceID, int nVassalOfCivID, final boolean canChangeTypeOfGoverment_AI) {
-        return this.releaseAVasssal(nTag, nVassalProvinces, nCapitalProvinceID, nVassalOfCivID, canChangeTypeOfGoverment_AI, true);
+        return this.releaseAVasssal(nTag, nVassalProvinces, nCapitalProvinceID, nVassalOfCivID, canChangeTypeOfGoverment_AI, -1, true);
     }
 
     protected final int releaseAVasssal(String nTag, final List<Integer> nVassalProvinces, int nCapitalProvinceID, int nVassalOfCivID, final boolean canChangeTypeOfGoverment_AI, final boolean safeChecks) {
+        return this.releaseAVasssal(nTag, nVassalProvinces, nCapitalProvinceID, nVassalOfCivID, canChangeTypeOfGoverment_AI, -1, safeChecks);
+    }
+
+    protected final int releaseAVasssal(String nTag, final List<Integer> nVassalProvinces, int nCapitalProvinceID, int nVassalOfCivID, final boolean canChangeTypeOfGoverment_AI, final int autonomy) {
+        return this.releaseAVasssal(nTag, nVassalProvinces, nCapitalProvinceID, nVassalOfCivID, canChangeTypeOfGoverment_AI, autonomy, true);
+    }
+
+    protected final int releaseAVasssal(String nTag, final List<Integer> nVassalProvinces, int nCapitalProvinceID, int nVassalOfCivID, final boolean canChangeTypeOfGoverment_AI, final int autonomy, final boolean safeChecks) {
         try {
             nVassalOfCivID = this.getCiv(nVassalOfCivID).getPuppetOfCivID();
             if (safeChecks) {
@@ -2238,10 +2246,9 @@ class Game {
             int nCivID = -1;
             int nCivID_TRUE_Ideology_CivID = -1;
 
-            int i;
-            for(i = 1; i < this.getCivsSize(); ++i) {
-                if (this.getCiv(i).getCivTag().equals(nTag)) {
-                    nCivID_TRUE_Ideology_CivID = i;
+            for (int j = 1; j < this.getCivsSize(); ++j) {
+                if (this.getCiv(j).getCivTag().equals(nTag)) {
+                    nCivID_TRUE_Ideology_CivID = j;
                     break;
                 }
             }
@@ -2255,7 +2262,7 @@ class Game {
             }
 
             if (!this.getCiv(nVassalOfCivID).getControlledByPlayer() && CFG.ideologiesManager.getIdeology(this.getCiv(nVassalOfCivID).getIdeologyID()).CAN_BECOME_CIVILIZED >= 0) {
-                i = CFG.ideologiesManager.getIdeologyID(nTag);
+                int i = CFG.ideologiesManager.getIdeologyID(nTag);
                 if (CFG.ideologiesManager.getIdeology(i).CAN_BECOME_CIVILIZED < 0) {
                     return -1;
                 }
@@ -2264,82 +2271,75 @@ class Game {
             if (nCapitalProvinceID >= 0) {
                 tempArmy0 = this.getProvince(nCapitalProvinceID).getArmy(0);
             } else {
-                for(i = 1; i < this.getCivsSize(); ++i) {
-                    if (this.getCiv(i).getCivTag().equals(nTag)) {
-                        nCivID = i;
+                for (int j = 1; j < this.getCivsSize(); ++j) {
+                    if (this.getCiv(j).getCivTag().equals(nTag)) {
+                        nCivID = j;
                         break;
                     }
                 }
-
                 if (nCivID >= 0 && this.getCiv(nCivID).getCapitalProvinceID() >= 0) {
-                    for(i = nVassalProvinces.size() - 1; i >= 0; --i) {
-                        if ((Integer)nVassalProvinces.get(i) == this.getCiv(nCivID).getCapitalProvinceID()) {
+                    for (int j = nVassalProvinces.size() - 1; j >= 0; --j) {
+                        if (nVassalProvinces.get(j) == this.getCiv(nCivID).getCapitalProvinceID()) {
                             nCapitalProvinceID = this.getCiv(nCivID).getCapitalProvinceID();
                             break;
                         }
                     }
                 }
-
                 if (nCapitalProvinceID < 0) {
                     if (nCivID_TRUE_Ideology_CivID >= 0 && this.getCiv(nCivID_TRUE_Ideology_CivID).getCapitalProvinceID() >= 0) {
-                        for(i = nVassalProvinces.size() - 1; i >= 0; --i) {
-                            if ((Integer)nVassalProvinces.get(i) == this.getCiv(nCivID_TRUE_Ideology_CivID).getCapitalProvinceID()) {
+                        for (int j = nVassalProvinces.size() - 1; j >= 0; --j) {
+                            if (nVassalProvinces.get(j) == this.getCiv(nCivID_TRUE_Ideology_CivID).getCapitalProvinceID()) {
                                 nCapitalProvinceID = this.getCiv(nCivID_TRUE_Ideology_CivID).getCapitalProvinceID();
                                 break;
                             }
                         }
                     }
-
                     if (nCapitalProvinceID < 0) {
-                        for(i = nVassalProvinces.size() - 1; i >= 0; --i) {
-                            if (this.getProvince((Integer)nVassalProvinces.get(i)).getCore().getHaveACore(nCivID_TRUE_Ideology_CivID)) {
+                        for (int j = nVassalProvinces.size() - 1; j >= 0; --j) {
+                            if (this.getProvince(nVassalProvinces.get(j)).getCore().getHaveACore(nCivID_TRUE_Ideology_CivID)) {
                                 if (nCapitalProvinceID < 0) {
-                                    nCapitalProvinceID = (Integer)nVassalProvinces.get(i);
-                                } else if (CFG.oR.nextInt(100) < 33) {
-                                    nCapitalProvinceID = (Integer)nVassalProvinces.get(i);
+                                    nCapitalProvinceID = nVassalProvinces.get(j);
+                                }
+                                else if (CFG.oR.nextInt(100) < 33) {
+                                    nCapitalProvinceID = nVassalProvinces.get(j);
                                 }
                             }
                         }
                     }
-
                     if (nCapitalProvinceID < 0) {
-                        i = 0;
-
-                        for(i = nVassalProvinces.size() - 1; i >= 0; --i) {
-                            if (this.getProvince((Integer)nVassalProvinces.get(i)).getPopulationData().getPopulation() > this.getProvince((Integer)nVassalProvinces.get(i)).getPopulationData().getPopulation()) {
-                                i = i;
+                        int tBest = 0;
+                        for (int k = nVassalProvinces.size() - 1; k >= 0; --k) {
+                            if (this.getProvince(nVassalProvinces.get(k)).getPopulationData().getPopulation() > this.getProvince(nVassalProvinces.get(tBest)).getPopulationData().getPopulation()) {
+                                tBest = k;
                             }
                         }
-
-                        nCapitalProvinceID = (Integer)nVassalProvinces.get(i);
+                        nCapitalProvinceID = nVassalProvinces.get(tBest);
                     }
                 }
             }
 
             if (this.createScenarioAddCivilization(nTag, nCapitalProvinceID, false, true, true)) {
-                for(i = 0; i < this.getPlayersSize(); ++i) {
-                    this.getPlayer(i).addMetCivilization(true);
+                for (int j = 0; j < this.getPlayersSize(); ++j) {
+                    this.getPlayer(j).addMetCivilization(true);
                 }
             }
 
             if (nCivID < 0) {
                 nCivID = this.getCivsSize() - 1;
-
-                for(i = 1; i < this.getCivsSize(); ++i) {
-                    if (this.getCiv(i).getCivTag().equals(nTag)) {
-                        nCivID = i;
+                for (int j = 1; j < this.getCivsSize(); ++j) {
+                    if (this.getCiv(j).getCivTag().equals(nTag)) {
+                        nCivID = j;
                         break;
                     }
                 }
             }
-
-            this.getCiv(nCivID).setPuppetOfCivID(nVassalOfCivID);
+            this.getCiv(nCivID).setPuppetOfCivID(nVassalOfCivID, autonomy);
             this.getCiv(nCivID).setVassalLiberityDesire(0.0F);
             this.getCiv(nCivID).setMoney(92L);
             tempRealTag = CFG.ideologiesManager.getRealTag(nTag);
 
             int randPop;
-            for(i = 0; i < nVassalProvinces.size(); ++i) {
+            for(int i = 0; i < nVassalProvinces.size(); ++i) {
                 int tArmyCivID = this.getProvince((Integer)nVassalProvinces.get(i)).getCivID();
                 randPop = this.getProvince((Integer)nVassalProvinces.get(i)).getArmy(0);
                 int tArmyOwner = this.getProvince((Integer)nVassalProvinces.get(i)).getArmyCivID(nVassalOfCivID);
@@ -2368,7 +2368,7 @@ class Game {
                 }
             }
 
-            for(i = this.getProvince(nCapitalProvinceID).getPopulationData().getNationalitiesSize() - 1; i >= 0; --i) {
+            for(int i = this.getProvince(nCapitalProvinceID).getPopulationData().getNationalitiesSize() - 1; i >= 0; --i) {
                 if (this.getProvince(nCapitalProvinceID).getPopulationData().getCivID(i) != nCivID) {
                     randPop = (int)((float)this.getProvince(nCapitalProvinceID).getPopulationData().getPopulationOfCivID(this.getProvince(nCapitalProvinceID).getPopulationData().getCivID(i)) * (0.225F + (float)CFG.oR.nextInt(32) / 100.0F));
                     if (randPop > 0) {
@@ -2394,9 +2394,9 @@ class Game {
             CFG.gameAction.buildRank_Score(nCivID);
             CFG.gameAction.buildRank_Score(nVassalOfCivID);
             CFG.gameAction.buildRank_Positions();
-            i = this.getActiveProvinceID();
+            final int tActiveProvince = CFG.game.getActiveProvinceID();
             this.setActiveProvinceID(-1);
-            this.setActiveProvinceID(i);
+            this.setActiveProvinceID(tActiveProvince);
             this.buildCivilizationRegions(nCivID);
             this.buildCivilizationRegions(nVassalOfCivID);
             this.setCivRelation_OfCivB(nVassalOfCivID, nCivID, Math.min(this.getCivRelation_OfCivB(nVassalOfCivID, nCivID) + 65.0F, 65.0F));

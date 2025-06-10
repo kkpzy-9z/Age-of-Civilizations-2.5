@@ -116,6 +116,8 @@ class MenuManager {
     protected int INGAME_CREATE_VASSAL_INFO_STATS = -1;
     protected int INGAME_CREATE_VASSAL_MAPMODES = -1;
     protected int INGAME_CREATE_VASSAL_CIVS = -1;
+    protected int INGAME_CREATE_VASSAL_CHANGEAUTONOMY = -1;
+    protected int INGAME_CREATE_VASSAL_CHANGEGOVERNMENT = -1;
     protected int INGAME_CREATE_VASSAL_SELECT_CIV = -1;
     protected int INGAME_CREATE_VASSAL_SELECT_CIV_ALPHABET = -1;
     protected int INGAME_CREATE_VASSAL_SELECT_CIV_LIST = -1;
@@ -773,12 +775,16 @@ class MenuManager {
                         this.INGAME_CREATE_VASSAL = this.addMenu(new Menu_InGame_CreateAVassal());
                         this.INGAME_CREATE_VASSAL_INFO = this.addNextMenuToView(this.INGAME_CREATE_VASSAL, new Menu_InGame_CreateAVassal_Info());
                         this.INGAME_CREATE_VASSAL_INFO_STATS = this.addNextMenuToView(this.INGAME_CREATE_VASSAL, new Menu_InGame_CreateAVassal_Info_Stats());
+                        this.INGAME_CREATE_VASSAL_CHANGEAUTONOMY = this.addNextMenuToView(this.INGAME_CREATE_VASSAL, new Menu_InGame_CreateAVassal_ChangeAutonomy());
+                        this.INGAME_CREATE_VASSAL_CHANGEGOVERNMENT = this.addNextMenuToView(this.INGAME_CREATE_VASSAL, new Menu_InGame_CreateAVassal_ChangeGovernment());
                         this.INGAME_CREATE_VASSAL_MAPMODES = this.addNextMenuToView(this.INGAME_CREATE_VASSAL, new Menu_InGame_CreateAVassal_MapModes());
                         this.INGAME_CREATE_VASSAL_CIVS = this.addNextMenuToView(this.INGAME_CREATE_VASSAL, new Menu_InGame_CreateAVassal_Civ());
                     } else {
                         this.menus.get(this.INGAME_CREATE_VASSAL).set(0, new Menu_InGame_CreateAVassal());
                         this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_INFO, new Menu_InGame_CreateAVassal_Info());
                         this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_INFO_STATS, new Menu_InGame_CreateAVassal_Info_Stats());
+                        this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_CHANGEAUTONOMY, new Menu_InGame_CreateAVassal_ChangeAutonomy());
+                        this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_CHANGEGOVERNMENT, new Menu_InGame_CreateAVassal_ChangeGovernment());
                         this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_CIVS, new Menu_InGame_CreateAVassal_Civ());
                     }
                     CFG.updateCreateAVassal_CivInfo();
@@ -2848,6 +2854,8 @@ class MenuManager {
         if (this.menus.get(this.INGAME_CREATE_VASSAL).get(this.INGAME_CREATE_VASSAL_INFO).getVisible()) {
             this.setOrderOfMenu(this.INGAME_CREATE_VASSAL_INFO);
             this.setOrderOfMenu(this.INGAME_CREATE_VASSAL_INFO_STATS);
+            this.setOrderOfMenu(this.INGAME_CREATE_VASSAL_CHANGEAUTONOMY);
+            this.setOrderOfMenu(this.INGAME_CREATE_VASSAL_CHANGEGOVERNMENT);
         }
     }
 
@@ -7963,6 +7971,30 @@ class MenuManager {
 
     protected final SliderMenu getCreateAVassal_Stats() {
         return this.menus.get(this.INGAME_CREATE_VASSAL).get(this.INGAME_CREATE_VASSAL_INFO_STATS);
+    }
+
+    protected final SliderMenu getCreateAVassal_ChangeAutonomy() {
+        return this.menus.get(this.INGAME_CREATE_VASSAL).get(this.INGAME_CREATE_VASSAL_CHANGEAUTONOMY);
+    }
+
+    //new rebuild vassals menu
+    protected final void rebuildCreateAVassal_ChangeAutonomy() {
+        if (this.INGAME_CREATE_VASSAL >= 0) {
+            this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_CHANGEAUTONOMY, new Menu_InGame_CreateAVassal_ChangeAutonomy(CFG.createVassal_Data.sCivTag));
+            this.menus.get(this.INGAME_CREATE_VASSAL).get(this.INGAME_CREATE_VASSAL_CHANGEAUTONOMY).setVisible(true);
+        }
+    }
+
+    protected final SliderMenu getCreateAVassal_ChangeIdeology() {
+        return this.menus.get(this.INGAME_CREATE_VASSAL).get(this.INGAME_CREATE_VASSAL_CHANGEGOVERNMENT);
+    }
+
+    //new rebuild vassals menu
+    protected final void rebuildCreateAVassal_ChangeIdeology() {
+        if (this.INGAME_CREATE_VASSAL >= 0) {
+            this.menus.get(this.INGAME_CREATE_VASSAL).set(this.INGAME_CREATE_VASSAL_CHANGEGOVERNMENT, new Menu_InGame_CreateAVassal_ChangeGovernment(CFG.createVassal_Data.sCivTag));
+            this.menus.get(this.INGAME_CREATE_VASSAL).get(this.INGAME_CREATE_VASSAL_CHANGEGOVERNMENT).setVisible(true);
+        }
     }
 
     protected final void rebuildCreate_NewGame_Civ_Info_Diplomacy() {
