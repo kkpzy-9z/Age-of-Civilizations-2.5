@@ -831,6 +831,10 @@ class Game_Scenarios {
             }
             else {
                lCivs.get(i + 1).setMoney((-999999 == tempScenarioGameData.getStartingMoneyCiv(i)) ? ((CFG.ideologiesManager.getIdeology(lCivs.get(i + 1).getIdeologyID()).CAN_BECOME_CIVILIZED >= 0) ? (tempScenarioGameData.getStartingMoney() / 10) : tempScenarioGameData.getStartingMoney()) : tempScenarioGameData.getStartingMoneyCiv(i));
+               //patch for previous version where vassals put lord in debt
+               if (lCivs.get(i + 1).getMoney() < 0) {
+                  lCivs.get(i + 1).setMoney(tempScenarioGameData.getStartingMoney());
+               }
             }
             if (lCivs.get(i + 1).getCapitalProvinceID() >= 0) {
                CFG.game.getProvince(lCivs.get(i + 1).getCapitalProvinceID()).setCivID_LoadScenario(i + 1);

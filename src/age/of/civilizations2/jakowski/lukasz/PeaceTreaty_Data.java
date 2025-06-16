@@ -53,8 +53,11 @@ class PeaceTreaty_Data
       this.prepareDemansVassalsData();
    }
 
-   protected static boolean isPlayerInvolved() {
-      return ((CFG.PLAYER_PEACE || CFG.SPECTATOR_MODE) && (CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY));
+   protected boolean isPlayerInvolved() {
+      if ((CFG.PLAYER_PEACE || CFG.SPECTATOR_MODE) && (CFG.sandbox_task == Menu.eINGAME_PEACE_TREATY)) {
+         return Menu_PeaceTreaty.WAR_ID == this.peaceTreatyGameData.iWarID;
+      }
+      return false;
    }
 
    protected PeaceTreaty_Data(final int iWarID, final boolean scoreCountDefenders) {
@@ -121,7 +124,7 @@ class PeaceTreaty_Data
             Gdx.app.log("AoC", "AI_UseVictoryPoints -> iBestCivID: " + iBestCivID + ((iBestCivID >= 0) ? (", " + CFG.game.getCiv(iBestCivID).getCivName()) : "") + ", tBestPoints: " + tBestPoints);
             //if optimal civ to take optimal province, and civ both not controlled by player, make AI choose provinces
             //if player led peace conferences, don't let AI take provinces change//
-            if (iBestCivID > 0 && tBestPoints > 0 && !CFG.game.getCiv(iBestCivID).getControlledByPlayer() && (!isPlayerInvolved())) {
+            if (iBestCivID > 0 && tBestPoints > 0 && !CFG.game.getCiv(iBestCivID).getControlledByPlayer() && (!this.isPlayerInvolved())) {
                if (recursionDepth++ > MAX_RECURSION_DEPTH) {
                   Gdx.app.log("AoC", "AI_UseVictoryPoints: Max recursion depth reached, aborting.");
                   recursionDepth = 0;
@@ -129,7 +132,7 @@ class PeaceTreaty_Data
                }
                Gdx.app.log("AoC", "AI_UseVictoryPoints -> AI TAKE PROVINCE");
                recursionDepth++;
-               CFG.toast.setInView("Calculating Peace Treaty for " + CFG.game.getCiv(iBestCivID).getCivName() + ", %" + recursionDepth);
+               CFG.toast.setInView("Calculating Peace Treaty for " + CFG.game.getCiv(iBestCivID).getCivName() + ", " + recursionDepth);
                this.AI_UseVictoryPoints_CivID(iBestCivID, tBestPoints);
             }
          }
@@ -375,7 +378,7 @@ class PeaceTreaty_Data
          this.iPlayerTurnID = CFG.PLAYER_TURNID;
 
          //give unlimited warscore and skip player addition
-         if (isPlayerInvolved()) {
+         if (this.isPlayerInvolved()) {
             //if player-led peace, give player infinite points on both sides
             //this.peaceTreatyGameData.lCivsData_Defenders.add(new PeaceTreaty_Civs(iBrushCivID));
             //this.peaceTreatyGameData.lCivsDemands_Defenders.add(new PeaceTreaty_Demands(iBrushCivID, 999999));
@@ -467,7 +470,7 @@ class PeaceTreaty_Data
          }
       }
       //add all provinces to be taken
-      if (isPlayerInvolved()) {
+      if (this.isPlayerInvolved()) {
          try {
             for (int i = this.peaceTreatyGameData.lCivsData_Defenders.size() - 1; i >= 0; --i) {
                //this.peaceTreatyGameData.lCivsData_Defenders.get(i).lProvincesLost.clear();

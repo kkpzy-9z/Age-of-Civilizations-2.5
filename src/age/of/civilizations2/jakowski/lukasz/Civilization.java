@@ -414,8 +414,8 @@ class Civilization {
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
             try {
                 //don't apply if dominion
-                if (this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus() >= 2.0) continue;
-                CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.getVassal_AutonomyStatus(this.civGameData.lVassals.get(i).iCivID).getColorStatus());
+                if (this.civGameData.lVassals.get(i).autonomyStatus.getColorStatus() >= 2.0) continue;
+                CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.civGameData.lVassals.get(i).autonomyStatus.getColorStatus());
             } catch (NullPointerException exception) {
                 CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, CFG.gameAutonomy.getAutonomy(0).getColorStatus());
             }
@@ -2087,7 +2087,9 @@ class Civilization {
         if (!CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.isEconomicControl()) {
             this.clearLoans();
             CFG.oAI.getAI_Style(this.civGameData.iAI_Style).manageBudget(this.iCivID);
-            CFG.game.getCiv(iPuppetOfCivID).setMoney(CFG.game.getCiv(iPuppetOfCivID).getMoney() + this.getMoney());
+            if (this.getMoney() > 0L) { //only add if positive
+                CFG.game.getCiv(iPuppetOfCivID).setMoney(CFG.game.getCiv(iPuppetOfCivID).getMoney() + this.getMoney());
+            }
             this.setMoney(0L);
             CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).setTribute(0);
         }

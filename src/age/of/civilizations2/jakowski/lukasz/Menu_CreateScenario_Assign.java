@@ -162,6 +162,10 @@ class Menu_CreateScenario_Assign extends Menu_CreateScenario {
          case 6:
             if (CFG.lCreateScenario_UndoAssignProvincesCivID.size() > 0) {
                CFG.game.getProvince(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getProvinceID()).setCivID(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getCivID(), false);
+               //revert true owner if occupy tool is off
+               if (!CFG.occupyTool) {
+                  CFG.game.getProvince(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getProvinceID()).setTrueOwnerOfProvince(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getCivID());
+               }
                CFG.game.getProvince(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getProvinceID()).buildProvinceCore();
                CFG.province_Cores_GameData.clearCoresData(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getProvinceID());
                CFG.game.setActiveProvinceID(((Undo_AssignProvinceCiv)CFG.lCreateScenario_UndoAssignProvincesCivID.get(CFG.lCreateScenario_UndoAssignProvincesCivID.size() - 1)).getProvinceID());

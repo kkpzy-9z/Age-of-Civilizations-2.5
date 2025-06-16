@@ -1036,7 +1036,7 @@ extends SliderMenu {
             }
         });
         tY += tempElemH;
-        menuElements.add(new Button_Diplomacy_Action(Images.top_diplomacy_points, "Create a State", 0, 0, tY, CFG.CIV_INFO_MENU_WIDTH - 2, tempElemH, true){
+        /*menuElements.add(new Button_Diplomacy_Action(Images.top_diplomacy_points, "Create a State", 0, 0, tY, CFG.CIV_INFO_MENU_WIDTH - 2, tempElemH, true){
 
             @Override
             protected void actionElement(int iID) {
@@ -1061,6 +1061,7 @@ extends SliderMenu {
             }
         });
         tY += tempElemH;
+        deprecated with new vassal option feature in menu */
         menuElements.add(new Button_Diplomacy_Action(Images.diplo_revolution, CFG.langManager.get("SupportRebels"), 0, 0, tY, CFG.CIV_INFO_MENU_WIDTH - 2, tempElemH, true){
 
             @Override

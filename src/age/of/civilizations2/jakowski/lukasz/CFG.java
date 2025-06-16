@@ -4583,6 +4583,10 @@ class CFG {
                     menuManager.getDialogMenu().getMenuElement(3).setText(langManager.get("ReleaseAVassal") + "?");
                     break;
                 }
+                case RELEASE_ALL_VASSALS: {
+                    menuManager.getDialogMenu().getMenuElement(3).setText(langManager.get("ReleaseAllVassals") + "?");
+                    break;
+                }
                 case SHUFFLE_CIVILIZATIONS: {
                     menuManager.getDialogMenu().getMenuElement(3).setText(langManager.get("ShuffleCivilizations") + "?");
                     break;
@@ -5428,7 +5432,7 @@ class CFG {
                         if (i >= 0) {
                             menuManager.rebuildMenu_InGame_VassalReleased(i);
                         }
-                        if (SPECTATOR_MODE && sandbox_task == Menu.eINGAME_CREATE_VASSAL_SELECT_CIV) {
+                        if (!createVassal_Data.isVassal) {
                             game.getCiv(i).setPuppetOfCivID(i);
                             game.setCivRelation_OfCivB(game.getPlayer(PLAYER_TURNID).getCivID(), i, Math.min(game.getCivRelation_OfCivB(game.getPlayer(PLAYER_TURNID).getCivID(), i) + 0F, 0F));
                             game.setCivRelation_OfCivB(i, game.getPlayer(PLAYER_TURNID).getCivID(), Math.min(game.getCivRelation_OfCivB(i, game.getPlayer(PLAYER_TURNID).getCivID()) + 0F, 0F));
@@ -5472,6 +5476,79 @@ class CFG {
                         menuManager.updateInGame_TOP_All(game.getPlayer(PLAYER_TURNID).getCivID());
                         return;
                     }
+                case RELEASE_ALL_VASSALS:
+                    final List<Integer> lForeignCores = new ArrayList<Integer>();
+                    for(i = 0; i < game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getNumOfProvinces(); ++i) {
+                        if (!game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).isOccupied()) {
+                            for(int j = 0; j < game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).getCore().getCivsSize(); ++j) {
+                                if (game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).getCore().getCivID(j) != game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).getCivID() && game.getCiv(game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).getCore().getCivID(j)).getNumOfProvinces() == 0) {
+                                    boolean tAdd = true;
+
+                                    for(int k = 0; k < lForeignCores.size(); ++k) {
+                                        if ((Integer)lForeignCores.get(k) == game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).getCore().getCivID(j)) {
+                                            tAdd = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (tAdd) {
+                                        lForeignCores.add(game.getProvince(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getProvinceID(i)).getCore().getCivID(j));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    List<Integer> tempProvinces = new ArrayList<Integer>();
+                    for(int core : lForeignCores) {
+                        try {
+                            createVassal_Data.setCivTag(game.getCiv(core).getCivTag());
+                            createVassal_Data.iCapitalProvinceID = -1;
+
+                            for (int i2 = 0; i2 < CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getNumOfProvinces(); ++i2) {
+                                for (int j = 0; j < CFG.game.getProvince(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getProvinceID(i2)).getCore().getCivsSize(); ++j) {
+                                    if (CFG.game.getProvince(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getProvinceID(i2)).getCore().getCivID(j) == core && CFG.game.getProvince(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getProvinceID(i2)).getTrueOwnerOfProvince() == CFG.game.getProvince(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getProvinceID(i2)).getCivID()) {
+                                        if (!CFG.game.getProvince(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getProvinceID(i2)).getIsCapital()) {
+                                            tempProvinces.add(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getProvinceID(i2));
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+
+                            i = game.releaseAVasssal(createVassal_Data.sCivTag, tempProvinces, createVassal_Data.iCapitalProvinceID, game.getPlayer(PLAYER_TURNID).getCivID(), false, createVassal_Data.iAutonomyStatus);
+                            if (i >= 0) {
+                                menuManager.rebuildMenu_InGame_VassalReleased(i);
+                            }
+                            if (!createVassal_Data.isVassal) {
+                                game.getCiv(i).setPuppetOfCivID(i);
+                                game.setCivRelation_OfCivB(game.getPlayer(PLAYER_TURNID).getCivID(), i, Math.min(game.getCivRelation_OfCivB(game.getPlayer(PLAYER_TURNID).getCivID(), i) + 0F, 0F));
+                                game.setCivRelation_OfCivB(i, game.getPlayer(PLAYER_TURNID).getCivID(), Math.min(game.getCivRelation_OfCivB(i, game.getPlayer(PLAYER_TURNID).getCivID()) + 0F, 0F));
+                            } else {
+                                game.getCiv((game.getPlayer(PLAYER_TURNID).getCivID())).updateVassalCivilizationsColor();
+                            }
+                        } catch (IndexOutOfBoundsException ex) {
+                            if (LOGS) {
+                                ex.printStackTrace();
+                            }
+                        }
+                        tempProvinces.clear();
+                    }
+
+                    gameAction.buildFogOfWar(PLAYER_TURNID);
+                    brushTool = false;
+                    menuManager.setViewID(Menu.eINGAME);
+                    Game_Render_Province.updateDrawProvinces();
+                    map.getMapBG().updateWorldMap_Shaders();
+                    createVassal_Data.dispose();
+                    createVassal_Data = null;
+                    viewsManager.setActiveViewID(game.getPlayer(PLAYER_TURNID).iACTIVE_VIEW_MODE);
+                    menuManager.updateInGame_TOP_All(game.getPlayer(PLAYER_TURNID).getCivID());
+                    menuManager.setVisible_Menu_InGame_CurrentWars(true);
+                    if (menuManager.getVisibleInGame_Tribute()) {
+                        menuManager.rebuildInGame_Tribute();
+                    }
+                    return;
                 case SHUFFLE_CIVILIZATIONS:
                     game.shuffleCivilizations();
                     menuManager.setVisible_CreateNewGame_Options(false);

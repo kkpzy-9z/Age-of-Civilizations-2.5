@@ -120,11 +120,12 @@ class Menu_InGame_CreateAVassal_Info_Stats extends SliderMenu {
       });
       ((MenuElement)menuElements.get(menuElements.size() - 1)).setCurrent(0);
       menuElements.add(new Button_PlayAsVassal("", CFG.PADDING, CFG.PADDING * 2, CFG.PADDING * 4 + (CFG.TEXT_HEIGHT + CFG.PADDING) * 5 + CFG.PADDING + CFG.graphCircleDraw.getWidth() + CFG.PADDING * 3, CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4, CFG.TEXT_HEIGHT + CFG.PADDING * 4, true, CFG.createVassal_Data != null && CFG.createVassal_Data.playAsVassal));
-      menuElements.add(new Button_PlayAsVassal("", CFG.PADDING, CFG.PADDING * 2, CFG.PADDING * 4 + (CFG.TEXT_HEIGHT + CFG.PADDING) * 7 + CFG.PADDING + CFG.graphCircleDraw.getWidth() + CFG.PADDING * 3, CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4, CFG.TEXT_HEIGHT + CFG.PADDING * 4, true, false, false));
+      menuElements.add(new Button_PlayAsVassal("", CFG.PADDING, CFG.PADDING * 2, CFG.PADDING * 4 + (CFG.TEXT_HEIGHT + CFG.PADDING) * 7 + CFG.PADDING + CFG.graphCircleDraw.getWidth() + CFG.PADDING * 3, CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4, CFG.TEXT_HEIGHT + CFG.PADDING * 4, true, CFG.createVassal_Data != null && CFG.createVassal_Data.isVassal));
       menuElements.add(new Button_PlayAsVassal("", CFG.PADDING, CFG.PADDING * 2, CFG.PADDING * 4 + (CFG.TEXT_HEIGHT + CFG.PADDING) * 9 + CFG.PADDING + CFG.graphCircleDraw.getWidth() + CFG.PADDING * 3, CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4, CFG.TEXT_HEIGHT + CFG.PADDING * 4, true, false, false));
+      menuElements.add(new Button_PlayAsVassal("", CFG.PADDING, CFG.PADDING * 2, CFG.PADDING * 4 + (CFG.TEXT_HEIGHT + CFG.PADDING) * 11 + CFG.PADDING + CFG.graphCircleDraw.getWidth() + CFG.PADDING * 3, CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4, CFG.TEXT_HEIGHT + CFG.PADDING * 4, true, false, false));
       menuElements.add(new Button_Transparent(0, 0, CFG.CIV_INFO_MENU_WIDTH, ((MenuElement)menuElements.get(menuElements.size() - 1)).getPosY() + ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight(), true));
       int tempPosY = ImageManager.getImage(Images.top_flag_frame).getHeight() + CFG.PADDING * 4 + CFG.BUTTON_HEIGHT + CFG.PADDING * 3;
-      this.initMenu((SliderMenuTitle)null, 0 + AoCGame.LEFT, tempPosY, CFG.CIV_INFO_MENU_WIDTH, Math.min(CFG.GAME_HEIGHT - tempPosY - CFG.map.getMapBG().getMinimapHeight() - CFG.PADDING * 2 - CFG.BUTTON_HEIGHT - CFG.PADDING, ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING * 2), menuElements, true, false);
+      this.initMenu((SliderMenuTitle)null, 0 + AoCGame.LEFT, tempPosY, CFG.CIV_INFO_MENU_WIDTH, ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING * 2, menuElements, true, false);
       this.updateLanguage();
    }
 
@@ -135,8 +136,9 @@ class Menu_InGame_CreateAVassal_Info_Stats extends SliderMenu {
       this.getMenuElement(7).setText(CFG.langManager.get("TechnologyLevel"));
       this.getMenuElement(9).setText(CFG.langManager.get("Economy"));
       this.getMenuElement(14).setText(CFG.langManager.get("PlayAsAReleasedVassal"));
-      this.getMenuElement(15).setText(CFG.langManager.get("Autonomy"));
-      this.getMenuElement(16).setText(CFG.langManager.get("Government"));
+      this.getMenuElement(15).setText(CFG.langManager.get("IsAVassal"));
+      this.getMenuElement(16).setText(CFG.langManager.get("Autonomy"));
+      this.getMenuElement(17).setText(CFG.langManager.get("Government"));
    }
 
    protected void draw(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean sliderMenuIsActive) {
@@ -174,10 +176,6 @@ class Menu_InGame_CreateAVassal_Info_Stats extends SliderMenu {
    }
 
    protected void actionElement(int iID) {
-      if (CFG.createVassal_Data.sCivTag == null) {
-         CFG.toast.setInView(CFG.langManager.get("SelectCivilization"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
-         return;
-      }
       switch (iID) {
          case 14: {
             try {
@@ -189,12 +187,28 @@ class Menu_InGame_CreateAVassal_Info_Stats extends SliderMenu {
          }
          case 15: {
             try {
-               CFG.menuManager.rebuildCreateAVassal_ChangeAutonomy();
+               this.getMenuElement(iID).setCheckboxState(!this.getMenuElement(iID).getCheckboxState());
+               CFG.createVassal_Data.isVassal = this.getMenuElement(iID).getCheckboxState();
             }
             catch (final NullPointerException ex) {}
             break;
          }
          case 16: {
+            if (CFG.createVassal_Data.sCivTag == null) {
+               CFG.toast.setInView(CFG.langManager.get("SelectCivilization"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
+               return;
+            }
+            try {
+               CFG.menuManager.rebuildCreateAVassal_ChangeAutonomy();
+            }
+            catch (final NullPointerException ex) {}
+            break;
+         }
+         case 17: {
+            if (CFG.createVassal_Data.sCivTag == null) {
+               CFG.toast.setInView(CFG.langManager.get("SelectCivilization"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
+               return;
+            }
             try {
                CFG.menuManager.rebuildCreateAVassal_ChangeIdeology();
             }

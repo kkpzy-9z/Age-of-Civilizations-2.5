@@ -695,7 +695,7 @@ class AI_Style
       }
    }
 
-   protected final ArrayList<Integer> getTopPrestige() {
+   protected final static ArrayList<Integer> getTopPrestige() {
       int[] tempIDS = new int[CFG.game.getCivsSize()];
       int[] tempScore = new int[CFG.game.getCivsSize()];
       int count = 0;
@@ -4373,88 +4373,83 @@ class AI_Style
 
                      if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).REVOLUTIONARY) {
                         final int peaceID = CFG.game.getPeaceTreaty_GameDataID(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
-                        final int warID = CFG.game.getWarID(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID);
-                        if (peaceID >= 0 && warID >= 0) {
+                        if (peaceID >= 0) {
                            final PeaceTreaty_Data tempData = new PeaceTreaty_Data(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData);
 
-                           boolean canEnd = (CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getNumOfProvinces() == 0 || CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID));
-                           //if (!canEnd) {
-                           //   try {
-                           //      canEnd = (Game_Calendar.TURN_ID > CFG.game.getWar(warID).getWarTurnID() + 39);
-                           //   }
-                           //   catch (final IndexOutOfBoundsException ex) {
-                           //      CFG.exceptionStack(ex);
-                           //   }
-                           //}
+                           final int warID = CFG.game.getWarID(tempData.peaceTreatyGameData.lCivsData_Defenders.get(0).iCivID, tempData.peaceTreatyGameData.lCivsData_Aggressors.get(0).iCivID);
+                           if (warID >= 0) {
+                              boolean canEnd = (CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getNumOfProvinces() == 0 || CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID));
+                              //if (!canEnd) {
+                              //   try {
+                              //      canEnd = (Game_Calendar.TURN_ID > CFG.game.getWar(warID).getWarTurnID() + 39);
+                              //   }
+                              //   catch (final IndexOutOfBoundsException ex) {
+                              //      CFG.exceptionStack(ex);
+                              //   }
+                              //}
 
-                           //if canend war state on
-                           canEnd = canEnd && CFG.game.getWar(warID).canEnd;
+                              //if canend war state on
+                              canEnd = canEnd && CFG.game.getWar(warID).canEnd;
 
-                           Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 000");
-                           if (canEnd) {
-                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 111");
-                              CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
-                           } else if (CFG.game.lPeaceTreaties.size() > 0) {
-                              //if puppet and lord in war, break
-                              if (CFG.game.getCiv(nCivID).getIsPupet() && (CFG.game.getWar(warID).getIsAggressor(CFG.game.getCiv(nCivID).getPuppetOfCivID()) || CFG.game.getWar(warID).getIsDefender(CFG.game.getCiv(nCivID).getPuppetOfCivID()))) break;
-
-                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 2222");
-                              int powerLeft = 0;
-                              int powerRight = 0;
-                              boolean canEnd_V2 = false;
-                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 3333");
-                              try {
-                                 for (int o = 0; o < tempData.peaceTreatyGameData.lCivsData_Defenders.size(); ++o) {
-                                    if (CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getNumOfProvinces() > 0) {
-                                       powerLeft += (int)(Math.max(CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getMoney(), 0L) / 5L + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getNumOfUnits() + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getNumOfProvinces());
-                                    }
-                                    else {
-                                       canEnd_V2 = true;
-                                    }
-                                 }
-                                 for (int o = 0; o < tempData.peaceTreatyGameData.lCivsData_Aggressors.size(); ++o) {
-                                    if (CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getNumOfProvinces() > 0) {
-                                       powerRight += (int)(Math.max(CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getMoney(), 0L) / 5L + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getNumOfUnits() + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getNumOfProvinces());
-                                    }
-                                    else {
-                                       canEnd_V2 = true;
-                                    }
-                                 }
-                              }
-                              catch (final IndexOutOfBoundsException ex2) {
-                                 canEnd_V2 = true;
-                              }
-                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 4444");
-                              if (canEnd_V2) {
-                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 5555");
+                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 000");
+                              if (canEnd) {
+                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 111");
                                  CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
-                              }
-                              else if (CFG.game.getWar(warID).getIsDefender(nCivID)) {
-                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 666");
-                                 if (powerLeft > powerRight * 0.475f) {
-                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 7777");
-                                    CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
+                              } else if (!CFG.game.lPeaceTreaties.isEmpty()) {
+                                 //if puppet and lord in war, break
+                                 if (CFG.game.getCiv(nCivID).getIsPupet() && (CFG.game.getWar(warID).getIsAggressor(CFG.game.getCiv(nCivID).getPuppetOfCivID()) || CFG.game.getWar(warID).getIsDefender(CFG.game.getCiv(nCivID).getPuppetOfCivID())))
+                                    break;
+
+                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 2222");
+                                 int powerLeft = 0;
+                                 int powerRight = 0;
+                                 boolean canEnd_V2 = false;
+                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 3333");
+                                 try {
+                                    for (int o = 0; o < tempData.peaceTreatyGameData.lCivsData_Defenders.size(); ++o) {
+                                       if (CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getNumOfProvinces() > 0) {
+                                          powerLeft += (int) (Math.max(CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getMoney(), 0L) / 5L + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getNumOfUnits() + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Defenders.get(o).iCivID).getNumOfProvinces());
+                                       } else {
+                                          canEnd_V2 = true;
+                                       }
+                                    }
+                                    for (int o = 0; o < tempData.peaceTreatyGameData.lCivsData_Aggressors.size(); ++o) {
+                                       if (CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getNumOfProvinces() > 0) {
+                                          powerRight += (int) (Math.max(CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getMoney(), 0L) / 5L + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getNumOfUnits() + CFG.game.getCiv(tempData.peaceTreatyGameData.lCivsData_Aggressors.get(o).iCivID).getNumOfProvinces());
+                                       } else {
+                                          canEnd_V2 = true;
+                                       }
+                                    }
+                                 } catch (final IndexOutOfBoundsException ex2) {
+                                    canEnd_V2 = true;
                                  }
-                                 else {
-                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 8888");
+                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 4444");
+                                 if (canEnd_V2) {
+                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 5555");
                                     CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
+                                 } else if (CFG.game.getWar(warID).getIsDefender(nCivID)) {
+                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 666");
+                                    if (powerLeft > powerRight * 0.475f) {
+                                       Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 7777");
+                                       CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
+                                    } else {
+                                       Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 8888");
+                                       CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
+                                    }
+                                 } else {
+                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 999");
+                                    if (powerRight > powerLeft * 0.475f) {
+                                       Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 10");
+                                       CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
+                                    } else {
+                                       Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 11");
+                                       CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
+                                    }
                                  }
+                              } else {
+                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 12");
+                                 CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
                               }
-                              else {
-                                 Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 999");
-                                 if (powerRight > powerLeft * 0.475f) {
-                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 10");
-                                    CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
-                                 }
-                                 else {
-                                    Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 11");
-                                    CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
-                                 }
-                              }
-                           }
-                           else {
-                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 12");
-                              CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
                            }
                         }
                         Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> END");
@@ -4465,7 +4460,7 @@ class AI_Style
                      }
                   }
                   catch (final IndexOutOfBoundsException ex3) {
-                     DiplomacyManager.acceptPeaceTreaty(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
+                     //DiplomacyManager.acceptPeaceTreaty(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
                      CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.removeMessage(i);
 
                      if (CFG.LOGS) CFG.exceptionStack(ex3);

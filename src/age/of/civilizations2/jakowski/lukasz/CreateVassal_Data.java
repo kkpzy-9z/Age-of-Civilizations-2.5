@@ -10,6 +10,7 @@ class CreateVassal_Data
     protected String sCivTag;
     protected Color oColor;
     protected boolean playAsVassal;
+    protected boolean isVassal;
     protected int iAutonomyStatus;
     private Image flagOfCivilization;
     private Image flagOfCivilizationH;
@@ -20,6 +21,7 @@ class CreateVassal_Data
         this.sCivTag = null;
         this.oColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         this.playAsVassal = false;
+        this.isVassal = true;
         this.flagOfCivilization = null;
         this.flagOfCivilizationH = null;
         this.iAutonomyStatus = 0;

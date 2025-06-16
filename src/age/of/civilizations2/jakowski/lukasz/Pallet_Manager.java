@@ -101,7 +101,6 @@ class Pallet_Manager {
       } else {
          for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
             FileHandle file = null;
-            if (CFG.game.getCiv(i).getIsPupet()) continue;
 
             try {
                if ((Boolean)this.isInternal.get(nPaletteID - 1)) {
