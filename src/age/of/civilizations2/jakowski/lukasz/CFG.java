@@ -3879,6 +3879,52 @@ class CFG {
                     }
                 }
             };
+        } else if (menuManager.getInRandom_Leaders()) {
+            keyboardSave = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if (keyboardMessage.length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildRandom_Leaders();
+                        menuManager.getRandom_Leaders_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildRandom_Leaders();
+                        menuManager.getRandom_Leaders_Alphabet();
+                    }
+                }
+            };
+            keyboardDelete = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if ((keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "").length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildRandom_Leaders();
+                        menuManager.getRandom_Leaders_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildRandom_Leaders();
+                        menuManager.getRandom_Leaders_Alphabet();
+                    }
+                }
+            };
+            keyboardWrite = new Keyboard_Action_Write(){
+
+                @Override
+                public void action(String nChar) {
+                    if ((keyboardMessage = keyboardMessage + nChar).length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildRandom_Leaders();
+                        menuManager.getRandom_Leaders_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildRandom_Leaders();
+                        menuManager.getRandom_Leaders_Alphabet();
+                    }
+                }
+            };
         } else if (menuManager.getInMapEditor_FormableCivs_SelectClaimant()) {
             keyboardSave = new Keyboard_Action(){
 
@@ -3968,6 +4014,52 @@ class CFG {
                         sSearch = null;
                         menuManager.rebuildLeader_Edit_SelectCivs_List();
                         menuManager.getLeaders_SelectCivs_Alphabet();
+                    }
+                }
+            };
+        } else if (menuManager.getInRandom_Leader_Edit_SelectCivs()) {
+            keyboardSave = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if (keyboardMessage.length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
+                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
+                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
+                    }
+                }
+            };
+            keyboardDelete = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if ((keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "").length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
+                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
+                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
+                    }
+                }
+            };
+            keyboardWrite = new Keyboard_Action_Write(){
+
+                @Override
+                public void action(String nChar) {
+                    if ((keyboardMessage = keyboardMessage + nChar).length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
+                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
+                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     }
                 }
             };
@@ -5519,7 +5611,10 @@ class CFG {
                             i = game.releaseAVasssal(createVassal_Data.sCivTag, tempProvinces, createVassal_Data.iCapitalProvinceID, game.getPlayer(PLAYER_TURNID).getCivID(), false, createVassal_Data.iAutonomyStatus);
                             if (i >= 0) {
                                 menuManager.rebuildMenu_InGame_VassalReleased(i);
+                            } else {
+                                continue;
                             }
+                            Gdx.app.log("VASSAL", "Released: " + createVassal_Data.sCivTag + " ID: " + i + " num of prov: " + tempProvinces.size());
                             if (!createVassal_Data.isVassal) {
                                 game.getCiv(i).setPuppetOfCivID(i);
                                 game.setCivRelation_OfCivB(game.getPlayer(PLAYER_TURNID).getCivID(), i, Math.min(game.getCivRelation_OfCivB(game.getPlayer(PLAYER_TURNID).getCivID(), i) + 0F, 0F));

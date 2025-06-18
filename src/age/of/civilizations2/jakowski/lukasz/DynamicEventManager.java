@@ -12,18 +12,20 @@ class DynamicEventManager implements Serializable {
     protected DynamicEventManager_Economy eventManagerEconomy;
     protected DynamicEventManager_CivilWar eventManagerCivilWar;
     protected DynamicEventManager_War eventManagerWar;
+    protected DynamicEventManager_Leader eventManagerLeader;
     protected ArrayList<Integer> lEventIndex;
 
     protected DynamicEventManager() {
         this.eventManagerEconomy = new DynamicEventManager_Economy();
         this.eventManagerCivilWar = new DynamicEventManager_CivilWar();
         this.eventManagerWar = new DynamicEventManager_War();
+        this.eventManagerLeader = new DynamicEventManager_Leader();
         this.lEventIndex = new ArrayList<Integer>();
     }
 
     protected void newTurnInvokeEvents() {
         //sort from high to low so no indexoutofbounds when removing lowest
-        Collections.sort(this.lEventIndex, Collections.reverseOrder());
+        this.lEventIndex.sort(Collections.reverseOrder());
         for (int i: this.lEventIndex) {
             CFG.eventsManager.removeEvent(i);
         }
@@ -32,6 +34,7 @@ class DynamicEventManager implements Serializable {
         this.eventManagerCivilWar.invokeCivilWarEvents();
         this.eventManagerWar.invokeWarEvents();
         this.eventManagerEconomy.invokeEconomicEvents();
+        this.eventManagerLeader.invokeLeaderEvents();
         //etc etc
     }
 
@@ -63,5 +66,6 @@ class DynamicEventManager implements Serializable {
         this.eventManagerEconomy = null;
         this.eventManagerCivilWar = null;
         this.eventManagerWar = null;
+        this.eventManagerLeader = null;
     }
 }

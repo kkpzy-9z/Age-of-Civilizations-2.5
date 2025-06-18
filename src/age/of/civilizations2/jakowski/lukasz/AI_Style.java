@@ -4366,18 +4366,18 @@ class AI_Style
                return;
             }
 
+            int warID = -1;
             switch (CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).messageType) {
                case PEACE_TREATY_LIST_OF_DEMANDS: {
                   Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> " + CFG.game.getCiv(nCivID).getCivName());
                   try {
-
                      if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).REVOLUTIONARY) {
                         final int peaceID = CFG.game.getPeaceTreaty_GameDataID(CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
                         if (peaceID >= 0) {
                            final PeaceTreaty_Data tempData = new PeaceTreaty_Data(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData);
 
-                           final int warID = CFG.game.getWarID(tempData.peaceTreatyGameData.lCivsData_Defenders.get(0).iCivID, tempData.peaceTreatyGameData.lCivsData_Aggressors.get(0).iCivID);
-                           if (warID >= 0) {
+                           warID = CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.iWarID;
+                           if (warID >= 0 && (CFG.game.getWar(warID).getIsAggressor(nCivID) || CFG.game.getWar(warID).getIsDefender(nCivID))) {
                               boolean canEnd = (CFG.game.getCiv(CFG.game.getCiv(nCivID).getPuppetOfCivID()).getNumOfProvinces() == 0 || CFG.game.isAlly(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID));
                               //if (!canEnd) {
                               //   try {
@@ -4450,6 +4450,9 @@ class AI_Style
                                  Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> 12");
                                  CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onDecline(nCivID);
                               }
+                           } else {
+                              Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> WAR NOT DETECTED ERROR");
+                              DiplomacyManager.acceptPeaceTreaty(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
                            }
                         }
                         Gdx.app.log("AoC", "respondToMessages -> PEACE_TREATY_LIST_OF_DEMANDS -> END");
@@ -4462,8 +4465,7 @@ class AI_Style
                   catch (final IndexOutOfBoundsException ex3) {
                      //DiplomacyManager.acceptPeaceTreaty(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).TAG);
                      CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.removeMessage(i);
-
-                     if (CFG.LOGS) CFG.exceptionStack(ex3);
+                     CFG.exceptionStack(ex3);
                   }
                   break;
                }
@@ -4471,8 +4473,10 @@ class AI_Style
                case WE_CAN_SIGN_PEACE_STATUS_QUO: {
                   Gdx.app.log("AoC", "respondToMessages -> WE_CAN_SIGN_PEACE -> " + CFG.game.getCiv(nCivID).getCivName() + " -> ");
                   final int nWarID = CFG.game.getWarID(nCivID, CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID);
-                  boolean playerTakesPartInPeaceTreaty = false;
-                  if (nWarID >= 0) {
+
+                  //safecheck: only evaluate if we didn't just decline a peace treaty from the same war
+                  //exception is if player's treaty
+                  if (nWarID >= 0 && ((warID != nWarID) || CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID == CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID())) {
                      if (!CFG.game.getWar(nWarID).canEnd) break;
                      //if puppet and lord in war, break
                      if (CFG.game.getCiv(nCivID).getIsPupet() && (CFG.game.getWar(nWarID).getIsAggressor(CFG.game.getCiv(nCivID).getPuppetOfCivID()) || CFG.game.getWar(nWarID).getIsDefender(CFG.game.getCiv(nCivID).getPuppetOfCivID()))) break;
@@ -4485,23 +4489,10 @@ class AI_Style
                      final List<Boolean> lAggressors = new ArrayList<Boolean>();
                      if (CFG.game.getWar(nWarID).getIsAggressor(nCivID)) {
                         for (int o2 = 0; o2 < CFG.game.getWar(nWarID).getAggressorsSize(); ++o2) {
-                           lAggressors.add(true);
                            if (CFG.game.getCiv(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID()).getControlledByPlayer()) {
-                              boolean playerOccupiedProvincesInThisPeace = false;
-                              for (int z = 0; z < CFG.game.getCiv(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID()).getNumOfProvinces(); ++z) {
-                                 if (CFG.game.getProvince(CFG.game.getCiv(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID()).getProvinceID(z)).isOccupied()) {
-                                    for (int p = 0; p < CFG.game.getWar(nWarID).getDefendersSize(); ++p) {
-                                       if (CFG.game.getWar(nWarID).getDefenderID(p).getCivID() == CFG.game.getProvince(CFG.game.getCiv(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID()).getProvinceID(z)).getTrueOwnerOfProvince()) {
-                                          playerOccupiedProvincesInThisPeace = true;
-                                          z = CFG.game.getCiv(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID()).getNumOfProvinces();
-                                          break;
-                                       }
-                                    }
-                                 }
-                              }
-                              if (playerOccupiedProvincesInThisPeace) {
-                                 playerTakesPartInPeaceTreaty = true;
-                              }
+                              lAggressors.add(false);
+                           } else {
+                              lAggressors.add(true);
                            }
                         }
                         for (int o2 = 0; o2 < CFG.game.getWar(nWarID).getDefendersSize(); ++o2) {
@@ -4513,32 +4504,14 @@ class AI_Style
                            lAggressors.add(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID() == CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID || CFG.game.getCiv(CFG.game.getWar(nWarID).getAggressorID(o2).getCivID()).getNumOfProvinces() == 0);
                         }
                         for (int o2 = 0; o2 < CFG.game.getWar(nWarID).getDefendersSize(); ++o2) {
-                           lDefenders.add(true);
                            if (CFG.game.getCiv(CFG.game.getWar(nWarID).getDefenderID(o2).getCivID()).getControlledByPlayer()) {
-                              //bugfix??? change//
-                              //playerTakesPartInPeaceTreaty = true;
-                              boolean playerOccupiedProvincesInThisPeace = false;
-                              for (int z = 0; z < CFG.game.getCiv(CFG.game.getWar(nWarID).getDefenderID(o2).getCivID()).getNumOfProvinces(); ++z) {
-                                 if (CFG.game.getProvince(CFG.game.getCiv(CFG.game.getWar(nWarID).getDefenderID(o2).getCivID()).getProvinceID(z)).isOccupied()) {
-                                    for (int p = 0; p < CFG.game.getWar(nWarID).getAggressorsSize(); ++p) {
-                                       if (CFG.game.getWar(nWarID).getAggressorID(p).getCivID() == CFG.game.getProvince(CFG.game.getCiv(CFG.game.getWar(nWarID).getDefenderID(o2).getCivID()).getProvinceID(z)).getTrueOwnerOfProvince()) {
-                                          playerOccupiedProvincesInThisPeace = true;
-                                          z = CFG.game.getCiv(CFG.game.getWar(nWarID).getDefenderID(o2).getCivID()).getNumOfProvinces();
-                                          break;
-                                       }
-                                    }
-                                 }
-                              }
-                              if (playerOccupiedProvincesInThisPeace) {
-                                 playerTakesPartInPeaceTreaty = true;
-                              }
+                              lDefenders.add(false);
+                           } else {
+                              lDefenders.add(true);
                            }
                         }
                      }
-                     if (playerTakesPartInPeaceTreaty) {
-                        Gdx.app.log("AoC", "respondToMessages -> WE_CAN_SIGN_PEACE -> playerTakesPartInPeaceTreaty: " + playerTakesPartInPeaceTreaty);
-                        break;
-                     }
+
                      Menu_PeaceTreaty.WAR_ID = nWarID;
                      CFG.peaceTreatyData = new PeaceTreaty_Data(Menu_PeaceTreaty.WAR_ID, lDefenders, lAggressors, CFG.game.getWar(nWarID).getIsAggressor(nCivID));
                      Gdx.app.log("AoC", "respondToMessages -> WE_CAN_SIGN_PEACE -> 000");

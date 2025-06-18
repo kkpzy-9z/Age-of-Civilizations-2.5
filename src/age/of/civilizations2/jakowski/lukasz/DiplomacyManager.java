@@ -1572,7 +1572,13 @@ class DiplomacyManager
                     CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.get(i).peaceTreatyAccepted = true;
                 }
                 if (!CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.get(i).peaceTreatyAccepted) {
-                    everyoneAccepted = false;
+                    //accept for puppets
+                    if (CFG.game.getCiv(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.get(i).iCivID).getPuppetOfCivID() == iCivID) {
+                        CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.get(i).peaceTreatyAccepted = true;
+                    } else {
+                        Gdx.app.log("AoC", "DIPLOMANAGER => Treaty not accepted by " + CFG.game.getCiv(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.get(i).iCivID).getCivName());
+                        everyoneAccepted = false;
+                    }
                 }
             }
             for (int i = 0; i < CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Aggressors.size(); ++i) {
@@ -1580,12 +1586,19 @@ class DiplomacyManager
                     CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Aggressors.get(i).peaceTreatyAccepted = true;
                 }
                 if (!CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Aggressors.get(i).peaceTreatyAccepted) {
-                    everyoneAccepted = false;
+                    //accept for puppets
+                    if (CFG.game.getCiv(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Aggressors.get(i).iCivID).getPuppetOfCivID() == iCivID) {
+                        CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Aggressors.get(i).peaceTreatyAccepted = true;
+                    } else {
+                        Gdx.app.log("AoC", "DIPLOMANAGER => Treaty not accepted by " + CFG.game.getCiv(CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Aggressors.get(i).iCivID).getCivName());
+                        everyoneAccepted = false;
+                    }
                 }
             }
         }
 
         if (everyoneAccepted) {
+            Gdx.app.log("AoC", "DIPLOMANAGER => Treaty accepted by everyone");
             try {
                 for (int i = 0; i < CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.size(); ++i) {
                     for (int j = 0; j < CFG.game.lPeaceTreaties.get(peaceID).peaceTreaty_GameData.lCivsDemands_Defenders.get(i).lDemands.size(); ++j) {

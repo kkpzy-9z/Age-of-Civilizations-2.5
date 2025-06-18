@@ -448,17 +448,17 @@ class PeaceTreaty_Data
          tempParticipants.add(false);
       }
       for (int i = 0; i < this.peaceTreatyGameData.lCivsData_Defenders.size(); ++i) {
-         if (CFG.game.getWar(this.peaceTreatyGameData.iWarID).getDefenderID_ByCivID(this.peaceTreatyGameData.lCivsData_Defenders.get(i).iCivID) < 1) {
-            //re-detect warid if not curciv not in war
-            this.peaceTreatyGameData.iWarID = CFG.game.getWarID(this.peaceTreatyGameData.lCivsData_Aggressors.get(0).iCivID, this.peaceTreatyGameData.lCivsData_Defenders.get(i).iCivID);
-         }
+         //if (CFG.game.getWar(this.peaceTreatyGameData.iWarID).getDefenderID_ByCivID(this.peaceTreatyGameData.lCivsData_Defenders.get(i).iCivID) < 1) {
+         //   //re-detect warid if not curciv not in war
+         //   this.peaceTreatyGameData.iWarID = CFG.game.getWarID(this.peaceTreatyGameData.lCivsData_Aggressors.get(0).iCivID, this.peaceTreatyGameData.lCivsData_Defenders.get(i).iCivID);
+         //}
          tempParticipants.set(this.peaceTreatyGameData.lCivsData_Defenders.get(i).iCivID, true);
       }
       for (int i = 0; i < this.peaceTreatyGameData.lCivsData_Aggressors.size(); ++i) {
-         if (CFG.game.getWar(this.peaceTreatyGameData.iWarID).getAggressorID_ByCivID(this.peaceTreatyGameData.lCivsData_Aggressors.get(i).iCivID) < 1) {
-            //re-detect warid if not curciv not in war
-            this.peaceTreatyGameData.iWarID = CFG.game.getWarID(this.peaceTreatyGameData.lCivsData_Defenders.get(0).iCivID, this.peaceTreatyGameData.lCivsData_Aggressors.get(i).iCivID);
-         }
+         //if (CFG.game.getWar(this.peaceTreatyGameData.iWarID).getAggressorID_ByCivID(this.peaceTreatyGameData.lCivsData_Aggressors.get(i).iCivID) < 1) {
+         //   //re-detect warid if not curciv not in war
+         //   this.peaceTreatyGameData.iWarID = CFG.game.getWarID(this.peaceTreatyGameData.lCivsData_Defenders.get(0).iCivID, this.peaceTreatyGameData.lCivsData_Aggressors.get(i).iCivID);
+         //}
          tempParticipants.set(this.peaceTreatyGameData.lCivsData_Aggressors.get(i).iCivID, true);
       }
       for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {
@@ -736,37 +736,43 @@ class PeaceTreaty_Data
                addAggressor.add(addCiv);
             }
             for (int m = this.peaceTreatyGameData.lCivsData_Defenders.size() - 1; m >= 0; --m) {
-               final PeaceTreaty_Civs tempLost = CFG.game.getWar(this.peaceTreatyGameData.iWarID).getDefenders_ProvincesLost(CFG.game.getWar(this.peaceTreatyGameData.iWarID).getDefenderID_ByCivID(this.peaceTreatyGameData.lCivsData_Defenders.get(m).iCivID), addDefender, addAggressor);
-               for (int j2 = tempLost.lProvincesLost.size() - 1; j2 >= 0; --j2) {
-                  boolean isAdded = false;
-                  for (int k2 = this.peaceTreatyGameData.lCivsData_Defenders.get(m).lProvincesLost.size() - 1; k2 >= 0; --k2) {
-                     if (tempLost.lProvincesLost.get(j2).equals(this.peaceTreatyGameData.lCivsData_Defenders.get(m).lProvincesLost.get(k2))) {
-                        isAdded = true;
-                        break;
+               try {
+                  final PeaceTreaty_Civs tempLost = CFG.game.getWar(this.peaceTreatyGameData.iWarID).getDefenders_ProvincesLost(CFG.game.getWar(this.peaceTreatyGameData.iWarID).getDefenderID_ByCivID(this.peaceTreatyGameData.lCivsData_Defenders.get(m).iCivID), addDefender, addAggressor);
+                  for (int j2 = tempLost.lProvincesLost.size() - 1; j2 >= 0; --j2) {
+                     boolean isAdded = false;
+                     for (int k2 = this.peaceTreatyGameData.lCivsData_Defenders.get(m).lProvincesLost.size() - 1; k2 >= 0; --k2) {
+                        if (tempLost.lProvincesLost.get(j2).equals(this.peaceTreatyGameData.lCivsData_Defenders.get(m).lProvincesLost.get(k2))) {
+                           isAdded = true;
+                           break;
+                        }
                      }
+                     if (!isAdded) {
+                        this.peaceTreatyGameData.lCivsData_Defenders.get(m).lProvincesLost.add(tempLost.lProvincesLost.get(j2));
+                        this.makeDemand_Province(tempLost.lProvincesLost.get(j2), this.peaceTreatyGameData.lCivsData_Defenders.get(m).iCivID, this.peaceTreatyGameData.lCivsData_Defenders.get(m).iCivID, true);
+                     }
+                     tempLost.lProvincesLost.remove(j2);
                   }
-                  if (!isAdded) {
-                     this.peaceTreatyGameData.lCivsData_Defenders.get(m).lProvincesLost.add(tempLost.lProvincesLost.get(j2));
-                     this.makeDemand_Province(tempLost.lProvincesLost.get(j2), this.peaceTreatyGameData.lCivsData_Defenders.get(m).iCivID, this.peaceTreatyGameData.lCivsData_Defenders.get(m).iCivID, true);
-                  }
-                  tempLost.lProvincesLost.remove(j2);
+               } catch (IndexOutOfBoundsException ex) {
                }
             }
             for (int m = 0; m < this.peaceTreatyGameData.lCivsData_Aggressors.size(); ++m) {
-               final PeaceTreaty_Civs tempLost = CFG.game.getWar(this.peaceTreatyGameData.iWarID).getAggressors_ProvincesLost(CFG.game.getWar(this.peaceTreatyGameData.iWarID).getAggressorID_ByCivID(this.peaceTreatyGameData.lCivsData_Aggressors.get(m).iCivID), addDefender, addAggressor);
-               for (int j2 = tempLost.lProvincesLost.size() - 1; j2 >= 0; --j2) {
-                  boolean isAdded = false;
-                  for (int k2 = this.peaceTreatyGameData.lCivsData_Aggressors.get(m).lProvincesLost.size() - 1; k2 >= 0; --k2) {
-                     if (tempLost.lProvincesLost.get(j2).equals(this.peaceTreatyGameData.lCivsData_Aggressors.get(m).lProvincesLost.get(k2))) {
-                        isAdded = true;
-                        break;
+               try {
+                  final PeaceTreaty_Civs tempLost = CFG.game.getWar(this.peaceTreatyGameData.iWarID).getAggressors_ProvincesLost(CFG.game.getWar(this.peaceTreatyGameData.iWarID).getAggressorID_ByCivID(this.peaceTreatyGameData.lCivsData_Aggressors.get(m).iCivID), addDefender, addAggressor);
+                  for (int j2 = tempLost.lProvincesLost.size() - 1; j2 >= 0; --j2) {
+                     boolean isAdded = false;
+                     for (int k2 = this.peaceTreatyGameData.lCivsData_Aggressors.get(m).lProvincesLost.size() - 1; k2 >= 0; --k2) {
+                        if (tempLost.lProvincesLost.get(j2).equals(this.peaceTreatyGameData.lCivsData_Aggressors.get(m).lProvincesLost.get(k2))) {
+                           isAdded = true;
+                           break;
+                        }
                      }
+                     if (!isAdded) {
+                        this.peaceTreatyGameData.lCivsData_Aggressors.get(m).lProvincesLost.add(tempLost.lProvincesLost.get(j2));
+                        this.makeDemand_Province(tempLost.lProvincesLost.get(j2), this.peaceTreatyGameData.lCivsData_Aggressors.get(m).iCivID, this.peaceTreatyGameData.lCivsData_Aggressors.get(m).iCivID, true);
+                     }
+                     tempLost.lProvincesLost.remove(j2);
                   }
-                  if (!isAdded) {
-                     this.peaceTreatyGameData.lCivsData_Aggressors.get(m).lProvincesLost.add(tempLost.lProvincesLost.get(j2));
-                     this.makeDemand_Province(tempLost.lProvincesLost.get(j2), this.peaceTreatyGameData.lCivsData_Aggressors.get(m).iCivID, this.peaceTreatyGameData.lCivsData_Aggressors.get(m).iCivID, true);
-                  }
-                  tempLost.lProvincesLost.remove(j2);
+               } catch (IndexOutOfBoundsException ex) {
                }
             }
             for (int m = this.peaceTreatyGameData.lCivsData_Defenders.size() - 1; m >= 0; --m) {

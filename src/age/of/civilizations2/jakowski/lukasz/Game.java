@@ -1448,13 +1448,16 @@ class Game {
                     //else get saved values
                     CFG.DYNAMIC_EVENTS = tempDataSav.DYNAMIC_EVENTS;
                     CFG.dynamicEventManager = tempDataSav.dynamicEventManager;
+                    //load new leader events
+                    if (tempDataSav.dynamicEventManager.eventManagerLeader == null) {
+                        CFG.dynamicEventManager.eventManagerLeader = new DynamicEventManager_Leader();
+                    }
                 }
                 CFG.PLAYER_PEACE = tempDataSav.PLAYER_PEACE;
                 CFG.AI_VASSALS = tempDataSav.AI_VASSALS;
                 CFG.AI_DIPLOMACY = tempDataSav.AI_DIPLOMACY;
 
                 Gdx.app.log("LOADSAVE", String.valueOf(CFG.DYNAMIC_EVENTS));
-                Gdx.app.log("LOADSAVE", String.valueOf(CFG.dynamicEventManager.eventManagerWar.lLargeWars));
             } catch (final Exception ex) {
                 //if from imcompatible save, default value
                 CFG.DYNAMIC_EVENTS = !CFG.SPECTATOR_MODE;
@@ -1555,7 +1558,7 @@ class Game {
                     final FileHandle file = Gdx.files.internal("game/leaders/" + tempTag);
                     CFG.leader_GameData = (Leader_GameData) CFG.deserialize(file.readBytes());
                 }
-                if (CFG.leader_GameData != null) {
+                if (DynamicEventManager_Leader.isValidLeader()) {
                     for (int m = CFG.leader_GameData.getCivsSize() - 1; m >= 0; --m) {
                         for (int k2 = 1; k2 < CFG.game.getCivsSize(); ++k2) {
                             if (CFG.game.getCiv(k2).getCivTag().equals(CFG.leader_GameData.getCiv(m)) || tRealTags.get(k2 - 1).equals(CFG.leader_GameData.getCiv(m))) {
@@ -1564,23 +1567,26 @@ class Game {
                                     m = -1;
                                     break;
                                 }
-                                if (Game_Calendar.currentYear > 1699 || !CFG.settingsManager.randomLeaders) {
-                                    if (Math.abs(CFG.leader_GameData.getLeaderOfCiv().getYear() + 30 - Game_Calendar.currentYear) < Math.abs(CFG.game.getCiv(k2).civGameData.leaderData.getYear() + 40 - Game_Calendar.currentYear)) {
-                                        CFG.game.getCiv(k2).civGameData.setLeader(CFG.leader_GameData.getLeaderOfCiv());
-                                        m = -1;
-                                        break;
-                                    }
-                                } else {
-                                    if (CFG.leader_GameData.getLeaderOfCiv().getYear() > 1699) {
-                                        break;
-                                    }
+                                //if (!CFG.settingsManager.randomLeaders) {
+                                //instead of arbitrary dates, use year of "in office", and prioritize leaders with more recent date
+                                if (Math.abs(CFG.leader_GameData.getLeaderOfCiv().getYear() - Game_Calendar.currentYear) > Math.abs(CFG.game.getCiv(k2).civGameData.leaderData.getYear() - Game_Calendar.currentYear)) {
+                                    CFG.game.getCiv(k2).civGameData.setLeader(CFG.leader_GameData.getLeaderOfCiv());
+                                    m = -1;
+                                    break;
+                                }
+                                //}
+                                //no more random choosing of leaders
+                                /* else {
+                                    //if (CFG.leader_GameData.getLeaderOfCiv().getYear() > 1699) {
+                                    //    break;
+                                    //}
                                     tRandLeaders.set(k2 - 1, tRandLeaders.get(k2 - 1) + 1);
                                     if (CFG.oR.nextInt(100) < 100.0f / tRandLeaders.get(k2 - 1) || (Game_Calendar.currentYear < 1700 && CFG.game.getCiv(k2).civGameData.leaderData.getYear() > 1699)) {
                                         CFG.game.getCiv(k2).civGameData.setLeader(CFG.leader_GameData.getLeaderOfCiv());
                                         m = -1;
                                         break;
                                     }
-                                }
+                                }*/
                             }
                         }
                     }
@@ -1589,6 +1595,19 @@ class Game {
             }
             CFG.leader_GameData = null;
         }
+
+        //build random leaders for civs without leaders still
+        for (int k = 1; k < CFG.game.getCivsSize(); ++k) {
+            try {
+                if (CFG.game.getCiv(k).civGameData.leaderData == null) {
+                    Gdx.app.log("LOADSAVE", "Building random leader for civ: " + CFG.game.getCiv(k).getCivName());
+                    DynamicEventManager_Leader.buildRandomLeader(k);
+                }
+            } catch (final NullPointerException ex5) {
+                CFG.exceptionStack(ex5);
+            }
+        }
+
         tRealTags.clear();
         tRealTags = null;
         tRandLeaders.clear();
@@ -10073,7 +10092,7 @@ class Game {
                 nData.add(new MenuElement_Hover_v2_Element_Type_Flag(nCivID, CFG.PADDING, 0));
                 nElements.add(new MenuElement_Hover_v2_Element2(nData));
                 nData.clear();
-                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Born") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InOffice") + ": "));
                 nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game.getCiv(nCivID).civGameData.leaderData.getDay() + " " + Game_Calendar.getMonthName(CFG.game.getCiv(nCivID).civGameData.leaderData.getMonth()) + " " + CFG.gameAges.getYear(CFG.game.getCiv(nCivID).civGameData.leaderData.getYear()), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
                 nData.add(new MenuElement_Hover_v2_Element_Type_Text(" - " + CFG.gameAges.getAge(CFG.gameAges.getAgeOfYear(CFG.game.getCiv(nCivID).civGameData.leaderData.getYear())).getName(), CFG.COLOR_TEXT_MODIFIER_NEUTRAL));
                 nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.time, CFG.PADDING, 0));
