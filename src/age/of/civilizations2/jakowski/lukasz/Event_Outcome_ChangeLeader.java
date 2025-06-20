@@ -58,7 +58,7 @@ class Event_Outcome_ChangeLeader extends Event_Outcome
     @Override
     protected String getConditionText() {
         try {
-            return CFG.langManager.get("ChangeLeader") + ": " + CFG.game.getCiv(this.getCivID()).civGameData.leaderData.getName() + " -> " + this.iValue.getName();
+            return this.iValue.getName() + " " + CFG.langManager.get("TakesPower");
         }
         catch (final IndexOutOfBoundsException | NullPointerException ex) {
             return CFG.langManager.get("ChangeLeader");
@@ -75,8 +75,9 @@ class Event_Outcome_ChangeLeader extends Event_Outcome
             final List<MenuElement_Hover_v2_Element2> tElements = new ArrayList<MenuElement_Hover_v2_Element2>();
             final List<MenuElement_Hover_v2_Element_Type> tData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
             tData.add(new MenuElement_Hover_v2_Element_Type_Flag(this.getCivID()));
-            tData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("ChangeLeader") + ": ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
-            tData.add(new MenuElement_Hover_v2_Element_Type_Text(this.iValue.getName(), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            tData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.getCiv(CFG.game.getCiv(this.getCivID()).getCivTag()) + ": ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            tData.add(new MenuElement_Hover_v2_Element_Type_Text(this.iValue.getName()));
+            tData.add(new MenuElement_Hover_v2_Element_Type_Text(" " + CFG.langManager.get("TakesPower"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
             tElements.add(new MenuElement_Hover_v2_Element2(tData));
             tData.clear();
             return tElements;

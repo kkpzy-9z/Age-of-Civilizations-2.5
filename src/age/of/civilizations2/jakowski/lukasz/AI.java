@@ -98,11 +98,11 @@ class AI
                         if (CFG.game.getWar(i).getIsAggressor(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID())) {
                             int k = CFG.game.getWar(i).getAggressorID_ByCivID(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
                             CFG.game.getCiv(CFG.game.getWar(i).getAggressorID(k).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_WeCanSignPeace(CFG.game.getWar(i).getDefenderID(j).getCivID()));
-                        }
-
-                        int k = CFG.oR.nextInt(CFG.game.getWar(i).getAggressorsSize());
-                        if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getWar(i).getAggressorID(k).getCivID()).getIdeologyID()).REVOLUTIONARY) {
-                            CFG.game.getCiv(CFG.game.getWar(i).getAggressorID(k).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_WeCanSignPeace(CFG.game.getWar(i).getDefenderID(j).getCivID()));
+                        } else {
+                            int k = CFG.oR.nextInt(CFG.game.getWar(i).getAggressorsSize());
+                            if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getWar(i).getAggressorID(k).getCivID()).getIdeologyID()).REVOLUTIONARY) {
+                                CFG.game.getCiv(CFG.game.getWar(i).getAggressorID(k).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_WeCanSignPeace(CFG.game.getWar(i).getDefenderID(j).getCivID()));
+                            }
                         }
                     }
                 }
@@ -111,11 +111,11 @@ class AI
                         if (CFG.game.getWar(i).getIsDefender(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID())) {
                             int k = CFG.game.getWar(i).getDefenderID_ByCivID(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
                             CFG.game.getCiv(CFG.game.getWar(i).getDefenderID(k).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_WeCanSignPeace(CFG.game.getWar(i).getAggressorID(j).getCivID()));
-                        }
-
-                        int k = CFG.oR.nextInt(CFG.game.getWar(i).getDefendersSize());
-                        if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getWar(i).getDefenderID(k).getCivID()).getIdeologyID()).REVOLUTIONARY) {
-                            CFG.game.getCiv(CFG.game.getWar(i).getDefenderID(k).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_WeCanSignPeace(CFG.game.getWar(i).getAggressorID(j).getCivID()));
+                        } else {
+                            int k = CFG.oR.nextInt(CFG.game.getWar(i).getDefendersSize());
+                            if (!CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getWar(i).getDefenderID(k).getCivID()).getIdeologyID()).REVOLUTIONARY) {
+                                CFG.game.getCiv(CFG.game.getWar(i).getDefenderID(k).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_WeCanSignPeace(CFG.game.getWar(i).getAggressorID(j).getCivID()));
+                            }
                         }
                     }
                 }

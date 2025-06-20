@@ -401,6 +401,7 @@ class CFG {
     protected static Province_Cores_GameData province_Cores_GameData;
     protected static FormableCivs_GameData formableCivs_GameData;
     protected static Leader_GameData leader_GameData;
+    protected static Leader_Random_GameData leader_Random_GameData;
     protected static Line_GameData editorLine_GameData;
     protected static final float ALPHA_PROVINCE_REGIONS = 0.45f;
     protected static final float ALPHA_PROVINCE_CONTINENTS = 0.7f;
@@ -4025,11 +4026,9 @@ class CFG {
                     if (keyboardMessage.length() > 0) {
                         sSearch = keyboardMessage;
                         menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
-                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     } else {
                         sSearch = null;
                         menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
-                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     }
                 }
             };
@@ -4040,11 +4039,9 @@ class CFG {
                     if ((keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "").length() > 0) {
                         sSearch = keyboardMessage;
                         menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
-                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     } else {
                         sSearch = null;
                         menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
-                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     }
                 }
             };
@@ -4055,11 +4052,9 @@ class CFG {
                     if ((keyboardMessage = keyboardMessage + nChar).length() > 0) {
                         sSearch = keyboardMessage;
                         menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
-                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     } else {
                         sSearch = null;
                         menuManager.rebuildRandom_Leader_Edit_SelectCivs_List();
-                        menuManager.getRandom_Leaders_SelectCivs_Alphabet();
                     }
                 }
             };
@@ -6191,6 +6186,7 @@ class CFG {
         province_Cores_GameData = null;
         formableCivs_GameData = null;
         leader_GameData = null;
+        leader_Random_GameData = null;
         editorLine_GameData = null;
         editor_Region_GameData = null;
         editor_Continent_GameData = null;

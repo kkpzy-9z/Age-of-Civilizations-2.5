@@ -338,12 +338,14 @@ class MenuManager {
     private int GAME_LEADERS_EDIT_CIVS = -1;
     private int GAME_RANDOM_LEADERS_EDIT_DATA = -1;
     private int GAME_RANDOM_LEADERS_EDIT_CIVS = -1;
+    private int GAME_RANDOM_LEADERS_EDIT_AITYPE = -1;
     private int GAME_LEADERS_EDIT_SELECT_CIVS = -1;
     private int GAME_LEADERS_EDIT_SELECT_CIVS_ALPHABET = -1;
     private int GAME_LEADERS_EDIT_SELECT_CIVS_LIST = -1;
     private int GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS = -1;
-    private int GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_ALPHABET = -1;
     private int GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST = -1;
+    private int GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE = -1;
+    private int GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST = -1;
     private int MAP_EDITOR_FORMABLE_CIVS = -1;
     private int MAP_EDITOR_FORMABLE_CIVS_EDIT = -1;
     private int MAP_EDITOR_FORMABLE_CIVS_EDIT_CLAIMANTS = -1;
@@ -2301,11 +2303,14 @@ class MenuManager {
                 case eGAME_RANDOM_LEADERS_EDIT: {
                     if (this.GAME_RANDOM_LEADERS_EDIT == -1) {
                         this.GAME_RANDOM_LEADERS_EDIT = this.addMenu(new Menu_Random_Leader_Edit());
+                        this.GAME_RANDOM_LEADERS_EDIT_AITYPE = this.addNextMenuToView(this.GAME_RANDOM_LEADERS_EDIT, new Menu_Random_Leader_Edit_AIType());
                         this.GAME_RANDOM_LEADERS_EDIT_CIVS = this.addNextMenuToView(this.GAME_RANDOM_LEADERS_EDIT, new Menu_Random_Leader_Edit_Civs());
                         this.GAME_RANDOM_LEADERS_EDIT_DATA = this.addNextMenuToView(this.GAME_RANDOM_LEADERS_EDIT, new Menu_Random_Leader_Edit_Data());
                     } else {
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(0).onBackPressed();
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(0, new Menu_Random_Leader_Edit());
+                        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_AITYPE).onBackPressed();
+                        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(this.GAME_RANDOM_LEADERS_EDIT_AITYPE, new Menu_Random_Leader_Edit_AIType());
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_CIVS).onBackPressed();
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(this.GAME_RANDOM_LEADERS_EDIT_CIVS, new Menu_Random_Leader_Edit_Civs());
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).onBackPressed();
@@ -2362,14 +2367,22 @@ class MenuManager {
                 case eGAME_RANDOM_LEADERS_EDIT_SELECT_CIVS: {
                     if (this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS == -1) {
                         this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS = this.addMenu(new Menu_Random_Leader_Edit_SelectCiv());
-                        this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_ALPHABET = this.addNextMenuToView(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS, new Menu_Random_Leader_Edit_SelectCiv_Alphabet());
                         this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST = this.addNextMenuToView(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS, new Menu_Random_Leader_Edit_SelectCiv_List());
                     } else {
-                        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).set(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_ALPHABET, new Menu_Random_Leader_Edit_SelectCiv_Alphabet());
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST).onBackPressed();
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).set(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST, new Menu_Random_Leader_Edit_SelectCiv_List());
                     }
                     return this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS;
+                }
+                case eGAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE: {
+                    if (this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE == -1) {
+                        this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE = this.addMenu(new Menu_Random_Leader_Edit_SelectAIType());
+                        this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST = this.addNextMenuToView(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE, new Menu_Random_Leader_Edit_SelectAIType_List());
+                    } else {
+                        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE).get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST).onBackPressed();
+                        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE).set(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST, new Menu_Random_Leader_Edit_SelectAIType_List());
+                    }
+                    return this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE;
                 }
                 case eMAP_EDITOR_FORMABLE_CIVS_SELECT_CLAIMANT: {
                     if (this.MAP_EDITOR_FORMABLE_CIVS_SELECT_CLAIMANT == -1) {
@@ -4211,6 +4224,11 @@ class MenuManager {
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).set(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST, new Menu_Random_Leader_Edit_SelectCiv_List());
     }
 
+    protected final void rebuildRandom_Leader_Edit_SelectAIType_List() {
+        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE).get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST).onBackPressed();
+        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE).set(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST, new Menu_Random_Leader_Edit_SelectAIType_List());
+    }
+
     protected final void rebuildMapEditor_FormableCivs_Claimants() {
         this.menus.get(this.MAP_EDITOR_FORMABLE_CIVS_EDIT).get(this.MAP_EDITOR_FORMABLE_CIVS_EDIT_CLAIMANTS).onBackPressed();
         this.menus.get(this.MAP_EDITOR_FORMABLE_CIVS_EDIT).set(this.MAP_EDITOR_FORMABLE_CIVS_EDIT_CLAIMANTS, new Menu_MapEditor_FormableCivs_Claimants());
@@ -4224,6 +4242,11 @@ class MenuManager {
     protected final void rebuildRandom_Leaders_Edit_Civs() {
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_CIVS).onBackPressed();
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(this.GAME_RANDOM_LEADERS_EDIT_CIVS, new Menu_Random_Leader_Edit_Civs());
+    }
+
+    protected final void rebuildRandom_Leaders_Edit_AIType() {
+        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_AITYPE).onBackPressed();
+        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(this.GAME_RANDOM_LEADERS_EDIT_AITYPE, new Menu_Random_Leader_Edit_AIType());
     }
 
     protected final void rebuildRandomGame_Civilizations_SelectList() {
@@ -4342,14 +4365,6 @@ class MenuManager {
             this.menus.get(this.GAME_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_LEADERS_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText("");
         } else {
             this.menus.get(this.GAME_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_LEADERS_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText(CFG.sSearch);
-        }
-    }
-
-    protected final void getRandom_Leaders_SelectCivs_Alphabet() {
-        if (CFG.sSearch == null) {
-            this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText("");
-        } else {
-            this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText(CFG.sSearch);
         }
     }
 
@@ -4513,6 +4528,10 @@ class MenuManager {
 
     protected final void clearRandom_Leaders__SelectCiv() {
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).get(2).onBackPressed();
+    }
+
+    protected final void clearRandom_Leaders__SelectAIType() {
+        this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE).get(2).onBackPressed();
     }
 
     protected final void clearRandomGame_SelectCivilizations() {
@@ -4725,12 +4744,12 @@ class MenuManager {
     }
 
     protected final void saveRandom_Leader_Edit_Data() {
-        CFG.leader_GameData.getLeaderOfCiv().setName(this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).getMenuElement(0).getText());
-        CFG.leader_GameData.getLeaderOfCiv().setImage(this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).getMenuElement(1).getText());
-        CFG.leader_GameData.getLeaderOfCiv().setWiki(this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).getMenuElement(3).getText());
-        CFG.leader_GameData.getLeaderOfCiv().setDay(Game_Calendar.currentDay);
-        CFG.leader_GameData.getLeaderOfCiv().setMonth(Game_Calendar.currentMonth);
-        CFG.leader_GameData.getLeaderOfCiv().setYear(Game_Calendar.currentYear);
+        CFG.leader_Random_GameData.getLeaderOfCiv().setName(this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).getMenuElement(0).getText());
+        CFG.leader_Random_GameData.getLeaderOfCiv().setImage(this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).getMenuElement(1).getText());
+        CFG.leader_Random_GameData.getLeaderOfCiv().setRiseToPower(this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_DATA).getMenuElement(3).getText());
+        CFG.leader_Random_GameData.getLeaderOfCiv().setDay(Game_Calendar.currentDay);
+        CFG.leader_Random_GameData.getLeaderOfCiv().setMonth(Game_Calendar.currentMonth);
+        CFG.leader_Random_GameData.getLeaderOfCiv().setYear(Game_Calendar.currentYear);
     }
 
     protected MenuManager() {

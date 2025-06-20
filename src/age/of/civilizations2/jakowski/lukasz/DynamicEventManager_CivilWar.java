@@ -170,7 +170,6 @@ class DynamicEventManager_CivilWar implements Serializable {
         try {
             //sort through every province of civ splitting
             ArrayList<Integer> tempProvinces = new ArrayList<>(CFG.game.getCiv(nCivID).lProvincesWithLowStability);
-            int nCapitalProvinceID = 0;
             for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); i++) {
                 //if capital or in list already, skip
                 if (CFG.game.getCiv(nCivID).getProvinceID(i) == CFG.game.getCiv(nCivID).getCapitalProvinceID() || tempProvinces.contains(CFG.game.getCiv(nCivID).getProvinceID(i))) continue;
@@ -178,10 +177,6 @@ class DynamicEventManager_CivilWar implements Serializable {
                 //randomly assign to new civ
                 if ((int)Math.round(Math.random()) == 1) {
                     tempProvinces.add(CFG.game.getCiv(nCivID).getProvinceID(i));
-
-                    if (CFG.game.getProvince(CFG.game.getCiv(nCivID).getProvinceID(i)).getPopulationData().getPopulation() > CFG.game.getProvince(nCapitalProvinceID).getPopulationData().getPopulation()) {
-                        nCapitalProvinceID = CFG.game.getCiv(nCivID).getProvinceID(i);
-                    }
                 }
             }
 
@@ -207,7 +202,8 @@ class DynamicEventManager_CivilWar implements Serializable {
             }
             CFG.game.getCiv(nCivID).setNumOfUnits(CFG.game.getCiv(nCivID).getNumOfUnits() - iSwitchingArmy);
 
-            int iNewCivID = CFG.game.releaseAVasssal(CFG.ideologiesManager.getRealTag(CFG.game.getCiv(nCivID).getCivTag()) + CFG.ideologiesManager.getIdeology(oldGovType).getExtraTag(), tempProvinces, nCapitalProvinceID, nCivID, false);
+            int iNewCivID = CFG.game.releaseAVasssal(CFG.ideologiesManager.getRealTag(CFG.game.getCiv(nCivID).getCivTag()) + CFG.ideologiesManager.getIdeology(oldGovType).getExtraTag(), tempProvinces, tempProvinces.get(0), nCivID, false);
+            CFG.game.moveCapitalToTheLargestCity(iNewCivID);
             if (iNewCivID >= 0) {
                 CFG.menuManager.rebuildMenu_InGame_VassalReleased(iNewCivID);
             }
@@ -276,6 +272,11 @@ class DynamicEventManager_CivilWar implements Serializable {
             CFG.game.getWar(CFG.game.getWarID(iNewCivID, nCivID)).canEnd = false;
             //fire event
             invokeTrueCivilWarEvent(nCivID, iNewCivID);
+            if ((int)(Math.ceil(Math.random() * (2))) == 1) {
+                CFG.dynamicEventManager.eventManagerLeader.invokeCivilWarLeaderChange(nCivID, iNewCivID);
+            } else {
+                DynamicEventManager_Leader.buildRandomLeader(iNewCivID);
+            }
 
             //reload for ui
             CFG.menuManager.rebuildMenu_InGame_War(nCivID, CFG.game.getCiv(iNewCivID).getCivID());

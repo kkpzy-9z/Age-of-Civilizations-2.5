@@ -1569,9 +1569,23 @@ class Game {
                                 }
                                 //if (!CFG.settingsManager.randomLeaders) {
                                 //instead of arbitrary dates, use year of "in office", and prioritize leaders with more recent date
-                                if (Math.abs(CFG.leader_GameData.getLeaderOfCiv().getYear() - Game_Calendar.currentYear) > Math.abs(CFG.game.getCiv(k2).civGameData.leaderData.getYear() - Game_Calendar.currentYear)) {
+                                if (CFG.leader_GameData.getLeaderOfCiv().isIncumbentYear() && CFG.game.getCiv(k2).civGameData.leaderData.isIncumbentYear()) {
+                                    if (Math.abs(CFG.leader_GameData.getLeaderOfCiv().getYear() - Game_Calendar.currentYear) > Math.abs(CFG.game.getCiv(k2).civGameData.leaderData.getYear() - Game_Calendar.currentYear)) {
+                                        CFG.game.getCiv(k2).civGameData.setLeader(CFG.leader_GameData.getLeaderOfCiv());
+                                        m = -1;
+                                        break;
+                                    }
+                                } else if (!CFG.leader_GameData.getLeaderOfCiv().isIncumbentYear() && !CFG.game.getCiv(k2).civGameData.leaderData.isIncumbentYear()) {
+                                    if (Math.abs(CFG.leader_GameData.getLeaderOfCiv().getYear() + 30 - Game_Calendar.currentYear) < Math.abs(CFG.game.getCiv(k2).civGameData.leaderData.getYear() + 40 - Game_Calendar.currentYear)) {
+                                        CFG.game.getCiv(k2).civGameData.setLeader(CFG.leader_GameData.getLeaderOfCiv());
+                                        m = -1;
+                                        break;
+                                    }
+                                } else if (CFG.leader_GameData.getLeaderOfCiv().isIncumbentYear() && !CFG.game.getCiv(k2).civGameData.leaderData.isIncumbentYear()) {
                                     CFG.game.getCiv(k2).civGameData.setLeader(CFG.leader_GameData.getLeaderOfCiv());
                                     m = -1;
+                                    break;
+                                } else if (!CFG.leader_GameData.getLeaderOfCiv().isIncumbentYear() && CFG.game.getCiv(k2).civGameData.leaderData.isIncumbentYear()) {
                                     break;
                                 }
                                 //}
@@ -1601,7 +1615,7 @@ class Game {
             try {
                 if (CFG.game.getCiv(k).civGameData.leaderData == null) {
                     Gdx.app.log("LOADSAVE", "Building random leader for civ: " + CFG.game.getCiv(k).getCivName());
-                    DynamicEventManager_Leader.buildRandomLeader(k);
+                    DynamicEventManager_Leader.buildRandomLeader(k, true);
                 }
             } catch (final NullPointerException ex5) {
                 CFG.exceptionStack(ex5);
@@ -10092,7 +10106,11 @@ class Game {
                 nData.add(new MenuElement_Hover_v2_Element_Type_Flag(nCivID, CFG.PADDING, 0));
                 nElements.add(new MenuElement_Hover_v2_Element2(nData));
                 nData.clear();
-                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InOffice") + ": "));
+                if (CFG.game.getCiv(nCivID).civGameData.leaderData.isIncumbentYear()) {
+                    nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InOffice") + ": "));
+                } else {
+                    nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Born") + ": "));
+                }
                 nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.game.getCiv(nCivID).civGameData.leaderData.getDay() + " " + Game_Calendar.getMonthName(CFG.game.getCiv(nCivID).civGameData.leaderData.getMonth()) + " " + CFG.gameAges.getYear(CFG.game.getCiv(nCivID).civGameData.leaderData.getYear()), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
                 nData.add(new MenuElement_Hover_v2_Element_Type_Text(" - " + CFG.gameAges.getAge(CFG.gameAges.getAgeOfYear(CFG.game.getCiv(nCivID).civGameData.leaderData.getYear())).getName(), CFG.COLOR_TEXT_MODIFIER_NEUTRAL));
                 nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.time, CFG.PADDING, 0));

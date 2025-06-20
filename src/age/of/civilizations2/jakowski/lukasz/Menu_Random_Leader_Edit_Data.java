@@ -9,39 +9,48 @@ class Menu_Random_Leader_Edit_Data extends SliderMenu {
    private String sName;
    private String sImage;
    private String sBorn;
-   private String sWiki;
 
    protected Menu_Random_Leader_Edit_Data() {
       super();
-      final int tempW = (int)(CFG.CIV_INFO_MENU_WIDTH * 1.25f);
+      final int tempW = (int)(CFG.CIV_INFO_MENU_WIDTH * 1.5f);
       final int tempElemH = CFG.BUTTON_HEIGHT;
       final List<MenuElement> menuElements = new ArrayList<MenuElement>();
       int tY = CFG.PADDING;
 
-      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_GameData.getLeaderOfCiv().getName(), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
+      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_Random_GameData.getLeaderOfCiv().getName(), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
          protected String getTextToDraw() {
             return Menu_Random_Leader_Edit_Data.this.sName + ": " + super.getText();
          }
       });
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
-      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_GameData.getLeaderOfCiv().getImage(), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
+      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_Random_GameData.getLeaderOfCiv().getImage(), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
          protected String getTextToDraw() {
             return Menu_Random_Leader_Edit_Data.this.sImage + ": " + super.getText();
          }
       });
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
-      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_GameData.getLeaderOfCiv().getDay() + " " + Game_Calendar.getMonthName(CFG.leader_GameData.getLeaderOfCiv().getMonth()) + " " + CFG.gameAges.getYear(CFG.leader_GameData.getLeaderOfCiv().getYear()), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
+      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_Random_GameData.getLeaderOfCiv().getDay() + " " + Game_Calendar.getMonthName(CFG.leader_Random_GameData.getLeaderOfCiv().getMonth()) + " " + CFG.gameAges.getYear(CFG.leader_Random_GameData.getLeaderOfCiv().getYear()), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
          protected String getTextToDraw() {
             return Menu_Random_Leader_Edit_Data.this.sBorn + ": " + super.getText();
          }
+
+          protected void buildElementHover() {
+              ArrayList<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
+              ArrayList<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
+
+              nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InOfficeTooltip1"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+              nElements.add(new MenuElement_Hover_v2_Element2(nData));
+              nData.clear();
+
+              nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InOfficeTooltip2"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+              nElements.add(new MenuElement_Hover_v2_Element2(nData));
+              nData.clear();
+
+              this.menuElementHover = new MenuElement_Hover_v2(nElements);
+          }
       });
       tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
-      menuElements.add(new Button_New_Game_Players_Special(CFG.leader_GameData.getLeaderOfCiv().getWiki(), CFG.PADDING * 2, CFG.PADDING + 2, tY, tempW - CFG.PADDING * 2 - 2, true) {
-         protected String getTextToDraw() {
-            return Menu_Random_Leader_Edit_Data.this.sWiki + ": " + super.getText();
-         }
-      });
-      tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
+
       menuElements.add(new Button_NewGameStyle_Left("-", -1, CFG.PADDING, tY, (int)((float)CFG.BUTTON_HEIGHT * 0.8F), (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
       menuElements.add(new Button_NewGameStyle_Middle((String)null, -1, CFG.PADDING + (int)((float)CFG.BUTTON_HEIGHT * 0.8F), tY, tempW - CFG.PADDING * 2 - (int)((float)CFG.BUTTON_HEIGHT * 0.8F) * 2, (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
       menuElements.add(new Button_NewGameStyle_Right("+", -1, CFG.PADDING + (int)((float)CFG.BUTTON_HEIGHT * 0.8F) + (tempW - CFG.PADDING * 2 - (int)((float)CFG.BUTTON_HEIGHT * 0.8F) * 2), tY, (int)((float)CFG.BUTTON_HEIGHT * 0.8F), (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
@@ -81,6 +90,8 @@ class Menu_Random_Leader_Edit_Data extends SliderMenu {
       menuElements.add(new Button_NewGameStyle_Left("-", -1, CFG.PADDING, tY, (int)((float)CFG.BUTTON_HEIGHT * 0.8F), (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
       menuElements.add(new Button_NewGameStyle_Middle((String)null, -1, CFG.PADDING + (int)((float)CFG.BUTTON_HEIGHT * 0.8F), tY, tempW - CFG.PADDING * 2 - (int)((float)CFG.BUTTON_HEIGHT * 0.8F) * 2, (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
       menuElements.add(new Button_NewGameStyle_Right("+", -1, CFG.PADDING + (int)((float)CFG.BUTTON_HEIGHT * 0.8F) + (tempW - CFG.PADDING * 2 - (int)((float)CFG.BUTTON_HEIGHT * 0.8F) * 2), tY, (int)((float)CFG.BUTTON_HEIGHT * 0.8F), (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
+      tY += ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
+      menuElements.add(new Button_NewGameStyle((String)null, -1, CFG.PADDING, tY, tempW - CFG.PADDING * 2 - 2, (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true));
       int var10000 = tY + ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING;
       this.initMenu(new SliderMenuTitle((String)null, CFG.BUTTON_HEIGHT * 3 / 4, false, false) {
          protected void draw(SpriteBatch oSB, int iTranslateX, int nPosX, int nPosY, int nWidth, boolean sliderMenuIsActive) {
@@ -98,27 +109,27 @@ class Menu_Random_Leader_Edit_Data extends SliderMenu {
             CFG.drawText(oSB, this.getText(), nPosX + nWidth / 2 - (int)((float)this.getTextWidth() * 0.75F / 2.0F) + iTranslateX, nPosY - this.getHeight() + this.getHeight() / 2 + 1 - (int)((float)this.getTextHeight() * 0.75F / 2.0F), CFG.COLOR_TEXT_MODIFIER_NEUTRAL);
             CFG.fontMain.getData().setScale(1.0F);
          }
-      }, 0, CFG.BUTTON_HEIGHT * 2 + CFG.PADDING * 4 + CFG.PADDING * 2 + CFG.BUTTON_HEIGHT / 4, tempW, Math.min(((MenuElement)menuElements.get(menuElements.size() - 1)).getPosY() + ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING, CFG.GAME_HEIGHT - (CFG.BUTTON_HEIGHT * 2 + CFG.PADDING * 4 + CFG.PADDING * 2 + CFG.BUTTON_HEIGHT * 3 / 4) - CFG.BUTTON_HEIGHT - CFG.PADDING * 3), menuElements);
+      }, 0, CFG.BUTTON_HEIGHT * 2 + CFG.PADDING * 4 + CFG.PADDING * 2 + CFG.BUTTON_HEIGHT / 4, tempW, Math.min(((MenuElement)menuElements.get(menuElements.size() - 1)).getPosY() + ((MenuElement)menuElements.get(menuElements.size() - 1)).getHeight() + CFG.PADDING * 2, CFG.GAME_HEIGHT - (CFG.BUTTON_HEIGHT * 2 + CFG.PADDING * 4 + CFG.PADDING * 2 + CFG.BUTTON_HEIGHT * 3 / 4) - CFG.BUTTON_HEIGHT), menuElements);
       this.updateLanguage();
    }
 
    protected void updateLanguage() {
       this.sName = CFG.langManager.get("Name");
       this.sImage = CFG.langManager.get("ImageName");
-      this.sBorn = CFG.langManager.get("Born");
-      this.sWiki = CFG.langManager.get("Wiki");
+      this.sBorn = CFG.langManager.get("InOffice");
       this.getTitle().setText(CFG.langManager.get("Leader"));
       this.getMenuElement(2).setText(Game_Calendar.currentDay + " " + Game_Calendar.getMonthName(Game_Calendar.currentMonth) + " " + CFG.gameAges.getYear(Game_Calendar.currentYear));
-      this.getMenuElement(5).setText(CFG.langManager.get("PopulationGrowthModifier") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_PopGrowth > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_PopGrowth * 100.0F) + "%");
-      this.getMenuElement(8).setText(CFG.langManager.get("EconomyGrowthModifier") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_EconomyGrowth > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_EconomyGrowth * 100.0F) + "%");
-      this.getMenuElement(11).setText(CFG.langManager.get("IncomeTaxation") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeTaxation > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeTaxation * 100.0F) + "%");
-      this.getMenuElement(14).setText(CFG.langManager.get("IncomeProduction") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeProduction > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeProduction * 100.0F) + "%");
-      this.getMenuElement(17).setText(CFG.langManager.get("Administration") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_Administration > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_Administration * 100.0F) + "%");
-      this.getMenuElement(20).setText(CFG.langManager.get("Research") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_Research > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_Research * 100.0F) + "%");
-      this.getMenuElement(23).setText(CFG.langManager.get("MilitaryUpkeep") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep * 100.0F) + "%");
-      this.getMenuElement(26).setText(CFG.langManager.get("AttackBonus") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_AttackBonus > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_AttackBonus * 100.0F) + "%");
-      this.getMenuElement(29).setText(CFG.langManager.get("DefenseBonus") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_DefenseBonus > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_DefenseBonus * 100.0F) + "%");
-      this.getMenuElement(32).setText(CFG.langManager.get("MovementPoints") + ": " + (CFG.leader_GameData.getLeaderOfCiv().fModifier_MovementPoints > 0.0F ? "+" : "") + (int)(CFG.leader_GameData.getLeaderOfCiv().fModifier_MovementPoints * 100.0F) + "%");
+      this.getMenuElement(4).setText(CFG.langManager.get("PopulationGrowthModifier") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_PopGrowth > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_PopGrowth * 100.0F) + "%");
+      this.getMenuElement(7).setText(CFG.langManager.get("EconomyGrowthModifier") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_EconomyGrowth > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_EconomyGrowth * 100.0F) + "%");
+      this.getMenuElement(10).setText(CFG.langManager.get("IncomeTaxation") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeTaxation > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeTaxation * 100.0F) + "%");
+      this.getMenuElement(13).setText(CFG.langManager.get("IncomeProduction") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeProduction > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeProduction * 100.0F) + "%");
+      this.getMenuElement(16).setText(CFG.langManager.get("Administration") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Administration > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Administration * 100.0F) + "%");
+      this.getMenuElement(19).setText(CFG.langManager.get("Research") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Research > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Research * 100.0F) + "%");
+      this.getMenuElement(22).setText(CFG.langManager.get("MilitaryUpkeep") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep * 100.0F) + "%");
+      this.getMenuElement(25).setText(CFG.langManager.get("AttackBonus") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_AttackBonus > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_AttackBonus * 100.0F) + "%");
+      this.getMenuElement(28).setText(CFG.langManager.get("DefenseBonus") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_DefenseBonus > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_DefenseBonus * 100.0F) + "%");
+      this.getMenuElement(31).setText(CFG.langManager.get("MovementPoints") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MovementPoints > 0.0F ? "+" : "") + (int)(CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MovementPoints * 100.0F) + "%");
+      this.getMenuElement(33).setText(CFG.langManager.get("AppearsAtStart") + ": " + (CFG.leader_Random_GameData.getLeaderOfCiv().canAppearNaturally() ? CFG.langManager.get("Yes") : CFG.langManager.get("No")));
    }
 
    protected void draw(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean sliderMenuIsActive) {
@@ -138,8 +149,7 @@ class Menu_Random_Leader_Edit_Data extends SliderMenu {
    protected void actionElement(int iID) {
       switch (iID) {
          case 0:
-          case 1:
-          case 3: {
+          case 1: {
             CFG.showKeyboard();
             return;
          }
@@ -150,119 +160,204 @@ class Menu_Random_Leader_Edit_Data extends SliderMenu {
             CFG.menuManager.updateSelecetScenarioAge_Slider();
             return;
          }
-          case 4: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_PopGrowth -= 0.01f;
-            this.updateLanguage();
-            return;
-         }
-         case 5:
-          case 8:
-          case 11:
-          case 14:
-          case 17:
-          case 20:
-          case 23:
-          case 26:
-          case 29:
-          case 32: {
+          case 4:
+          case 7:
+          case 10:
+          case 13:
+          case 16:
+          case 19:
+          case 22:
+          case 25:
+          case 28:
+          case 31: {
             CFG.toast.setInView(this.getMenuElement(iID).getText(), CFG.COLOR_TEXT_NUM_OF_PROVINCES);
             return;
          }
+         case 3: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_PopGrowth -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_PopGrowth -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
+          }
+         case 5: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_PopGrowth += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_PopGrowth += 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
          case 6: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_PopGrowth += 0.01f;
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_EconomyGrowth -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_EconomyGrowth -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 8: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_EconomyGrowth += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_EconomyGrowth += 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 9: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeTaxation -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeTaxation -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 11: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeTaxation += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeTaxation += 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 12: {
+            if (AoCGame.isShiftDown) {
+                CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeProduction -= 0.1f;
+            } else {
+                CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeProduction -= 0.01f;
+            }
             this.updateLanguage();
             return;
          }
-         case 7: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_EconomyGrowth -= 0.01f;
+         case 14: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeProduction += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_IncomeProduction += 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 15: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Administration -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Administration -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 17: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Administration += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Administration += 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+         case 18: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Research -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Research -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
+         }
+          case 20: {
+              if (AoCGame.isShiftDown) {
+                  CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Research += 0.1f;
+              } else {
+                  CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_Research += 0.01f;
+              }
+              this.updateLanguage();
+              return;
+         }
+         case 21: {
+            if (AoCGame.isShiftDown) {
+                CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep -= 0.1f;
+            } else {
+                CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep -= 0.01f;
+            }
             this.updateLanguage();
             return;
          }
-          case 9: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_EconomyGrowth += 0.01f;
-            this.updateLanguage();
-            return;
+         case 23: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep += 0.01f;
+             }
+             this.updateLanguage();
+             return;
          }
-         case 10: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeTaxation -= 0.01f;
-            this.updateLanguage();
-            return;
+         case 24: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_AttackBonus -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_AttackBonus -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
          }
-          case 12: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeTaxation += 0.01f;
-            this.updateLanguage();
-            return;
+          case 26: {
+              if (AoCGame.isShiftDown) {
+                  CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_AttackBonus += 0.1f;
+              } else {
+                  CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_AttackBonus += 0.01f;
+              }
+              this.updateLanguage();
+              return;
          }
-         case 13: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeProduction -= 0.01f;
-            this.updateLanguage();
-            return;
+         case 27: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_DefenseBonus -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_DefenseBonus -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
          }
-          case 15: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_IncomeProduction += 0.01f;
-            this.updateLanguage();
-            return;
+          case 29: {
+              if (AoCGame.isShiftDown) {
+                  CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_DefenseBonus += 0.1f;
+              } else {
+                  CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_DefenseBonus += 0.01f;
+              }
+              this.updateLanguage();
+              return;
          }
-         case 16: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_Administration -= 0.01f;
-            this.updateLanguage();
-            return;
+         case 30: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MovementPoints -= 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MovementPoints -= 0.01f;
+             }
+             this.updateLanguage();
+             return;
          }
-          case 18: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_Administration += 0.01f;
-            this.updateLanguage();
-            return;
-         }
-         case 19: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_Research -= 0.01f;
-            this.updateLanguage();
-            return;
-         }
-          case 21: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_Research += 0.01f;
-            this.updateLanguage();
-            return;
-         }
-         case 22: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep -= 0.01f;
-            this.updateLanguage();
-            return;
-         }
-          case 24: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_MilitaryUpkeep += 0.01f;
-            this.updateLanguage();
-            return;
-         }
-         case 25: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_AttackBonus -= 0.01f;
-            this.updateLanguage();
-            return;
-         }
-          case 27: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_AttackBonus += 0.01f;
-            this.updateLanguage();
-            return;
-         }
-         case 28: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_DefenseBonus -= 0.01f;
-            this.updateLanguage();
-            return;
-         }
-          case 30: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_DefenseBonus += 0.01f;
-            this.updateLanguage();
-            return;
-         }
-         case 31: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_MovementPoints -= 0.01f;
-            this.updateLanguage();
-            return;
+         case 32: {
+             if (AoCGame.isShiftDown) {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MovementPoints += 0.1f;
+             } else {
+                 CFG.leader_Random_GameData.getLeaderOfCiv().fModifier_MovementPoints += 0.01f;
+             }
+             this.updateLanguage();
+             return;
          }
           case 33: {
-            CFG.leader_GameData.getLeaderOfCiv().fModifier_MovementPoints += 0.01f;
-            this.updateLanguage();
-            return;
-         }
+              CFG.leader_Random_GameData.getLeaderOfCiv().setCanAppearNaturally(!CFG.leader_Random_GameData.getLeaderOfCiv().canAppearNaturally());
+              this.updateLanguage();
+              return;
+          }
       }
    }
 }

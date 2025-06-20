@@ -50,13 +50,18 @@ class Menu_Random_Leader_Edit extends SliderMenu
             }
             case 1: {
                 CFG.menuManager.saveRandom_Leader_Edit_Data();
-                if (CFG.leader_GameData.getLeaderOfCiv().getName().isEmpty()) {
+                if (CFG.leader_Random_GameData.getLeaderOfCiv().getName().isEmpty()) {
                     CFG.toast.setInView("-- " + CFG.langManager.get("Name") + " --", CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
                     CFG.toast.setTimeInView(6000);
                     break;
                 }
-                if (CFG.leader_GameData.getCivsSize() == 0) {
-                    CFG.toast.setInView("-- " + CFG.langManager.get("Civilizations") + " --", CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
+                if (CFG.leader_Random_GameData.getCivsSize() == 0) {
+                    CFG.toast.setInView("-- " + CFG.langManager.get("Continents") + " --", CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
+                    CFG.toast.setTimeInView(6000);
+                    break;
+                }
+                if (CFG.leader_Random_GameData.getAITypesSize() == 0) {
+                    CFG.toast.setInView("-- " + CFG.langManager.get("AITypes") + " --", CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
                     CFG.toast.setTimeInView(6000);
                     break;
                 }
@@ -77,8 +82,8 @@ class Menu_Random_Leader_Edit extends SliderMenu
     private final void saveLeader() {
         final OutputStream os = null;
         try {
-            final FileHandle fileData = Gdx.files.local("game/leadersRandom/" + CFG.leader_GameData.getLeaderOfCiv().getTag());
-            fileData.writeBytes(CFG.serialize(CFG.leader_GameData), false);
+            final FileHandle fileData = Gdx.files.local("game/leadersRandom/" + CFG.leader_Random_GameData.getLeaderOfCiv().getTag());
+            fileData.writeBytes(CFG.serialize(CFG.leader_Random_GameData), false);
         }
         catch (final IOException ex2) {}
         finally {
@@ -98,28 +103,28 @@ class Menu_Random_Leader_Edit extends SliderMenu
                 file = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
             }
             final String tempTags = file.readString();
-            if (!tempTags.contains(CFG.leader_GameData.getLeaderOfCiv().getTag())) {
+            if (!tempTags.contains(CFG.leader_Random_GameData.getLeaderOfCiv().getTag())) {
                 final FileHandle fileSave = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
-                fileSave.writeString(tempTags + CFG.leader_GameData.getLeaderOfCiv().getTag() + ";", false);
+                fileSave.writeString(tempTags + CFG.leader_Random_GameData.getLeaderOfCiv().getTag() + ";", false);
             }
             else {
                 final String[] tempTagsSplited = tempTags.split(";");
                 boolean tAdd = true;
                 for (String s : tempTagsSplited) {
-                    if (s.equals(CFG.leader_GameData.getLeaderOfCiv().getTag())) {
+                    if (s.equals(CFG.leader_Random_GameData.getLeaderOfCiv().getTag())) {
                         tAdd = false;
                         break;
                     }
                 }
                 if (tAdd) {
                     final FileHandle fileSave2 = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
-                    fileSave2.writeString(tempTags + CFG.leader_GameData.getLeaderOfCiv().getTag() + ";", false);
+                    fileSave2.writeString(tempTags + CFG.leader_Random_GameData.getLeaderOfCiv().getTag() + ";", false);
                 }
             }
         }
         catch (final GdxRuntimeException ex) {
             final FileHandle fileSave3 = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
-            fileSave3.writeString(CFG.leader_GameData.getLeaderOfCiv().getTag() + ";", false);
+            fileSave3.writeString(CFG.leader_Random_GameData.getLeaderOfCiv().getTag() + ";", false);
         }
     }
 }

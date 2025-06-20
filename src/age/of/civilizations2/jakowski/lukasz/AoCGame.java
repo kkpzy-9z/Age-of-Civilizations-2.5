@@ -2,6 +2,7 @@
 // Class Version: 8
 package age.of.civilizations2.jakowski.lukasz;
 
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -12,8 +13,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import java.lang.reflect.InvocationTargetException;
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -21,8 +21,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.ApplicationAdapter;
+
 import java.io.File;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +48,8 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
     protected static ShaderProgram nextPlayerTurnShader;
     protected static ShaderProgram shaderAlpha;
     protected static ShaderProgram shaderAlpha2;
+    protected static boolean isShiftDown;
+    protected static boolean isPasting;
     private final String VERTEX = "attribute vec4 a_position;attribute vec4 a_color;attribute vec2 a_texCoord0;uniform mat4 u_projTrans;varying vec4 vColor;varying vec2 vTexCoord;void main() {\tvColor = a_color;\tvTexCoord = a_texCoord0;\tgl_Position =  u_projTrans * a_position;}";
     private String vertexShader;
     private String fragmentShader;
@@ -535,8 +536,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                         CFG.drawTextWithShadow(this.oSB, "FPS: " + CFG.iNumOfFPS, CFG.PADDING * 2, CFG.PADDING * 2, Color.WHITE);
                         CFG.fontMain.getData().setScale(1.0f);
                     }
-                    catch (final NullPointerException ex7) {}
-                    catch (final IllegalStateException ex8) {}
+                    catch (final NullPointerException | IllegalStateException ex7) {}
                 }
                 this.oSB.setColor(Color.WHITE);
                 this.oSB.end();
@@ -854,7 +854,8 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
             }
         }
     }
-    
+
+    //For reference: https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/Input.java#L68
     @Override
     public boolean keyDown(final int keycode) {
         try {
@@ -886,6 +887,9 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                     this.MAP_MOVE_TOP = false;
                     this.lScrollTime_MAPY = System.currentTimeMillis();
                     this.iScroll_MAPY = 15.0f;
+                }
+                if (keycode == 59) {
+                    AoCGame.isShiftDown = true;
                 }
             }
         }
@@ -939,6 +943,9 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                 }
                 if (keycode == 20) {
                     this.MAP_MOVE_BOT = false;
+                }
+                if (keycode == 59) {
+                    AoCGame.isShiftDown = false;
                 }
                 if (CFG.isDesktop()) {
                     if (CFG.menuManager.getDialogMenu().getVisible()) {
@@ -1366,10 +1373,35 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
     @Override
     public boolean keyTyped(final char character) {
         CFG.setRender_3(true);
-        Gdx.app.log("AoC", "" + (int)character + " character: " + character);
         try {
             if (CFG.menuManager.getKeyboard().getVisible() && character > '\0') {
+                Gdx.app.log("AoC", "" + (int)character + " character: " + character);
                 if (character == '' || character == '\b') {
+                    CFG.keyboardDelete.action();
+                    CFG.menuManager.getKeyboard().onMenuPressed();
+                }
+                else if (character == 22) {
+                    Gdx.app.log("AoC", "Pasted from clipboard: " + Gdx.app.getClipboard().getContents());
+                    CFG.keyboardWrite.action("" + Gdx.app.getClipboard().getContents());
+                    CFG.menuManager.getKeyboard().onMenuPressed();
+                    CFG.toast.setInView(CFG.langManager.get("PastedFromClipboard") + "!");
+                }
+                else if (character == 3) {
+                    Gdx.app.log("AoC", "Copied from clipboard: " + CFG.keyboardMessage);
+                    Gdx.app.getClipboard().setContents(CFG.keyboardMessage);
+                    CFG.toast.setInView(CFG.langManager.get("CopiedToClipboard") + "!");
+                }
+                else if (character == 24) {
+                    Gdx.app.log("AoC", "Cut from clipboard: " + CFG.keyboardMessage);
+                    Gdx.app.getClipboard().setContents(CFG.keyboardMessage);
+                    CFG.keyboardMessage = "";
+                    CFG.keyboardDelete.action();
+                    CFG.menuManager.getKeyboard().onMenuPressed();
+                    CFG.toast.setInView(CFG.langManager.get("CutToClipboard") + "!");
+                }
+                else if (character == 127) {
+                    Gdx.app.log("AoC", "Deleted all");
+                    CFG.keyboardMessage = "";
                     CFG.keyboardDelete.action();
                     CFG.menuManager.getKeyboard().onMenuPressed();
                 }

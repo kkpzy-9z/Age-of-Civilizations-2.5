@@ -79,23 +79,23 @@ class Menu_Random_Leaders_Alphabet extends SliderMenu {
             try {
                try {
                   final FileHandle file = Gdx.files.local("game/leadersRandom/" + tagsSPLITED[j]);
-                  CFG.leader_GameData = (Leader_GameData)CFG.deserialize(file.readBytes());
+                  CFG.leader_Random_GameData = (Leader_Random_GameData)CFG.deserialize(file.readBytes());
                }
                catch (final GdxRuntimeException ex) {
                   final FileHandle file = Gdx.files.internal("game/leadersRandom/" + tagsSPLITED[j]);
-                  CFG.leader_GameData = (Leader_GameData)CFG.deserialize(file.readBytes());
+                  CFG.leader_Random_GameData = (Leader_Random_GameData)CFG.deserialize(file.readBytes());
                }
             }
             catch (final ClassNotFoundException | IOException ex2) {}
-             if (!CFG.leader_GameData.getLeaderOfCiv().getName().isEmpty()) {
+             if (!CFG.leader_Random_GameData.getLeaderOfCiv().getName().isEmpty()) {
                  for (Character lCharacter : this.lCharacters) {
-                     if (lCharacter == CFG.leader_GameData.getLeaderOfCiv().getName().charAt(0)) {
+                     if (lCharacter == CFG.leader_Random_GameData.getLeaderOfCiv().getName().charAt(0)) {
                          addChar = false;
                          break;
                      }
                  }
                if (addChar) {
-                  this.lCharacters.add(CFG.leader_GameData.getLeaderOfCiv().getName().charAt(0));
+                  this.lCharacters.add(CFG.leader_Random_GameData.getLeaderOfCiv().getName().charAt(0));
                }
             }
          }

@@ -418,6 +418,11 @@ class Civilization {
                 CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.civGameData.lVassals.get(i).autonomyStatus.getColorStatus());
             } catch (NullPointerException exception) {
                 CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, CFG.gameAutonomy.getAutonomy(0).getColorStatus());
+                //update pallet if possible
+                try {
+                    CFG.palletManager.loadCivilizationPalletColor(CFG.palletManager.getActivePalletID(), this.civGameData.lVassals.get(i).iCivID);
+                } catch (NullPointerException ex) {
+                }
             }
         }
     }
@@ -433,7 +438,11 @@ class Civilization {
         }
 
         //update vassal colors
-        this.updateVassalCivilizationsColor();
+        if (this.getIsPupet()) {
+            CFG.game.getCiv(this.civGameData.iPuppetOfCivID).updateVassalCivilizationsColor();
+        } else {
+            this.updateVassalCivilizationsColor();
+        }
 
         this.updateCivilizationIdeology();
         this.loadFlag();
@@ -2046,7 +2055,8 @@ class Civilization {
         CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).setAutonomyStatus(iAutonomyStatus);
 
         //set color
-        this.updateCivilizationColor(CFG.game.getCiv(iPuppetOfCivID).getR(), CFG.game.getCiv(iPuppetOfCivID).getG(), CFG.game.getCiv(iPuppetOfCivID).getB(), CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.getColorStatus());
+        CFG.game.getCiv(iPuppetOfCivID).updateVassalCivilizationsColor();
+        //this.updateCivilizationColor(CFG.game.getCiv(iPuppetOfCivID).getR(), CFG.game.getCiv(iPuppetOfCivID).getG(), CFG.game.getCiv(iPuppetOfCivID).getB(), CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.getColorStatus());
 
         //set this civ's vassals to be overseen by new lord
         if (CFG.menuManager.getInManageDiplomacy() || CFG.menuManager.getInCreateScenario_Civilizations()) {

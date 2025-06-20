@@ -14,8 +14,8 @@ class DynamicEventManager_Economy implements Serializable {
     protected int CRASH_SCANAT = -1;
     protected int MIRACLE_SCANAT = -1;
     protected int PLAYER_SCANAT = -1;
-    private final int TURNS_LOWER_BOUND = 10;
-    private final int TURNS_UPPER_BOUND = 30;
+    private final int TURNS_LOWER_BOUND = 15;
+    private final int TURNS_UPPER_BOUND = 35;
     private final int SCAN_TOPECONOMIES = 10;
     private final float CRASH_INVESTMENT_BUFFER = 0.25f;
     private final float MIRACLE_INVESTMENT_BUFFER = 0.25f;
@@ -37,9 +37,9 @@ class DynamicEventManager_Economy implements Serializable {
         currentTurn = CFG.game.getPlayer(CFG.PLAYER_TURNID).statistics_Civ_GameData.getTurns();
         //onstart set first scan dates
         if (CRASH_SCANAT == -1 || MIRACLE_SCANAT == -1 || PLAYER_SCANAT == -1) {
-            CRASH_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, 3, true);
-            MIRACLE_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, 3, true);
-            PLAYER_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, 3, true);
+            CRASH_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            MIRACLE_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            PLAYER_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
             Gdx.app.log("AoC2.5", "Scans C M P: " + (CRASH_SCANAT - currentTurn) + " " + (MIRACLE_SCANAT - currentTurn) + " " + (PLAYER_SCANAT - currentTurn));
         }
 

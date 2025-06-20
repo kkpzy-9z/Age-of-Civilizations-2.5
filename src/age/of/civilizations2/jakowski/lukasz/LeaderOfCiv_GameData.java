@@ -12,6 +12,7 @@ class LeaderOfCiv_GameData implements Serializable
     private int Year;
     private int Month;
     private int Day;
+    private boolean incumbentYear = false;
     protected float fModifier_PopGrowth;
     protected float fModifier_EconomyGrowth;
     protected float fModifier_IncomeTaxation;
@@ -32,6 +33,7 @@ class LeaderOfCiv_GameData implements Serializable
         this.Year = 3;
         this.Month = 2;
         this.Day = 1;
+        this.incumbentYear = true;
         this.fModifier_PopGrowth = 0.0f;
         this.fModifier_EconomyGrowth = 0.0f;
         this.fModifier_IncomeTaxation = 0.0f;
@@ -99,5 +101,13 @@ class LeaderOfCiv_GameData implements Serializable
     
     protected final void setTag(final String sTag) {
         this.sTag = sTag;
+    }
+
+    protected final boolean isIncumbentYear() {
+        return this.incumbentYear;
+    }
+
+    protected final void setIncumbentYear(final boolean incumbentYear) {
+        this.incumbentYear = incumbentYear;
     }
 }

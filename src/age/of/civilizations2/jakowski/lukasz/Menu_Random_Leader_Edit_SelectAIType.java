@@ -4,8 +4,8 @@ import javax.swing.MenuElement;
 import java.util.ArrayList;
 import java.util.List;
 
-class Menu_Random_Leader_Edit_SelectCiv extends SliderMenu {
-   protected Menu_Random_Leader_Edit_SelectCiv() {
+class Menu_Random_Leader_Edit_SelectAIType extends SliderMenu {
+   protected Menu_Random_Leader_Edit_SelectAIType() {
       super();
       final List menuElements = new ArrayList<MenuElement>();
       menuElements.add(new Button_Menu_LR_Line(null, -1, 0, 0, CFG.GAME_WIDTH, CFG.BUTTON_HEIGHT, true));
@@ -15,7 +15,7 @@ class Menu_Random_Leader_Edit_SelectCiv extends SliderMenu {
 
    protected void updateLanguage() {
       this.getMenuElement(0).setText(CFG.langManager.get("Back"));
-      this.getTitle().setText(CFG.langManager.get("SelectContinent"));
+      this.getTitle().setText(CFG.langManager.get("SelectAIType"));
    }
 
    protected final void actionElement(int iID) {
@@ -24,7 +24,7 @@ class Menu_Random_Leader_Edit_SelectCiv extends SliderMenu {
 
    protected void onBackPressed() {
       CFG.menuManager.setViewID(Menu.eGAME_RANDOM_LEADERS_EDIT);
-      CFG.menuManager.clearRandom_Leaders__SelectCiv();
+      CFG.menuManager.clearRandom_Leaders__SelectAIType();
    }
 
    protected void actionClose() {
