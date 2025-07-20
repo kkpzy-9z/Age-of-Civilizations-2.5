@@ -3978,6 +3978,52 @@ class CFG {
                     }
                 }
             };
+        } else if (menuManager.getInCreateScenario_Events_SelectLeader()) {
+            keyboardSave = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if (keyboardMessage.length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildSelect_Leaders();
+                        menuManager.getSelect_Leaders_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildSelect_Leaders();
+                        menuManager.getSelect_Leaders_Alphabet();
+                    }
+                }
+            };
+            keyboardDelete = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if ((keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "").length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildSelect_Leaders();
+                        menuManager.getSelect_Leaders_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildSelect_Leaders();
+                        menuManager.getSelect_Leaders_Alphabet();
+                    }
+                }
+            };
+            keyboardWrite = new Keyboard_Action_Write(){
+
+                @Override
+                public void action(String nChar) {
+                    if ((keyboardMessage = keyboardMessage + nChar).length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildSelect_Leaders();
+                        menuManager.getSelect_Leaders_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildSelect_Leaders();
+                        menuManager.getSelect_Leaders_Alphabet();
+                    }
+                }
+            };
         } else if (menuManager.getInMapEditor_FormableCivs_SelectClaimant()) {
             keyboardSave = new Keyboard_Action(){
 

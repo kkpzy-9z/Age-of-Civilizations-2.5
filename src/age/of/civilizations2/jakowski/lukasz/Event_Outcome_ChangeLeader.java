@@ -25,6 +25,14 @@ class Event_Outcome_ChangeLeader extends Event_Outcome
     protected void setLeader(final LeaderOfCiv_GameData nValue) {
         this.iValue = nValue;
     }
+
+    protected String getLeaderName() {
+        try {
+            return this.iValue.getName();
+        } catch (final NullPointerException ex) {
+            return CFG.langManager.get("None");
+        }
+    }
     
     @Override
     protected boolean updateCivIDAfterRemove(final int nRemovedCivID) {
@@ -89,6 +97,6 @@ class Event_Outcome_ChangeLeader extends Event_Outcome
     
     @Override
     protected final void editViewID() {
-        //CFG.menuManager.setViewID(Menu.eCREATE_SCENARIO_EVENTS_OUT_CHANGELEADER);
+        CFG.menuManager.setViewID(Menu.eCREATE_SCENARIO_EVENTS_OUT_CHANGELEADER);
     }
 }

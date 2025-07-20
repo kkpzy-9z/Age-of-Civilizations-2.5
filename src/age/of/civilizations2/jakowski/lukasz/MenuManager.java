@@ -269,6 +269,7 @@ class MenuManager {
     private int CREATE_SCENARIO_EVENTS_OUT_DECLAREWAR = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_WHITEPEACE = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_CHANGEIDEOLOGY = -1;
+    private int CREATE_SCENARIO_EVENTS_OUT_CHANGELEADER = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_INCRELATION = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_DECRELATION = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_ADDARMY = -1;
@@ -292,6 +293,7 @@ class MenuManager {
     private int CREATE_SCENARIO_EVENTS_ADD_CIV_LIST = -1;
     private int CREATE_SCENARIO_EVENTS_ADD_CIV_ALPHABET = -1;
     private int CREATE_SCENARIO_EVENTS_SELECTEVENT = -1;
+    private int CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER = -1;
     private int CREATE_SCENARIO_EVENTS_SELECTIDEOLOGY = -1;
     private int CREATE_SCENARIO_EVENTS_DECISION = -1;
     private int CREATE_SCENARIO_EVENTS_DATE = -1;
@@ -1703,6 +1705,14 @@ class MenuManager {
                     }
                     return this.CREATE_SCENARIO_EVENTS_OUT_CHANGEIDEOLOGY;
                 }
+                case eCREATE_SCENARIO_EVENTS_OUT_CHANGELEADER: {
+                    if (this.CREATE_SCENARIO_EVENTS_OUT_CHANGELEADER == -1) {
+                        this.CREATE_SCENARIO_EVENTS_OUT_CHANGELEADER = this.addMenu(new Menu_CreateScenario_Events_Out_ChangeLeader());
+                    } else {
+                        this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_CHANGELEADER).set(0, new Menu_CreateScenario_Events_Out_ChangeLeader());
+                    }
+                    return this.CREATE_SCENARIO_EVENTS_OUT_CHANGELEADER;
+                }
                 case eCREATE_SCENARIO_EVENTS_OUT_INCRELATION: {
                     if (this.CREATE_SCENARIO_EVENTS_OUT_INCRELATION == -1) {
                         this.CREATE_SCENARIO_EVENTS_OUT_INCRELATION = this.addMenu(new Menu_CreateScenario_Events_Out_IncRelation());
@@ -1872,6 +1882,16 @@ class MenuManager {
                         this.menus.get(this.CREATE_SCENARIO_EVENTS_SELECTEVENT).set(1, new Menu_CreateScenario_Events_SelectEvent_List());
                     }
                     return this.CREATE_SCENARIO_EVENTS_SELECTEVENT;
+                }
+                case eCREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER: {
+                    if (this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER == -1) {
+                        this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER = this.addMenu(new Menu_CreateScenario_Events_Out_Select_Leader());
+                        this.addNextMenuToView(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER, new Menu_CreateScenario_Events_Out_Select_Leader_List());
+                    } else {
+                        this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER).set(0, new Menu_CreateScenario_Events_Out_Select_Leader());
+                        this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER).set(1, new Menu_CreateScenario_Events_Out_Select_Leader_List());
+                    }
+                    return this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER;
                 }
                 case eCREATE_SCENARIO_EVENTS_SELECT_PROVINCES: {
                     if (this.CREATE_SCENARIO_EVENTS_SELECT_PROVINCES == -1) {
@@ -3394,6 +3414,10 @@ class MenuManager {
         return this.viewID == this.CREATE_SCENARIO_EVENTS_SELECT_PROVINCES;
     }
 
+    protected final boolean getInCreateScenario_Events_SelectLeader() {
+        return this.viewID == this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER;
+    }
+
     protected final boolean getInCreateScenario_Cores_AddCiv() {
         return this.viewID == this.CREATE_SCENARIO_CORES_ADD_CIV;
     }
@@ -4285,6 +4309,11 @@ class MenuManager {
         this.menus.get(this.GAME_RANDOM_LEADERS).set(1, new Menu_Random_Leaders_Options());
     }
 
+    protected final void rebuildSelect_Leaders() {
+        this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER).get(1).setVisible(false);
+        this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER).set(1, new Menu_CreateScenario_Events_Out_Select_Leader_List());
+    }
+
     protected final void rebuildMapEditor_FormableCivs_SelectClaimantList() {
         this.menus.get(this.MAP_EDITOR_FORMABLE_CIVS_SELECT_CLAIMANT).get(this.MAP_EDITOR_FORMABLE_CIVS_SELECT_CLAIMANT_LIST).onBackPressed();
         this.menus.get(this.MAP_EDITOR_FORMABLE_CIVS_SELECT_CLAIMANT).set(this.MAP_EDITOR_FORMABLE_CIVS_SELECT_CLAIMANT_LIST, new Menu_MapEditor_FormableCivs_SelectClaimant_List());
@@ -4425,6 +4454,14 @@ class MenuManager {
             this.menus.get(this.GAME_RANDOM_LEADERS).get(2).getMenuElement(0).setText("");
         } else {
             this.menus.get(this.GAME_RANDOM_LEADERS).get(2).getMenuElement(0).setText(CFG.sSearch);
+        }
+    }
+
+    protected final void getSelect_Leaders_Alphabet() {
+        if (CFG.sSearch == null) {
+            this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER).get(2).getMenuElement(0).setText("");
+        } else {
+            this.menus.get(this.CREATE_SCENARIO_EVENTS_OUT_SELECT_LEADER).get(2).getMenuElement(0).setText(CFG.sSearch);
         }
     }
 
