@@ -27,5 +27,6 @@ class LeaderOfCiv_Random_GameData extends LeaderOfCiv_GameData implements Serial
     LeaderOfCiv_Random_GameData() {
         super();
         this.setWiki("");
+        this.setRandom(true);
     }
 }

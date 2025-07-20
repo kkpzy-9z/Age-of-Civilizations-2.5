@@ -26,6 +26,7 @@ class Keyboard extends SliderMenu
     protected static int activeColor_RGB_ID;
     protected static boolean commandsMode;
     protected static int changeCivilizationNameMode;
+    protected static int changeLeaderNameMode;
     protected static int changeProvinceNameMode;
     protected static int changeCityNameIDToo;
     
@@ -461,6 +462,7 @@ class Keyboard extends SliderMenu
         Keyboard.activeColor_RGB_ID = -1;
         Keyboard.commandsMode = false;
         Keyboard.changeCivilizationNameMode = 0;
+        Keyboard.changeLeaderNameMode = -1;
         Keyboard.changeProvinceNameMode = -1;
         Keyboard.changeCityNameIDToo = -1;
     }

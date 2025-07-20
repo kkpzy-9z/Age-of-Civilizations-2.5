@@ -1367,9 +1367,7 @@ class Menu_InGame_Build extends SliderMenu {
    }
 
    protected void actionElement(int iID) {
-      if (!CFG.SPECTATOR_MODE) {
-         this.getMenuElement(iID).actionElement(iID);
-      }
+      this.getMenuElement(iID).actionElement(iID); //works in spec mode now
    }
 
    protected void setVisible(boolean visible) {

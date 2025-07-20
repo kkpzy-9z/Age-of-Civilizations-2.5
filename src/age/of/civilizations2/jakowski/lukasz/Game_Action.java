@@ -208,6 +208,7 @@ class Game_Action {
       CFG.game.getPlayer(CFG.PLAYER_TURNID).fBefore_Scale = CFG.map.getMapScale().getCurrentScale();
       CFG.game.getPlayer(CFG.PLAYER_TURNID).iACTIVE_VIEW_MODE = CFG.viewsManager.getActiveViewID();
       CFG.game.getPlayer(CFG.PLAYER_TURNID).visible_CivInfo = CFG.menuManager.getVisible_InGame_CivInfo() ? CFG.getActiveCivInfo() : -1;
+      CFG.game.getPlayer(CFG.PLAYER_TURNID).visible_ManageInfo = CFG.menuManager.getVisible_InGame_ManageInfo() ? true : false;
       CFG.game.getPlayer(CFG.PLAYER_TURNID).visible_Outliner = CFG.menuManager.getVisible_Menu_InGame_Outliner();
       CFG.game.getPlayer(CFG.PLAYER_TURNID).visible_CensusOfProvince = CFG.menuManager.getVisibleInGame_CensusOfProvince() ? Menu_InGame_CensusOfProvince.PROVINCE_ID : -1;
       CFG.game.getPlayer(CFG.PLAYER_TURNID).visible_Wars = CFG.menuManager.getVisibleInGame_Wars();
@@ -234,6 +235,7 @@ class Game_Action {
       try {
          CFG.menuManager.setVisible_InGame_CivInfo(false);
          CFG.menuManager.setVisible_InGame_FlagAction(false);
+         CFG.menuManager.setVisible_InGame_CivManage(false);
          CFG.menuManager.setVisibleInGame_WarDetails(false);
          CFG.menuManager.setVisibleInGame_Wars(false);
          CFG.menuManager.setVisibleInGame_CensusOfProvince(false);
@@ -407,6 +409,49 @@ class Game_Action {
 
    protected final int getUpdateCivsDiplomacyPoints(int nCivID) {
       return Math.max(this.getDiplomacyPoints_BaseValue(nCivID) + this.getDiplomacyPoints_FromEnemies(nCivID) + this.getDiplomacyPoints_FromRank(nCivID) + this.getDiplomacyPoints_FromTechnology(nCivID) - DiplomacyManager.getCostOfCurrentDiplomaticActionsUpdate(nCivID), 5);
+   }
+
+   //add decisions.json decisions to all player civ leaders
+   protected final void updatePlayerDecisions() {
+      for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+         if (CFG.game.getPlayer(i).getCivID() > 0) {
+            try {
+               CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.clearDecisions();
+               for (Decision_GameData decision : CFG.gameDecisions.lDecisions) {
+                  CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.addDecision(decision.copy());
+               }
+            } catch (NullPointerException | GdxRuntimeException ex) {
+               DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
+
+               for (Decision_GameData decision : CFG.gameDecisions.lDecisions) {
+                  CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.addDecision(decision.copy());
+               }
+            }
+         }
+      }
+   }
+
+   //initialize class perceptions of leader
+   protected final void updateClassPerceptions() {
+      for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+         if (CFG.game.getPlayer(i).getCivID() > 0) {
+            try {
+               CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.clearClassViews();
+
+               CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, 0.5F);
+               CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, 0.5F);
+               CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, 0.5F);
+            } catch (NullPointerException | GdxRuntimeException ex) {
+               DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
+
+               for (Decision_GameData decision : CFG.gameDecisions.lDecisions) {
+                  CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, 0.5F);
+                  CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, 0.5F);
+                  CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, 0.5F);
+               }
+            }
+         }
+      }
    }
 
    protected final int getDiplomacyPoints_BaseValue(int nCivID) {

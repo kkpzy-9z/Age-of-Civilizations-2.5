@@ -687,7 +687,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
             try {
                 if (CFG.isDesktop()) {
                     if (CFG.menuManager.getInGameView() && CFG.map.getMapScale().getCurrentScale() >= 1.0f) {
-                        if (button == 1 && !CFG.SPECTATOR_MODE && CFG.gameAction.getActiveTurnState() == Game_Action.TurnStates.INPUT_ORDERS && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getMovePoints() >= CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getIdeologyID()).COST_OF_MOVE_OWN_PROVINCE && CFG.game.getActiveProvinceID() >= 0 && CFG.gameAction.controlsArmyInProvince(CFG.game.getActiveProvinceID(), CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()) && !CFG.menuManager.getVisible_InGame_FlagAction()) {
+                        if (button == 1 && CFG.gameAction.getActiveTurnState() == Game_Action.TurnStates.INPUT_ORDERS && (CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getMovePoints() >= CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getIdeologyID()).COST_OF_MOVE_OWN_PROVINCE && CFG.game.getActiveProvinceID() >= 0 && CFG.gameAction.controlsArmyInProvince(CFG.game.getActiveProvinceID(), CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()) || CFG.SPECTATOR_MODE) && !CFG.menuManager.getVisible_InGame_FlagAction()) {
                             CFG.game.setProvinceID_PPM(screenX, screenY);
                         }
                         else {
@@ -1039,6 +1039,43 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                                 RTS.updateShowBattles();
                             }
                         }
+                        //toggle spec mode, if shift + s
+                        else if (isShiftDown && keycode == 47) {
+                            if (CFG.gameAction.getActiveTurnState() == Game_Action.TurnStates.INPUT_ORDERS) {
+                                Gdx.app.log("AoC2.5", "Toggle spectator mode: " + CFG.SPECTATOR_MODE);
+                                CFG.SPECTATOR_MODE = !CFG.SPECTATOR_MODE;
+                                CFG.toast.setInView("SHIFT + S, " + CFG.langManager.get("ESSM"), CFG.SPECTATOR_MODE ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
+
+                                //added refresh
+                                if (CFG.menuManager.getVisible_InGame_CivInfo()) {
+                                    CFG.setActiveCivInfo(CFG.getActiveCivInfo());
+                                }
+                                CFG.updateActiveCivInfo_InGame();
+
+                                if (!CFG.SPECTATOR_MODE) {
+                                    CFG.menuManager.updateInGame_TOP_All(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+                                    CFG.menuManager.setVisible_Menu_InGame_CurrentWars(true);
+
+                                    CFG.game.getPlayer(CFG.PLAYER_TURNID).buildMetProvincesAndCivs();
+                                    CFG.gameAction.buildFogOfWar(CFG.PLAYER_TURNID);
+                                    Game_Render.updateDrawCivRegionNames_FogOfWar();
+
+                                    for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {
+                                        CFG.game.getProvince(i).updateProvinceBorder();
+                                    }
+                                    CFG.game.updateActiveProvinceBorderStyle();
+                                } else {
+                                    CFG.game.getPlayer(CFG.PLAYER_TURNID).initMetProvince(true);
+                                    CFG.game.getPlayer(CFG.PLAYER_TURNID).initMetCivilization(true);
+                                    Game_Render.updateDrawCivRegionNames_FogOfWar();
+
+                                    for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {
+                                        CFG.game.getProvince(i).updateProvinceBorder();
+                                    }
+                                    CFG.game.updateActiveProvinceBorderStyle();
+                                }
+                            }
+                        }
                         else if (keycode == 66) {
                             if (!CFG.menuManager.getInGameView_Options() && CFG.gameAction.getActiveTurnState() == Game_Action.TurnStates.INPUT_ORDERS && (CFG.menuManager.getInGame_ProvinceMoveUnits_Visible() || CFG.menuManager.getInGame_ProvinceRecruit_Visible() || CFG.menuManager.getInGame_ProvinceRecruitInstantly_Visible() || CFG.menuManager.getInGame_ProvinceRegroupArmy_Visible() || CFG.menuManager.getInGame_ProvinceDisband_Visible())) {
                                 if (CFG.menuManager.getInGame_ProvinceMoveUnits_Visible()) {
@@ -1168,6 +1205,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                                         Menu_InGame.clickFlagAction();
                                     }
                                     CFG.menuManager.setVisible_InGame_CivInfo(!CFG.menuManager.getVisible_InGame_CivInfo());
+                                    CFG.menuManager.setVisible_InGame_CivManage(!CFG.menuManager.getVisible_InGame_ManageInfo());
                                 }
                                 else if (keycode == 246) {
                                     CFG.viewsManager.setActiveViewID(ViewsManager.VIEW_DIPLOMACY_MODE);
@@ -1404,6 +1442,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                     CFG.keyboardMessage = "";
                     CFG.keyboardDelete.action();
                     CFG.menuManager.getKeyboard().onMenuPressed();
+                    CFG.toast.setInView(CFG.langManager.get("DeletedAll") + "!");
                 }
                 else if (character != '\r' && character != ';' && character != '<') {
                     CFG.keyboardWrite.action("" + character);

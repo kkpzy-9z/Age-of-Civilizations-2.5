@@ -407,6 +407,44 @@ class Menu_InGame_ProvinceAction extends SliderMenu {
 
          }
       });
+      menuElements.add(new Button_Game((String)null, -1, CFG.GAME_WIDTH - CFG.BUTTON_WIDTH - CFG.PADDING, CFG.PADDING, true) {
+         protected boolean getVisible() {
+            try {
+               return CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() == CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID();
+            } catch (IndexOutOfBoundsException var2) {
+               return false;
+            }
+         }
+
+         protected void drawButtonBG(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean isActive) {
+            super.drawButtonBG(oSB, iTranslateX, iTranslateY, isActive);
+            if (isActive) {
+               oSB.setColor(Color.WHITE);
+            } else if (this.getIsHovered()) {
+               oSB.setColor(new Color(1.0F, 1.0F, 1.0F, 0.75F));
+            } else {
+               oSB.setColor(new Color(1.0F, 1.0F, 1.0F, 0.575F));
+            }
+
+            ImageManager.getImage(Images.top_diplomacy_points).draw(oSB, this.getPosX() + this.getWidth() - ImageManager.getImage(Images.act_plunder).getWidth() - CFG.PADDING + iTranslateX, this.getPosY() + this.getHeight() - ImageManager.getImage(Images.act_plunder).getHeight() - CFG.PADDING + iTranslateY);
+            oSB.setColor(Color.WHITE);
+         }
+
+         protected void buildElementHover() {
+            if (CFG.isDesktop()) {
+               List nElements = new ArrayList();
+               List nData = new ArrayList();
+               nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Shortcut") + ": "));
+               nData.add(new MenuElement_Hover_v2_Element_Type_Text("TAB", CFG.COLOR_TEXT_NUM_OF_PROVINCES));
+               nElements.add(new MenuElement_Hover_v2_Element2(nData));
+               nData.clear();
+               this.menuElementHover = new MenuElement_Hover_v2(nElements);
+            } else {
+               this.menuElementHover = null;
+            }
+         }
+      });
+
       this.initMenu((SliderMenuTitle)null, 0, CFG.GAME_HEIGHT - CFG.map.getMapBG().getMinimapHeight() - CFG.BUTTON_HEIGHT - CFG.PADDING * 2, CFG.GAME_WIDTH, CFG.BUTTON_HEIGHT + CFG.PADDING * 2, menuElements, true, false);
       this.updateLanguage();
       CFG.fMOVE_MENU_PERCENTAGE = 5.0F;
@@ -421,8 +459,9 @@ class Menu_InGame_ProvinceAction extends SliderMenu {
       this.getMenuElement(4).setText(CFG.langManager.get("MoveTo"));
       this.getMenuElement(5).setText(CFG.langManager.get("Migrate"));
       this.getMenuElement(6).setText(CFG.langManager.get("Plunder"));
+      this.getMenuElement(7).setText(CFG.langManager.get("Manage"));
       this.updateButtonWidth(5, CFG.PADDING, CFG.BUTTON_WIDTH);
-      this.updatedButtonsWidth(CFG.PADDING, CFG.BUTTON_WIDTH);
+      //this.updatedButtonsWidth(CFG.PADDING, CFG.BUTTON_WIDTH);
    }
 
    protected void draw(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean sliderMenuIsActive) {
@@ -437,8 +476,24 @@ class Menu_InGame_ProvinceAction extends SliderMenu {
       Rectangle clipBounds = new Rectangle((float)(this.getPosX() + iTranslateX), (float)(CFG.GAME_HEIGHT - this.getPosY() + 1 - iTranslateY), (float)this.getWidth(), (float)(-this.getHeight() - 1));
       oSB.flush();
       ScissorStack.pushScissors(clipBounds);
-      int tWidth = (this.getMenuElement(this.getMenuElementsSize() - 1).getVisible() ? this.getMenuElement(this.getMenuElementsSize() - 1).getPosX() + this.getMenuElement(this.getMenuElementsSize() - 1).getWidth() : (this.getMenuElement(this.getMenuElementsSize() - 2).getVisible() ? this.getMenuElement(this.getMenuElementsSize() - 2).getPosX() + this.getMenuElement(this.getMenuElementsSize() - 2).getWidth() : this.getMenuElement(this.getMenuElementsSize() - 3).getPosX() + this.getMenuElement(this.getMenuElementsSize() - 3).getWidth())) + CFG.PADDING + 1;
+
+      int tWidth;
+      if (this.getMenuElement(this.getMenuElementsSize() - 2).getVisible()) {
+          tWidth = this.getMenuElement(this.getMenuElementsSize() - 2).getPosX() + this.getMenuElement(this.getMenuElementsSize() - 2).getWidth();
+      } else if (this.getMenuElement(this.getMenuElementsSize() - 3).getVisible()) {
+          tWidth = this.getMenuElement(this.getMenuElementsSize() - 3).getPosX() + this.getMenuElement(this.getMenuElementsSize() - 3).getWidth();
+      } else {
+          tWidth = this.getMenuElement(this.getMenuElementsSize() - 4).getPosX() + this.getMenuElement(this.getMenuElementsSize() - 4).getWidth();
+      }
+      tWidth += CFG.PADDING + 1;
+
       ImageManager.getImage(Images.bg_game_action).draw2(oSB, this.getPosX() + iTranslateX, this.getPosY() - ImageManager.getImage(Images.bg_game_action).getHeight() + (int)((float)this.getHeight() * (100.0F - CFG.fMOVE_MENU_PERCENTAGE) / 100.0F) - 1 + iTranslateY, tWidth, this.getHeight() + 1, true, false);
+      ImageManager.getImage(Images.bg_game_action).draw2(oSB, this.getPosX() + iTranslateX, this.getPosY() - ImageManager.getImage(Images.bg_game_action).getHeight() + (int)((float)this.getHeight() * (100.0F - CFG.fMOVE_MENU_PERCENTAGE) / 100.0F) - 1 + iTranslateY, tWidth, this.getHeight() + 1, true, false);
+
+      ImageManager.getImage(Images.bg_game_action).draw2(oSB, CFG.GAME_WIDTH - CFG.BUTTON_WIDTH + CFG.PADDING * 2 + iTranslateX, this.getPosY() - ImageManager.getImage(Images.bg_game_action).getHeight() + (int)((float)this.getHeight() * (100.0F - CFG.fMOVE_MENU_PERCENTAGE) / 100.0F) - 1 + iTranslateY, tWidth, this.getHeight() + 1, false, false);
+      ImageManager.getImage(Images.bg_game_action).draw2(oSB, CFG.GAME_WIDTH - CFG.BUTTON_WIDTH - CFG.PADDING * 2 - iTranslateX, this.getPosY() - ImageManager.getImage(Images.bg_game_action).getHeight() + (int)((float)this.getHeight() * (100.0F - CFG.fMOVE_MENU_PERCENTAGE) / 100.0F) - 1 + iTranslateY, tWidth, this.getHeight() + 1, false, false);
+      ImageManager.getImage(Images.line_32_off1).draw(oSB, CFG.GAME_WIDTH - CFG.BUTTON_WIDTH - CFG.PADDING * 2 - iTranslateX, this.getPosY() + this.getHeight() - 1 - ImageManager.getImage(Images.line_32_off1).getHeight() + iTranslateY, tWidth, 1);
+
       oSB.setColor(CFG.COLOR_BG_GAME_MENU_SHADOW);
       ImageManager.getImage(Images.pix255_255_255).draw(oSB, this.getPosX() + iTranslateX, this.getPosY() + this.getHeight() - 1 - ImageManager.getImage(Images.pix255_255_255).getHeight() + iTranslateY, tWidth, 1);
       ImageManager.getImage(Images.line_32_off1).draw(oSB, this.getPosX() + iTranslateX, this.getPosY() + this.getHeight() - 1 - ImageManager.getImage(Images.line_32_off1).getHeight() + iTranslateY, tWidth, 1);
@@ -570,6 +625,14 @@ class Menu_InGame_ProvinceAction extends SliderMenu {
 
    }
 
+   protected static final void clickManage() {
+      if (CFG.menuManager.getVisible_InGame_FlagAction()) {
+         Menu_InGame.clickFlagAction();
+      }
+
+      CFG.menuManager.setVisible_InGame_CivManage(!CFG.menuManager.getVisible_InGame_CivManage());
+   }
+
    protected final void actionElement(int iID) {
       switch (iID) {
          case 0:
@@ -604,6 +667,10 @@ class Menu_InGame_ProvinceAction extends SliderMenu {
                   CFG.menuManager.rebuildInGame_Plunder(CFG.game.getActiveProvinceID());
                }
             }
+            break;
+         case 7:
+            clickManage();
+            break;
       }
 
    }

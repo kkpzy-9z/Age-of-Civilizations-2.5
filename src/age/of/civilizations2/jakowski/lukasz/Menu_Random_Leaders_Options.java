@@ -160,7 +160,7 @@ class Menu_Random_Leaders_Options extends SliderMenu
     
     @Override
     protected void updateLanguage() {
-        this.getMenuElement(0).setText(CFG.langManager.get("AddNewLeader"));
+        this.getMenuElement(0).setText(CFG.langManager.get("AddNewRandomLeader"));
     }
     
     @Override

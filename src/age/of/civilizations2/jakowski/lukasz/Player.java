@@ -20,6 +20,7 @@ class Player {
    protected int iBefore_ActiveProvince;
    protected int iACTIVE_VIEW_MODE = -1;
    protected int visible_CivInfo = -1;
+   protected boolean visible_ManageInfo = false;
    protected boolean visible_Outliner = false;
    protected int visible_CensusOfProvince = -1;
    protected boolean visible_Wars = false;

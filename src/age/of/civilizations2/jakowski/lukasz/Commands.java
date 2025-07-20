@@ -205,10 +205,40 @@ class Commands {
                     lShit.clear();
                     return;
                 }
-                if (tempCommand[0].equals("Drew Durnil") || tempCommand[0].equals("drew durnil") || tempCommand[0].equals("drewdurnil") || tempCommand[0].equals("drew") || tempCommand[0].equals("Drew") || tempCommand[0].equals("Durnil") || tempCommand[0].equals("durnil") || tempCommand[0].equals("observe") || tempCommand[0].equals("noob") || tempCommand[0].equals("Spectator") || tempCommand[0].equals("spectator")) {
-                    CFG.toast.setInView("Games -> New Game -> Options -> Spectactor Mode");
+                if (tempCommand[0].equals("Drew Durnil") || tempCommand[0].equals("drew durnil") || tempCommand[0].equals("drewdurnil") || tempCommand[0].equals("drew") || tempCommand[0].equals("Drew") || tempCommand[0].equals("Durnil") || tempCommand[0].equals("durnil") || tempCommand[0].equals("observe") || tempCommand[0].equals("noob") || tempCommand[0].equals("Spectator") || tempCommand[0].equals("spectator") || tempCommand[0].equals("spec")) {
+                    CFG.SPECTATOR_MODE = !CFG.SPECTATOR_MODE;
+
+                    //added refresh
+                    if (CFG.menuManager.getVisible_InGame_CivInfo()) {
+                        CFG.setActiveCivInfo(CFG.getActiveCivInfo());
+                    }
+                    CFG.updateActiveCivInfo_InGame();
+
+                    if (!CFG.SPECTATOR_MODE) {
+                        CFG.menuManager.updateInGame_TOP_All(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+                        CFG.menuManager.setVisible_Menu_InGame_CurrentWars(true);
+
+                        CFG.game.getPlayer(CFG.PLAYER_TURNID).buildMetProvincesAndCivs();
+                        CFG.gameAction.buildFogOfWar(CFG.PLAYER_TURNID);
+                        Game_Render.updateDrawCivRegionNames_FogOfWar();
+
+                        for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {
+                            CFG.game.getProvince(i).updateProvinceBorder();
+                        }
+                        CFG.game.updateActiveProvinceBorderStyle();
+                    } else {
+                        CFG.game.getPlayer(CFG.PLAYER_TURNID).initMetProvince(true);
+                        CFG.game.getPlayer(CFG.PLAYER_TURNID).initMetCivilization(true);
+                        Game_Render.updateDrawCivRegionNames_FogOfWar();
+
+                        for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {
+                            CFG.game.getProvince(i).updateProvinceBorder();
+                        }
+                        CFG.game.updateActiveProvinceBorderStyle();
+                    }
+
                     CFG.toast.setTimeInView(4500);
-                    Commands.addMessage("Games -> New Game -> Options -> Spectator Mode");
+                    Commands.addMessage("Spectator Mode" + (CFG.SPECTATOR_MODE ? CFG.langManager.get("Enabled") : CFG.langManager.get("Disabled")));
                     return;
                 }
                 if (tempCommand[0].equals("civs") || tempCommand[0].equals("tags")) {
@@ -806,13 +836,26 @@ class Commands {
                         int tActiveProvince = CFG.game.getActiveProvinceID();
                         CFG.game.setActiveProvinceID(-1);
                         CFG.game.setActiveProvinceID(tActiveProvince);
-                        CFG.toast.setInView(Commands.cheatMess() + CFG.langManager.get("War"));
+                        CFG.toast.setInView(Commands.cheatMess() + CFG.langManager.get("ID"));
                     } else {
                         Commands.IllegalCommand();
                         CFG.toast.setInView(CFG.langManager.get("ChooseAProvince"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
                         Commands.addMessage(CFG.langManager.get(CFG.langManager.get("ChooseAProvince")));
                         Commands.addMessage("");
                     }
+                    return;
+                }
+                if (tempCommand[0].equals("listall") || tempCommand[0].equals("idall") || tempCommand[0].equals("allid")) {
+                    for (int i = 0; i < CFG.game.getCivsSize(); i++) {
+                        if (CFG.game.getCiv(i).getNumOfProvinces() > 0) {
+                            Commands.addMessage(Commands.cheatMess() + CFG.langManager.get("Civilization") + ": " + CFG.game.getCiv(i).getCivName() + ": " + CFG.game.getCiv(i).getCivID());
+                            Gdx.app.log(String.valueOf(CFG.game.getCiv(i).getCivID()), CFG.game.getCiv(i).getCivName());
+                        }
+                    }
+                    int tActiveProvince = CFG.game.getActiveProvinceID();
+                    CFG.game.setActiveProvinceID(-1);
+                    CFG.game.setActiveProvinceID(tActiveProvince);
+                    CFG.toast.setInView(Commands.cheatMess() + CFG.langManager.get("ID"));
                     return;
                 }
                 if (tempCommand[0].equals("war")) {

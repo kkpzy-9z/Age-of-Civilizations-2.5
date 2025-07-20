@@ -413,15 +413,22 @@ class Civilization {
         //update vassal colors
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
             try {
-                //don't apply if dominion
-                if (this.civGameData.lVassals.get(i).autonomyStatus.getColorStatus() >= 2.0) continue;
+                //normal if dominion
+                if (this.civGameData.lVassals.get(i).autonomyStatus.getColorStatus() >= 2.0) {
+                    try {
+                        CFG.palletManager.loadCivilizationPalletColor(CFG.palletManager.getActivePalletID(), this.civGameData.lVassals.get(i).iCivID);
+                    } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                        CFG.palletManager.loadCivilizationStandardColor(this.civGameData.lVassals.get(i).iCivID);
+                    }
+                    continue;
+                };
                 CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, this.civGameData.lVassals.get(i).autonomyStatus.getColorStatus());
             } catch (NullPointerException exception) {
-                CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, CFG.gameAutonomy.getAutonomy(0).getColorStatus());
                 //update pallet if possible
                 try {
                     CFG.palletManager.loadCivilizationPalletColor(CFG.palletManager.getActivePalletID(), this.civGameData.lVassals.get(i).iCivID);
-                } catch (NullPointerException ex) {
+                } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                    CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).updateCivilizationColor(this.civGameData.iR, this.civGameData.iG, this.civGameData.iB, CFG.gameAutonomy.getAutonomy(0).getColorStatus());
                 }
             }
         }
@@ -2065,6 +2072,11 @@ class Civilization {
         for (int i = 0; i < this.civGameData.iVassalsSize; i++) {
             CFG.game.getCiv(this.civGameData.lVassals.get(i).iCivID).setPuppetOfCivID(iPuppetOfCivID);
         }
+        //leave current alliance if not with lord
+        if (this.getAllianceID() != -1 && CFG.game.getCiv(iPuppetOfCivID).getAllianceID() != this.getAllianceID()) {
+            CFG.game.getAlliance(this.getAllianceID()).removeCivilization(this.iCivID);
+            this.setAllianceID(0);
+        }
 
         //if no mil control disband
         if (!CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.isMilitaryControl()) {
@@ -2906,6 +2918,30 @@ class Civilization {
         this.civGameData.fModifier_AttackBonus -= nBonus.fModifier_AttackBonus;
         this.civGameData.fModifier_DefenseBonus -= nBonus.fModifier_DefenseBonus;
         this.civGameData.fModifier_MovementPoints -= nBonus.fModifier_MovementPoints;
+    }
+
+    protected void applyDecisionChange(Decision_GameData decision) {
+        this.civGameData.fModifier_PopGrowth += decision.fModifier_PopGrowth;
+        this.civGameData.fModifier_EconomyGrowth += decision.fModifier_EconomyGrowth;
+        this.civGameData.fModifier_IncomeTaxation += decision.fModifier_IncomeTaxation;
+        this.civGameData.fModifier_IncomeProduction += decision.fModifier_IncomeProduction;
+        this.civGameData.fModifier_Research += decision.fModifier_Research;
+        this.civGameData.fModifier_MilitaryUpkeep += decision.fModifier_MilitaryUpkeep;
+        this.civGameData.fModifier_AttackBonus += decision.fModifier_AttackBonus;
+        this.civGameData.fModifier_DefenseBonus += decision.fModifier_DefenseBonus;
+        this.civGameData.fModifier_MovementPoints += decision.fModifier_MovementPoints;
+    }
+
+    protected void applyDecisionChange_Expired(Decision_GameData decision) {
+        this.civGameData.fModifier_PopGrowth -= decision.fModifier_PopGrowth;
+        this.civGameData.fModifier_EconomyGrowth -= decision.fModifier_EconomyGrowth;
+        this.civGameData.fModifier_IncomeTaxation -= decision.fModifier_IncomeTaxation;
+        this.civGameData.fModifier_IncomeProduction -= decision.fModifier_IncomeProduction;
+        this.civGameData.fModifier_Research -= decision.fModifier_Research;
+        this.civGameData.fModifier_MilitaryUpkeep -= decision.fModifier_MilitaryUpkeep;
+        this.civGameData.fModifier_AttackBonus -= decision.fModifier_AttackBonus;
+        this.civGameData.fModifier_DefenseBonus -= decision.fModifier_DefenseBonus;
+        this.civGameData.fModifier_MovementPoints -= decision.fModifier_MovementPoints;
     }
 
     protected final float getModifier_PopGrowth() {

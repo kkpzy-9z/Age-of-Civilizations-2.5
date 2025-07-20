@@ -1,6 +1,9 @@
 package age.of.civilizations2.jakowski.lukasz;
 
-import java.io.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 class LeaderOfCiv_GameData implements Serializable
 {
@@ -12,7 +15,10 @@ class LeaderOfCiv_GameData implements Serializable
     private int Year;
     private int Month;
     private int Day;
+    private boolean wasRandom = false;
     private boolean incumbentYear = false;
+    private final List<Decision_GameData> decisions;
+    private float[] lClassViews = new float[] { 0.0F, 0.0F, 0.0F };; //upper, middle, lower
     protected float fModifier_PopGrowth;
     protected float fModifier_EconomyGrowth;
     protected float fModifier_IncomeTaxation;
@@ -31,9 +37,12 @@ class LeaderOfCiv_GameData implements Serializable
         this.sImage = "";
         this.sWiki = "";
         this.Year = 3;
-        this.Month = 2;
+        this.Month = 1;
         this.Day = 1;
         this.incumbentYear = true;
+        this.wasRandom = false;
+        this.decisions = new ArrayList<Decision_GameData>();
+        this.lClassViews = new float[] { 0.0F, 0.0F, 0.0F };
         this.fModifier_PopGrowth = 0.0f;
         this.fModifier_EconomyGrowth = 0.0f;
         this.fModifier_IncomeTaxation = 0.0f;
@@ -109,5 +118,57 @@ class LeaderOfCiv_GameData implements Serializable
 
     protected final void setIncumbentYear(final boolean incumbentYear) {
         this.incumbentYear = incumbentYear;
+    }
+
+    protected final boolean isRandom() {
+        return this.wasRandom;
+    }
+
+    protected final void setRandom(final boolean wasRandom) {
+        this.wasRandom = wasRandom;
+    }
+
+    protected final Decision_GameData getDecision(int index) {
+        if (index < 0 || index >= this.decisions.size()) return null;
+        return this.decisions.get(index);
+    }
+
+    protected final Decision_GameData getDecisionByName(String name) {
+        for (Decision_GameData d : this.decisions) {
+            if (d.getName().equals(name)) return d;
+        }
+        return null;
+    }
+
+    protected final int getDecisionsCount() {
+        return this.decisions.size();
+    }
+
+    protected final void addDecision(final Decision_GameData decision) {
+        if (decision == null) return;
+        this.decisions.add(decision);
+    }
+
+    protected final void removeDecision(int index) {
+        if (index < 0 || index >= this.decisions.size()) return;
+        this.decisions.remove(index);
+    }
+
+    protected final void clearDecisions() {
+        this.decisions.clear();
+    }
+
+    protected final float getClassViews(int classIndex) {
+        if (classIndex < 0 || classIndex >= this.lClassViews.length) return 0;
+        return this.lClassViews[classIndex];
+    }
+
+    protected final void setClassViews(int classIndex, float views) {
+        if (classIndex < 0 || classIndex >= this.lClassViews.length) return;
+        this.lClassViews[classIndex] = Math.max(0.0F, Math.min(views, 1.0F));
+    }
+
+    protected final void clearClassViews() {
+        Arrays.fill(this.lClassViews, 0);
     }
 }

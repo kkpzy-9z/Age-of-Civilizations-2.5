@@ -125,6 +125,8 @@ extends SliderMenu {
                     CFG.gameAges = new Game_Ages();
                     //new autonomy load
                     CFG.gameAutonomy = new Game_Autonomy();
+                    //new decisions load
+                    CFG.gameDecisions = new Game_Decisions();
                     CFG.plagueManager = new PlagueManager();
                     ++this.iStepID;
                     break block50;

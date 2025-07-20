@@ -1057,7 +1057,7 @@ class Game {
         CFG.province_Cores_GameData = new Province_Cores_GameData();
         this.getGameScenarios().buildProvincePopulationAndEconomy(false, false);
         this.getGameScenarios().buildDiplomacy();
-        this.build_Leaders();
+        this.build_Leaders(false);
         this.buildCivilizationsRegions();
         this.buildCivilizationsRegions_TextOver();
         CFG.gameAction.buildRank_Score();
@@ -1472,7 +1472,7 @@ class Game {
         }
     }
 
-    protected final void build_Leaders() {
+    protected final void build_Leaders(final boolean nEditor) {
         final List<String> tempTags = new ArrayList<String>();
         try {
             if (CFG.readLocalFiles()) {
@@ -1614,8 +1614,11 @@ class Game {
         for (int k = 1; k < CFG.game.getCivsSize(); ++k) {
             try {
                 if (CFG.game.getCiv(k).civGameData.leaderData == null) {
-                    Gdx.app.log("LOADSAVE", "Building random leader for civ: " + CFG.game.getCiv(k).getCivName());
-                    DynamicEventManager_Leader.buildRandomLeader(k, true);
+                    Gdx.app.log("BUILD_LEADERS", "Building random leader for civ: " + CFG.game.getCiv(k).getCivName());
+                    if (!DynamicEventManager_Leader.buildRandomLeader(k, true)) {
+                        Gdx.app.log("BUILD_LEADERS", "No random leader for " + CFG.game.getCiv(k).getCivName() + ", placeholder built");
+                        DynamicEventManager_Leader.buildPlaceholderLeader(k);
+                    }
                 }
             } catch (final NullPointerException ex5) {
                 CFG.exceptionStack(ex5);
@@ -1671,7 +1674,7 @@ class Game {
         this.buildWastelandLevels();
         this.getGameScenarios().loadDiplomacyData(nEditor);
         CFG.holyRomanEmpire_Manager.loadHolyRomanEmpire_ScenarioData();
-        this.build_Leaders();
+        this.build_Leaders(nEditor);
         this.buildCivilizationsRegions();
         this.buildCivilizationsRegions_TextOver();
         if (this.getGameScenarios().getScenario_ActivePallet_TAG() != null) {
@@ -10096,7 +10099,137 @@ class Game {
             return null;
         }
     }
-    
+
+    protected final MenuElement_Hover_v2 getHover_Decision(final Decision_GameData decision) {
+        final List<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
+        final List<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text(decision.getDesc(), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        if (decision.getInProgress()) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InProgress") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Yes"), CFG.COLOR_TEXT_MODIFIER_POSITIVE));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Expires") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (decision.getTurnLength() - decision.getTurnsProgress()), CFG.COLOR_TEXT_MODIFIER_POSITIVE));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        } else {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InProgress") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("No"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("TurnLength") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + decision.getTurnLength(), CFG.COLOR_TEXT_MODIFIER_NEUTRAL));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Repeatable") + ": "));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text((decision.isRepeatable()) ? CFG.langManager.get("Yes") : CFG.langManager.get("No"), (decision.isRepeatable()) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        if (decision.fModifier_UpperClass != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("UpperClass") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_UpperClass > 0.0f) ? "+" : "") + (int)(decision.fModifier_UpperClass * 100.0f) + "%", (decision.fModifier_UpperClass > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_MiddleClass != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MiddleClass") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_MiddleClass > 0.0f) ? "+" : "") + (int)(decision.fModifier_MiddleClass * 100.0f) + "%", (decision.fModifier_MiddleClass > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_LowerClass != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("LowerClass") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_LowerClass > 0.0f) ? "+" : "") + (int)(decision.fModifier_LowerClass * 100.0f) + "%", (decision.fModifier_LowerClass > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+
+        if (decision.fModifier_AttackBonus != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("AttackBonus") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_AttackBonus > 0.0f) ? "+" : "") + (int)(decision.fModifier_AttackBonus * 100.0f) + "%", (decision.fModifier_AttackBonus > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_DefenseBonus != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("DefenseBonus") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_DefenseBonus > 0.0f) ? "+" : "") + (int)(decision.fModifier_DefenseBonus * 100.0f) + "%", (decision.fModifier_DefenseBonus > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_PopGrowth != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("PopulationGrowthModifier") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_PopGrowth > 0.0f) ? "+" : "") + (int)(decision.fModifier_PopGrowth * 100.0f) + "%", (decision.fModifier_PopGrowth > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.population_growth, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_EconomyGrowth != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("EconomyGrowthModifier") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_EconomyGrowth > 0.0f) ? "+" : "") + (int)(decision.fModifier_EconomyGrowth * 100.0f) + "%", (decision.fModifier_EconomyGrowth > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.economy, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_IncomeTaxation != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("IncomeTaxation") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_IncomeTaxation > 0.0f) ? "+" : "") + (int)(decision.fModifier_IncomeTaxation * 100.0f) + "%", (decision.fModifier_IncomeTaxation > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_IncomeProduction != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("IncomeProduction") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_IncomeProduction > 0.0f) ? "+" : "") + (int)(decision.fModifier_IncomeProduction * 100.0f) + "%", (decision.fModifier_IncomeProduction > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.development, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_Administration != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Administration") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_Administration > 0.0f) ? "+" : "") + (int)(decision.fModifier_Administration * 100.0f) + "%", (decision.fModifier_Administration < 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold2, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_MilitaryUpkeep != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MilitaryUpkeep") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_MilitaryUpkeep > 0.0f) ? "+" : "") + (int)(decision.fModifier_MilitaryUpkeep * 100.0f) + "%", (decision.fModifier_MilitaryUpkeep < 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_army, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_Research != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Research") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_Research > 0.0f) ? "+" : "") + (int)(decision.fModifier_Research * 100.0f) + "%", (decision.fModifier_Research > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.research, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+        if (decision.fModifier_MovementPoints != 0.0f) {
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MovementPoints") + ": "));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_MovementPoints > 0.0f) ? "+" : "") + (int)(decision.fModifier_MovementPoints * 100.0f) + "%", (decision.fModifier_MovementPoints > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_movement_points, CFG.PADDING, 0));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+        }
+
+        return new MenuElement_Hover_v2(nElements);
+    }
+
     protected final MenuElement_Hover_v2 getHover_LeaderOfCiv(final int nCivID) {
         try {
             final List<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();

@@ -275,7 +275,14 @@ class DynamicEventManager_CivilWar implements Serializable {
             if ((int)(Math.ceil(Math.random() * (2))) == 1) {
                 CFG.dynamicEventManager.eventManagerLeader.invokeCivilWarLeaderChange(nCivID, iNewCivID);
             } else {
-                DynamicEventManager_Leader.buildRandomLeader(iNewCivID);
+                //try 10 times to randomize leader and find one that is not original
+                for (int i = 0; i < 10; i++) {
+                    DynamicEventManager_Leader.buildRandomLeader(iNewCivID);
+                    if (!CFG.game.getCiv(iNewCivID).civGameData.leaderData.getName().equals(CFG.game.getCiv(nCivID).civGameData.leaderData.getName())) {
+                        break;
+                    }
+                }
+
             }
 
             //reload for ui

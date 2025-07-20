@@ -97,6 +97,9 @@ class MenuManager {
     protected int INGAME_CIV_INFO2 = -1;
     protected int INGAME_CIV_INFO_DIPLOMACY = -1;
     protected int INGAME_CIV_INFO_DIPLO_ACTIONS = -1;
+    protected int INGAME_CIV_MANAGE = -1;
+    protected int INGAME_CIV_MANAGE2 = -1;
+    protected int INGAME_CIV_MANAGE_ACTIONS = -1;
     protected int INGAME_CIV_INFO_ACTIONS = -1;
     protected int INGAME_CIV_INFO_OPINIONS = -1;
     protected int INGAME_CIV_INFO_DECISIONS = -1;
@@ -681,6 +684,9 @@ class MenuManager {
                         this.INGAME_CIV_INFO2 = this.addNextMenuToView(this.INGAME, new Menu_InGame_CivInfo_Stats());
                         this.INGAME_CIV_INFO_DIPLOMACY = this.addNextMenuToView(this.INGAME, new Menu_InGame_CivInfo_Stats_Diplomacy());
                         this.INGAME_CIV_INFO_DIPLO_ACTIONS = this.addNextMenuToView(this.INGAME, new Menu_InGame_CivInfo_Stats_DiploActions());
+                        this.INGAME_CIV_MANAGE = this.addNextMenuToView(this.INGAME, new Menu_InGame_Manage_Info());
+                        this.INGAME_CIV_MANAGE2 = this.addNextMenuToView(this.INGAME, new Menu_InGame_Manage_Stats());
+                        this.INGAME_CIV_MANAGE_ACTIONS = this.addNextMenuToView(this.INGAME, new Menu_InGame_CivInfo_Manage_DiploActions());
                         this.INGAME_ALLIANCE = this.addNextMenuToView(this.INGAME, new Menu_InGame_Alliance());
                         this.INGAME_MILITARY_ALLIANCES = this.addNextMenuToView(this.INGAME, new Menu_InGame_MilitaryAlliances());
                         this.INGAME_HISTORY = this.addNextMenuToView(this.INGAME, new Menu_InGame_History(0));
@@ -3148,6 +3154,68 @@ class MenuManager {
         this.setOrderOfMenu_InGame_CivInfo();
     }
 
+    protected final void setVisible_InGame_CivManage(boolean visible) {
+        this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE).setVisible(visible);
+        this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE2).setVisible(visible);
+        this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE_ACTIONS).setVisible(visible);
+        if (visible) {
+            //int nCivID = CFG.getActiveCivInfo_BasedOnActiveProvinceID(CFG.game.getActiveProvinceID());
+            //if (nCivID != CFG.getActiveCivInfo()) {
+            //    CFG.setActiveCivInfo(nCivID);
+            //}
+            CFG.updateActiveCivManagement_InGame();
+            if (CFG.menuManager.getVisible_Menu_InGame_Outliner()) {
+                CFG.menuManager.setVisible_Menu_InGame_Outliner(false);
+            }
+        }
+        this.setOrderOfMenu_InGame_ManageCiv_Info();
+    }
+
+    protected final boolean getVisible_InGame_CivManage() {
+        return this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE).getVisible();
+    }
+
+    protected final SliderMenu getInGame_Civ_Manage() {
+        return this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE);
+    }
+
+    protected final SliderMenu getInGame_Civ_Manage2() {
+        return this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE2);
+    }
+
+    protected final void rebuildInGame_ManageCiv2() {
+        if (this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE2).getVisible()) {
+            this.menus.get(this.INGAME).set(this.INGAME_CIV_MANAGE2, new Menu_InGame_Manage_Stats());
+            this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE2).setVisible(true);
+            this.setOrderOfMenu_InGame_ManageCiv_Info();
+        } else {
+            this.menus.get(this.INGAME).set(this.INGAME_CIV_MANAGE2, new Menu_InGame_Manage_Stats());
+            this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE2).setVisible(false);
+        }
+    }
+
+    protected final void rebuildInGame_ManageCiv_Actions() {
+        if (this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE_ACTIONS).getVisible()) {
+            this.menus.get(this.INGAME).set(this.INGAME_CIV_MANAGE_ACTIONS, new Menu_InGame_CivInfo_Manage_DiploActions());
+            this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE_ACTIONS).setVisible(true);
+            this.setOrderOfMenu_InGame_ManageCiv_Info();
+        } else {
+            this.menus.get(this.INGAME).set(this.INGAME_CIV_MANAGE_ACTIONS, new Menu_InGame_CivInfo_Manage_DiploActions());
+            this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE_ACTIONS).setVisible(false);
+        }
+    }
+
+    protected final void setOrderOfMenu_InGame_ManageCiv_Info() {
+        if (this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE).getVisible()) {
+            this.setOrderOfMenu(this.INGAME_CIV_MANAGE);
+            this.setOrderOfMenu(this.INGAME_CIV_MANAGE2);
+            this.setOrderOfMenu(this.INGAME_CIV_MANAGE_ACTIONS);
+            //this.setOrderOfMenu(this.INGAME_CIV_INFO_ACTIONS);
+            //this.setOrderOfMenu(this.INGAME_CIV_INFO_OPINIONS);
+            //this.setOrderOfMenu(this.INGAME_CIV_INFO_DECISIONS);
+        }
+    }
+
     protected final void setVisible_InGame_CivInfo_Decisions(boolean visible) {
         if (visible) {
             this.menus.get(this.INGAME).get(this.INGAME_CIV_INFO_DECISIONS).actionClose();
@@ -3174,8 +3242,16 @@ class MenuManager {
         return this.menus.get(this.INGAME).get(this.INGAME_CIV_INFO).getVisible();
     }
 
+    protected final boolean getVisible_InGame_ManageInfo() {
+        return this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE).getVisible();
+    }
+
     protected final SliderMenu getInGame_CivInfo() {
         return this.menus.get(this.INGAME).get(this.INGAME_CIV_INFO);
+    }
+
+    protected final SliderMenu getInGame_Manage_Info() {
+        return this.menus.get(this.INGAME).get(this.INGAME_CIV_MANAGE);
     }
 
     protected final SliderMenu getInGame_SendMessage() {

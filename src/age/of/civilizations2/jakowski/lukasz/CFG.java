@@ -7,6 +7,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -19,10 +20,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 class CFG {
     protected static boolean LOGS = false;
@@ -500,6 +498,8 @@ class CFG {
     protected static Game game;
     //new game autonomy load
     protected static Game_Autonomy gameAutonomy;
+    //new game decisions load
+    protected static Game_Decisions gameDecisions;
     protected static Game_Ages gameAges;
     protected static PlagueManager plagueManager;
     protected static Game_Action gameAction;
@@ -1291,9 +1291,10 @@ class CFG {
             if (game.getCiv(activeCivInfo).civGameData.leaderData != null && game.getCiv(activeCivInfo).civGameData.leaderData.getImage().length() > 0) {
                 try {
                     try {
-                        activeCivLeader = new Image(new Texture(Gdx.files.internal("game/leadersIMG/" + game.getCiv(activeCivInfo).civGameData.leaderData.getImage())), Texture.TextureFilter.Linear);
+                        //formatting changed for reading leader images bc all white glitch
+                        activeCivLeader = new Image(new Texture(Gdx.files.internal("game/leadersIMG/" + game.getCiv(activeCivInfo).civGameData.leaderData.getImage()), Pixmap.Format.RGBA8888, false), Texture.TextureFilter.Linear);
                     } catch (GdxRuntimeException var4) {
-                        activeCivLeader = new Image(new Texture(Gdx.files.local("game/leadersIMG/" + game.getCiv(activeCivInfo).civGameData.leaderData.getImage())), Texture.TextureFilter.Linear);
+                        activeCivLeader = new Image(new Texture(Gdx.files.local("game/leadersIMG/" + game.getCiv(activeCivInfo).civGameData.leaderData.getImage()), Pixmap.Format.RGBA8888, false), Texture.TextureFilter.Linear);
                     }
                 } catch (GdxRuntimeException var6) {
                     activeCivLeader = null;
@@ -1473,6 +1474,28 @@ class CFG {
         return Math.min((int)fOut, 100);
     }
 
+
+    protected static final void updateActiveCivManagement_InGame() {
+        try {
+            menuManager.getInGame_Manage_Info().getMenuElement(0).setText(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).civGameData.leaderData.getName());
+        } catch (NullPointerException ex) {
+            //build leader
+            if (!DynamicEventManager_Leader.buildRandomLeader(game.getPlayer(PLAYER_TURNID).getCivID(), true)) {
+                DynamicEventManager_Leader.buildPlaceholderLeader(game.getPlayer(PLAYER_TURNID).getCivID());
+            }
+            menuManager.getInGame_Manage_Info().getMenuElement(0).setText(CFG.game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).civGameData.leaderData.getName());
+        }
+
+        menuManager.getInGame_Manage_Info().getMenuElement(1).setText((langManager.get("Ideals") + ": ") + (Objects.equals(ideologiesManager.getIdeology(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getIdeologyID()).AI_TYPE, "DEFAULT") ? "Despotism" : ideologiesManager.getIdeology(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getIdeologyID()).AI_TYPE.charAt(0) + ideologiesManager.getIdeology(game.getCiv(game.getPlayer(PLAYER_TURNID).getCivID()).getIdeologyID()).AI_TYPE.substring(1).toLowerCase()));
+
+        menuManager.getInGame_Manage_Info().getMenuElement(0).setVisible(true);
+        menuManager.getInGame_Manage_Info().getMenuElement(1).setVisible(true);
+        menuManager.getInGame_Manage_Info().getMenuElement(2).setVisible(true);
+
+        menuManager.rebuildInGame_ManageCiv2();
+        menuManager.rebuildInGame_ManageCiv_Actions();
+    }
+
    protected static final void updateActiveCivInfo_InGame() {
        if (CFG.SPECTATOR_MODE) {
            if (CFG.game.getActiveProvinceID() >= 0 && (CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() != CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID()) && (CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() > 0)) {
@@ -1498,6 +1521,10 @@ class CFG {
                    CFG.menuManager.setVisible_InGame_ViewIncome(true);
                }
            }
+       }
+
+       if (menuManager.getVisible_InGame_ManageInfo()) {
+           updateActiveCivManagement_InGame();
        }
 
       menuManager.getInGame_CivInfo().getMenuElement(1).setText("" + game.getCiv(activeCivInfo).getCivName());
@@ -3439,6 +3466,31 @@ class CFG {
                 }
             };
             CFG.updateKeyboard_DefaultWrite();
+        } else if (Keyboard.changeLeaderNameMode > 0 && menuManager.getInGameView()) {
+            keyboardSave = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if (keyboardMessage.length() > 0) {
+                        game.getCiv(Keyboard.changeLeaderNameMode).civGameData.leaderData.setName(keyboardMessage);
+                        game.setActiveProvinceID(game.getActiveProvinceID());
+
+                        if (menuManager.getInGameView()) {
+                            CFG.updateActiveCivInfo_InGame();
+                        } else if (menuManager.getInCreateNewGame()) {
+                            CFG.updateActiveCivInfo_CreateNewGame();
+                        }
+                    }
+                }
+            };
+            keyboardDelete = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "";
+                }
+            };
+            CFG.updateKeyboard_DefaultWrite();
         } else if (Keyboard.changeProvinceNameMode > 0 && menuManager.getInGameView()) {
             keyboardSave = new Keyboard_Action(){
 
@@ -4551,7 +4603,7 @@ class CFG {
                     break;
                 }
                 case END_GAME_SPECTACTOR: {
-                    menuManager.getDialogMenu().getMenuElement(3).setText("God Mode?");
+                    menuManager.getDialogMenu().getMenuElement(3).setText(langManager.get("ESSM") + "?");
                     break;
                 }
                 case END_GAME_EXIT_MAIN_MENU: {

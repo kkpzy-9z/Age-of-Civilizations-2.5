@@ -213,8 +213,8 @@ class Map_TouchManager {
 
             @Override
             public void extraAction(int nPosX, int nPosY) {
-                if (CFG.SPECTATOR_MODE) {
-                    if (CFG.game.getActiveProvinceID() >= 0 && CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() != CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() && CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() > 0) {
+                if (CFG.SPECTATOR_MODE && CFG.game.getActiveProvinceID() >= 0) {
+                    if (CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() != CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() && CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() >= 0) {
                         CFG.game.getPlayer(CFG.PLAYER_TURNID).setCivID(CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID());
                         CFG.game.getPlayer(CFG.PLAYER_TURNID).loadPlayersFlag();
                         CFG.setActiveCivInfo(CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID());
@@ -237,6 +237,9 @@ class Map_TouchManager {
                         } else if (CFG.viewsManager.getActiveViewID() == ViewsManager.VIEW_INCOME_MODE && CFG.menuManager.getVisible_InGame_View_Stats()) {
                             CFG.menuManager.setVisible_InGame_ViewIncome(true);
                         }
+                        CFG.game.updateHighlight_MoveUnitsProvinces(CFG.game.getActiveProvinceID()); //show army movement lines
+                    } else if (!CFG.chooseProvinceMode || CFG.chooseProvinceMode_BEFORE && CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() >= 0) {
+                        CFG.game.updateHighlight_MoveUnitsProvinces(CFG.game.getActiveProvinceID()); //show army movement lines
                     }
                 } else if (CFG.game.getActiveProvinceID() >= 0) {
                     CFG.game.autoBuildChooseProvinceMode(false);

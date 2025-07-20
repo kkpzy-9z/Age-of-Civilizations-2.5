@@ -6,6 +6,7 @@ class Event_Outcome_ChangeLeader extends Event_Outcome
 {
     protected int iCivID = -1;
     protected LeaderOfCiv_GameData iValue = new LeaderOfCiv_GameData();
+    protected boolean bIsLeaderChange = true;
 
     Event_Outcome_ChangeLeader() {
         super();
@@ -39,7 +40,7 @@ class Event_Outcome_ChangeLeader extends Event_Outcome
     
     @Override
     protected void outcomeAction() {
-        if (this.getCivID() >= 0 && this.getCivID() < CFG.game.getCivsSize()) {
+        if (this.getCivID() >= 0 && this.getCivID() < CFG.game.getCivsSize() && this.bIsLeaderChange && this.iValue != null) {
             try {
                 CFG.game.getCiv(this.getCivID()).civGameData.setLeader(this.iValue);
 

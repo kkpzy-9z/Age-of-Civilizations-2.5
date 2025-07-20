@@ -186,6 +186,8 @@ class Game_NewGame {
         Gdx.app.log("AoC", "newGame: 12");
         Game_NewGame.updateBudgetSpendings();
         Gdx.app.log("AoC", "newGame: 13");
+        CFG.gameAction.updatePlayerDecisions();
+        CFG.gameAction.updateClassPerceptions();
         CFG.game_NextTurnUpdate.updateInflationPeakValue();
         CFG.game_NextTurnUpdate.updatePlayableProvinces();
         TechnologyManager.updateAverageTechLevel();
@@ -390,6 +392,8 @@ class Game_NewGame {
         CFG.gameAction.updateCivsHappiness();
         CFG.game_NextTurnUpdate.updateProvinceStability();
         Game_NewGame.updateBudgetSpendings();
+        CFG.gameAction.updatePlayerDecisions();
+        CFG.gameAction.updateClassPerceptions();
         CFG.game_NextTurnUpdate.updateInflationPeakValue();
         CFG.game_NextTurnUpdate.updatePlayableProvinces();
         TechnologyManager.updateAverageTechLevel();

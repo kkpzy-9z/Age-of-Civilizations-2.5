@@ -6,30 +6,91 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DynamicEventManager_Leader implements Serializable {
     private static final long serialVersionUID = 0L;
-    private int civpl = 0;
-    private int currentTurn = -1;
+    private static int currentAge = -1;
+    private static int currentTurn = -1;
+    private static int currentScenario = -1;
     protected Event_GameData event_lastturn;
-    final static int MAXIMUM_TIME_OF_RULE = 50;
+    final static int MAXIMUM_TIME_OF_RULE = 75;
+    final static int MINIMUM_TIME_OF_RULE = 10;
 
     DynamicEventManager_Leader() {
-
+        //cacheLeaders();
     }
 
     protected void invokeLeaderEvents() {
-        civpl = CFG.getActiveCivInfo();
-        //this.invokeRandomLeaderEvent();
+        currentTurn = CFG.game.getPlayer(CFG.PLAYER_TURNID).statistics_Civ_GameData.getTurns();
+
+        if (currentTurn == 1 && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData != null
+            && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.isRandom()) {
+            this.invokeInitLeaderEvent();
+        }
+
+    }
+
+    private static LinkedHashMap<String, Leader_Random_GameData> leaderCache = new LinkedHashMap<>();
+    private static void cacheLeaders() {
+        currentAge = CFG.gameAges.getAgeOfYear(Game_Calendar.currentYear);
+        currentScenario = CFG.game.getScenarioID();
+
+        //if (!leaderCache.isEmpty()) return;
+        leaderCache.clear();
+
+        //randomize leader order
+        List<String> files = CFG.getFileNames("game/leadersRandom/");
+        Collections.shuffle(files);
+
+        LinkedHashMap<String, Leader_Random_GameData> toAppendtoLeaders = new LinkedHashMap<>();
+        for (String fileName : files) {
+            if (fileName.equals("Age_of_Civilizations")) continue;
+            try {
+                FileHandle file = Gdx.files.local("game/leadersRandom/" + fileName);
+                CFG.leader_Random_GameData = (Leader_Random_GameData) CFG.deserialize(file.readBytes());
+
+                CFG.leader_Random_GameData.getLeaderOfCiv().setRandom(true); //ensure that the leader is marked as random
+
+                if (isValidLeaderRandom()) {
+                    if (CFG.leader_Random_GameData.containsCiv("All") || CFG.leader_Random_GameData.containsAIType("All")) {
+                        toAppendtoLeaders.put(fileName, CFG.leader_Random_GameData);
+                    } else {
+                        leaderCache.put(fileName, CFG.leader_Random_GameData);
+                    }
+                }
+                CFG.leader_Random_GameData = null;
+            } catch (Exception e) {
+                try {
+                    FileHandle file = Gdx.files.internal("game/leadersRandom/" + fileName);
+                    CFG.leader_Random_GameData = (Leader_Random_GameData) CFG.deserialize(file.readBytes());
+
+                    CFG.leader_Random_GameData.getLeaderOfCiv().setRandom(true); //ensure that the leader is marked as random
+
+                    if (isValidLeaderRandom()) {
+                        if (CFG.leader_Random_GameData.containsCiv("All") || CFG.leader_Random_GameData.containsAIType("All")) {
+                            toAppendtoLeaders.put(fileName, CFG.leader_Random_GameData);
+                        } else {
+                            leaderCache.put(fileName, CFG.leader_Random_GameData);
+                        }
+                    }
+                    CFG.leader_Random_GameData = null;
+                } catch (Exception e2) {
+
+                }
+            }
+        }
+        //merge generics with leader list at END
+        //ensures generics are last resort
+        leaderCache.putAll(toAppendtoLeaders);
     }
 
     protected static boolean isValidLeader() {
         return (
             CFG.leader_GameData.getLeaderOfCiv() != null && //non-null leader
             CFG.leader_GameData.getLeaderOfCiv().getYear() <= Game_Calendar.currentYear && //leader in office before time
-            CFG.leader_GameData.getLeaderOfCiv().getYear() >= Game_Calendar.currentYear - MAXIMUM_TIME_OF_RULE //leader in office not too long ago
+            CFG.leader_GameData.getLeaderOfCiv().getYear() >= Game_Calendar.currentYear - MAXIMUM_TIME_OF_RULE && //leader in office not too long ago
+            (CFG.leader_GameData.getLeaderOfCiv().isIncumbentYear() || CFG.leader_GameData.getLeaderOfCiv().getYear() <= Game_Calendar.currentYear - MINIMUM_TIME_OF_RULE) //leader not too young (only if birthdate set)
         );
     }
 
@@ -44,12 +105,54 @@ public class DynamicEventManager_Leader implements Serializable {
         );
     }
 
-    protected static void buildRandomLeader(int iCivID) {
-        buildRandomLeader(iCivID, false);
+    protected static void safeReplaceLeader(final int iCivID) {
+        try {
+            final LeaderOfCiv_GameData newLeader = new LeaderOfCiv_GameData();
+
+            newLeader.setTag(CFG.game.getCiv(iCivID).civGameData.leaderData.getTag());
+            newLeader.setName(CFG.game.getCiv(iCivID).civGameData.leaderData.getName());
+            newLeader.setImage(CFG.game.getCiv(iCivID).civGameData.leaderData.getImage());
+            newLeader.setWiki(CFG.game.getCiv(iCivID).civGameData.leaderData.getWiki());
+            newLeader.setYear(CFG.game.getCiv(iCivID).civGameData.leaderData.getYear());
+            newLeader.setMonth(CFG.game.getCiv(iCivID).civGameData.leaderData.getMonth());
+            newLeader.setDay(CFG.game.getCiv(iCivID).civGameData.leaderData.getDay());
+            newLeader.setIncumbentYear(CFG.game.getCiv(iCivID).civGameData.leaderData.isIncumbentYear());
+            newLeader.setRandom(CFG.game.getCiv(iCivID).civGameData.leaderData.isRandom());
+
+            newLeader.fModifier_PopGrowth = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_PopGrowth;
+            newLeader.fModifier_EconomyGrowth = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_EconomyGrowth;
+            newLeader.fModifier_IncomeTaxation = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_IncomeTaxation;
+            newLeader.fModifier_IncomeProduction = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_IncomeProduction;
+            newLeader.fModifier_Administration = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_Administration;
+            newLeader.fModifier_Research = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_Research;
+            newLeader.fModifier_MilitaryUpkeep = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_MilitaryUpkeep;
+            newLeader.fModifier_AttackBonus = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_AttackBonus;
+            newLeader.fModifier_DefenseBonus = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_DefenseBonus;
+            newLeader.fModifier_MovementPoints = CFG.game.getCiv(iCivID).civGameData.leaderData.fModifier_MovementPoints;
+
+            CFG.game.getCiv(iCivID).civGameData.leaderData = newLeader;
+        } catch (NullPointerException ex) {
+            buildPlaceholderLeader(iCivID);
+        }
     }
 
-    protected static void buildRandomLeader(int iCivID, boolean atStartGame) {
-        if (CFG.game.getCiv(iCivID).getNumOfProvinces() < 1) return;
+    protected static void buildPlaceholderLeader(int iCivID) {
+         CFG.game.getCiv(iCivID).civGameData.leaderData = new LeaderOfCiv_GameData();
+         CFG.game.getCiv(iCivID).civGameData.leaderData.setName(CFG.langManager.get("Leader" + " " + CFG.langManager.get("Of") + " " + CFG.game.getCiv(iCivID).getCivName()));
+         CFG.game.getCiv(iCivID).civGameData.leaderData.setYear(Game_Calendar.currentYear - (int) (Math.random() * DynamicEventManager_Leader.MAXIMUM_TIME_OF_RULE));
+         CFG.game.getCiv(iCivID).civGameData.leaderData.setMonth(Math.abs(Game_Calendar.currentMonth - (int) (Math.random() * 12)));
+         CFG.game.getCiv(iCivID).civGameData.leaderData.setDay(Math.abs(Game_Calendar.currentDay - (int) (Math.random() * 28)));
+    }
+
+    protected static boolean buildRandomLeader(int iCivID) {
+        return buildRandomLeader(iCivID, false);
+    }
+
+    protected static boolean buildRandomLeader(int iCivID, boolean atStartGame) {
+        if (CFG.game.getCiv(iCivID).getNumOfProvinces() < 1) return false;
+        if (currentAge != CFG.gameAges.getAgeOfYear(Game_Calendar.currentYear) || currentScenario != CFG.game.getScenarioID()) {
+            cacheLeaders();
+        }
 
         String sContName;
         if (CFG.game.getCiv(iCivID).getCapitalProvinceID() >= 0) {
@@ -58,79 +161,51 @@ public class DynamicEventManager_Leader implements Serializable {
             sContName = CFG.map.getMapContinents().getName(CFG.game.getProvince(CFG.game.getCiv(iCivID).getProvinceID(0)).getContinent());
         }
 
-        final ArrayList<Integer> candidates = new ArrayList<>();
-        String[] tagsSPLITED = null;
         try {
-            if (CFG.isDesktop()) {
-                final List<String> tempFiles = CFG.getFileNames("game/leadersRandom/");
-                for (int i = 0, iSize = tempFiles.size(); i < iSize; ++i) {
-                    if (tempFiles.get(i).equals("Age_of_Civilizations")) {
-                        tempFiles.remove(i);
-                        break;
+            String toRemove = null;
+
+            //shuffle the keys to randomize leader selection
+            //List<String> keys = new ArrayList<>(leaderCache.keySet());
+            //Collections.shuffle(keys);
+            //for (String leaderKey : keys) {
+            for (String leaderKey : leaderCache.keySet()) {
+                CFG.leader_Random_GameData = leaderCache.get(leaderKey);
+                if ((CFG.leader_Random_GameData.containsCiv(sContName) || CFG.leader_Random_GameData.containsCiv("All")) &&
+                   (CFG.leader_Random_GameData.containsAIType(CFG.ideologiesManager.getIdeology(CFG.game.getCiv(iCivID).getIdeologyID()).AI_TYPE) || CFG.leader_Random_GameData.containsAIType("All")) &&
+                   (CFG.leader_Random_GameData.getLeaderOfCiv().canAppearNaturally() || !atStartGame)) {
+
+                    CFG.game.getCiv(iCivID).civGameData.setLeader(CFG.leader_Random_GameData.getLeaderOfCiv());
+                    if (!atStartGame) {
+                        CFG.game.getCiv(iCivID).civGameData.leaderData.setYear(Game_Calendar.currentYear);
+                        CFG.game.getCiv(iCivID).civGameData.leaderData.setMonth(Game_Calendar.currentMonth);
+                        CFG.game.getCiv(iCivID).civGameData.leaderData.setDay(Game_Calendar.currentDay);
+                    } else {
+                        CFG.game.getCiv(iCivID).civGameData.leaderData.setYear(Game_Calendar.currentYear - (int) (Math.random() * MAXIMUM_TIME_OF_RULE));
+                        CFG.game.getCiv(iCivID).civGameData.leaderData.setMonth(Math.abs(Game_Calendar.currentMonth - (int) (Math.random() * 12)));
+                        CFG.game.getCiv(iCivID).civGameData.leaderData.setDay(Math.abs(Game_Calendar.currentDay - (int) (Math.random() * 28)));
                     }
+
+                    toRemove = leaderKey;
+                    if (leaderCache.isEmpty()) {
+                        //if no more leaders are available, reset the cache
+                        Gdx.app.log("AoC", "No more leaders available, resetting cache...");
+                        cacheLeaders();
+                    }
+                    break;
                 }
-                tagsSPLITED = new String[tempFiles.size()];
-                for (int i = 0, iSize = tempFiles.size(); i < iSize; ++i) {
-                    tagsSPLITED[i] = tempFiles.get(i);
-                }
-            } else {
-                final FileHandle tempFileT = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
-                final String tempT = tempFileT.readString();
-                tagsSPLITED = tempT.split(";");
+                CFG.leader_Random_GameData = null;
             }
-            for (int j = 0, iSize2 = tagsSPLITED.length; j < iSize2; ++j) {
-                try {
-                    try {
-                        final FileHandle file = Gdx.files.local("game/leadersRandom/" + tagsSPLITED[j]);
-                        CFG.leader_Random_GameData = (Leader_Random_GameData) CFG.deserialize(file.readBytes());
-                    } catch (final GdxRuntimeException ex) {
-                        final FileHandle file = Gdx.files.internal("game/leadersRandom/" + tagsSPLITED[j]);
-                        CFG.leader_Random_GameData = (Leader_Random_GameData) CFG.deserialize(file.readBytes());
-                    }
-                } catch (final ClassNotFoundException | IOException ex4) {
-                }
-                if (CFG.leader_Random_GameData.containsCiv(sContName) || CFG.leader_Random_GameData.containsCiv("All")) {
-                    if (CFG.leader_Random_GameData.containsAIType(CFG.ideologiesManager.getIdeology(CFG.game.getCiv(iCivID).getIdeologyID()).AI_TYPE) || CFG.leader_Random_GameData.containsAIType("All")) {
-                        if (DynamicEventManager_Leader.isValidLeaderRandom()) {
-                            if (!atStartGame || (CFG.leader_Random_GameData.getLeaderOfCiv().canAppearNaturally())) {
-                                candidates.add(j);
-                            }
-                        }
-                    }
-                }
+            if (toRemove != null) {
+                leaderCache.remove(toRemove);
+                return true;
             }
+
         } catch (GdxRuntimeException e) {
+            // Optionally log error
         }
-
-        if (!candidates.isEmpty()) {
-            int randomIndex = candidates.get(CFG.oR.nextInt(candidates.size()));
-
-            try {
-                try {
-                    try {
-                        final FileHandle file = Gdx.files.local("game/leadersRandom/" + tagsSPLITED[randomIndex]);
-                        CFG.leader_Random_GameData = (Leader_Random_GameData) CFG.deserialize(file.readBytes());
-                    } catch (final GdxRuntimeException ex) {
-                        final FileHandle file = Gdx.files.internal("game/leadersRandom/" + tagsSPLITED[randomIndex]);
-                        CFG.leader_Random_GameData = (Leader_Random_GameData) CFG.deserialize(file.readBytes());
-                    }
-                } catch (final ClassNotFoundException | IOException ex4) {
-                }
-            } catch (GdxRuntimeException e) {
-            }
-
-            CFG.game.getCiv(iCivID).civGameData.setLeader(CFG.leader_Random_GameData.getLeaderOfCiv());
-            if (!atStartGame) {
-                CFG.game.getCiv(iCivID).civGameData.leaderData.setYear(Game_Calendar.currentYear);
-                CFG.game.getCiv(iCivID).civGameData.leaderData.setMonth(Game_Calendar.currentMonth);
-                CFG.game.getCiv(iCivID).civGameData.leaderData.setDay(Game_Calendar.currentDay);
-            } else {
-                CFG.game.getCiv(iCivID).civGameData.leaderData.setYear(Game_Calendar.currentYear - (int)(Math.random() * MAXIMUM_TIME_OF_RULE));
-                CFG.game.getCiv(iCivID).civGameData.leaderData.setMonth(Math.abs(Game_Calendar.currentMonth - (int)(Math.random() * 12)));
-                CFG.game.getCiv(iCivID).civGameData.leaderData.setDay(Math.abs(Game_Calendar.currentDay - (int)(Math.random() * 28)));
-            }
-        }
+        return false;
     }
+
 
     protected void invokeCivilWarLeaderChange(final int iCivID, final int newCivID) {
         Event_GameData eventGameData = new Event_GameData();
@@ -199,75 +274,34 @@ public class DynamicEventManager_Leader implements Serializable {
         event_lastturn.setFired(currentTurn);
     }
 
-    protected void invokeRandomLeaderEvent() {
-        String civRef = CFG.game.getCiv(civpl).getCivName();
+    protected void invokeInitLeaderEvent() {
+        String civRef = CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getCivName();
         Event_GameData eventGameData = new Event_GameData();
         Event_Outcome_ChangeLeader eventOutcomeChangeLeader = new Event_Outcome_ChangeLeader();
         Event_Conditions_CivExist eventConditionsCivExist = new Event_Conditions_CivExist();
 
-        eventOutcomeChangeLeader.iCivID = civpl;
-        eventOutcomeChangeLeader.iValue.setName("Steve Jobs");
-        eventOutcomeChangeLeader.iValue.setImage("bat.png");
-        eventConditionsCivExist.iCivID = civpl;
+        eventOutcomeChangeLeader.iCivID = CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID();
+        eventOutcomeChangeLeader.iValue.setName(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getName());
+        eventOutcomeChangeLeader.bIsLeaderChange = false; //no leader change, just ouput
+        eventConditionsCivExist.iCivID = CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID();
 
-        if (CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() == civpl) {
-            //SELF
-            eventGameData.setup_Event(
-                    CFG.langManager.get(String.format("EventMiracleNamePlayer_" + (int)(Math.ceil(Math.random() * (2))))),
-                    "EventMiracle_" + (int)(Math.ceil(Math.random() * (5))),
-                    "eventMiracle",
-                    CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()
-            );
-            eventGameData.setup_EventPopUp(
-                    true,
-                    CFG.langManager.get(String.format("EventMiracleDescPlayer_" + (int)(Math.ceil(Math.random() * (2)))))
-            );
-            eventGameData.setup_EventDecisions(
-                    CFG.langManager.get(String.format("EventMiracleDecisionPlayer_" + (int)(Math.ceil(Math.random() * (2))))),
-                    eventOutcomeChangeLeader
-            );
-            eventGameData.setup_EventTriggers(
-                    eventConditionsCivExist
-            );
-        } else if (!CFG.getMetCiv(civpl)) {
-            //UNDISCOVERED
-            eventGameData.setup_Event(
-                    CFG.langManager.get(String.format("EventMiracleNameUndiscovered_" + (int)(Math.ceil(Math.random() * (3))))),
-                    "EventMiracle_" + (int)(Math.ceil(Math.random() * (5))),
-                    "eventMiracle",
-                    CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()
-            );
-            eventGameData.setup_EventPopUp(
-                    true,
-                    CFG.langManager.get(String.format("EventMiracleDescUndiscovered_" + (int)(Math.ceil(Math.random() * (3)))))
-            );
-            eventGameData.setup_EventDecisions(
-                    CFG.langManager.get(String.format("EventMiracleDecisionUndiscovered_" + (int)(Math.ceil(Math.random() * (3))))),
-                    eventOutcomeChangeLeader
-            );
-            eventGameData.setup_EventTriggers(
-                    eventConditionsCivExist
-            );
-        } else {
-            //OTHER
-            eventGameData.setup_Event(
-                    CFG.langManager.get(String.format("EventMiracleName_" + (int)(Math.ceil(Math.random() * (3)))), civRef),
-                    "EventMiracle_" + (int)(Math.ceil(Math.random() * (5))),
-                    "eventMiracle",
-                    CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()
-            );
-            eventGameData.setup_EventPopUp(
-                    true,
-                    CFG.langManager.get(String.format("EventMiracleDesc_" + (int)(Math.ceil(Math.random() * (3)))), civRef)
-            );
-            eventGameData.setup_EventDecisions(
-                    CFG.langManager.get(String.format("EventMiracleDecision_" + (int)(Math.ceil(Math.random() * (3))))),
-                    eventOutcomeChangeLeader
-            );
-            eventGameData.setup_EventTriggers(
-                    eventConditionsCivExist
-            );
-        }
+        eventGameData.setup_Event(
+                CFG.langManager.get(String.format("EventMiracleNamePlayer_" + (int)(Math.ceil(Math.random() * (2))))),
+                "EventMiracle_" + (int)(Math.ceil(Math.random() * (5))),
+                "eventMiracle",
+                CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()
+        );
+        eventGameData.setup_EventPopUp(
+                true,
+                CFG.langManager.get(String.format("EventMiracleDescPlayer_" + (int)(Math.ceil(Math.random() * (2)))))
+        );
+        eventGameData.setup_EventDecisions(
+                CFG.langManager.get(String.format("EventMiracleDecisionPlayer_" + (int)(Math.ceil(Math.random() * (2))))),
+                eventOutcomeChangeLeader
+        );
+        eventGameData.setup_EventTriggers(
+                eventConditionsCivExist
+        );
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;

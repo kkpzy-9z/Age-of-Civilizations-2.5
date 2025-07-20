@@ -4529,6 +4529,10 @@ class AI_Style
                }
                case JOIN_ALLIANCE: {
                   if (CFG.game.getCiv(nCivID).getIsPupet()) {
+                     if (CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).iFromCivID == CFG.game.getCiv(nCivID).getPuppetOfCivID()) {
+                        CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.getMessage(i).onAccept(nCivID);
+                        CFG.game.getCiv(nCivID).getCivilization_Diplomacy_GameData().messageBox.removeMessage(i);
+                     }
                      break;
                   }
 

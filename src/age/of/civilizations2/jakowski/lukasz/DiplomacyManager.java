@@ -664,16 +664,16 @@ class DiplomacyManager
                 if (CFG.game.getCiv(i).getHappiness() < 50) {
                     CFG.game.getCiv(i).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_LowHappiness(i, 0));
                 }
-                if (CFG.game.getCiv(i).lProvincesWithLowStability.size() > 0) {
-                    boolean sendLowStability = false;
+                if (!CFG.game.getCiv(i).lProvincesWithLowStability.isEmpty()) {
                     for (int j = CFG.game.getCiv(i).lProvincesWithLowStability.size() - 1; j >= 0; --j) {
-                        if (CFG.game.getProvince(CFG.game.getCiv(i).lProvincesWithLowStability.get(j)).getProvinceStability() < 75.0f) {
-                            sendLowStability = true;
+                        if (CFG.game.getProvince(CFG.game.getCiv(i).lProvincesWithLowStability.get(j)).getTrueOwnerOfProvince() == i &&
+                            CFG.game.getProvince(CFG.game.getCiv(i).lProvincesWithLowStability.get(j)).getProvinceStability() < 80.0f)
+                        {
+                            CFG.game.getCiv(i).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_LowStability(i, 0));
                             break;
+                        } else {
+                            CFG.game.getCiv(i).lProvincesWithLowStability.remove(j);
                         }
-                    }
-                    if (sendLowStability) {
-                        CFG.game.getCiv(i).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_LowStability(i, 0));
                     }
                 }
             }

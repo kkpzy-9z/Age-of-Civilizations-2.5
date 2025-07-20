@@ -23,7 +23,33 @@ class Game_NextTurnUpdate
     Game_NextTurnUpdate() {
         super();
     }
-    
+
+    protected final void updateDecisions() {
+        for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+            for (int decIndex = 0; decIndex < CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecisionsCount(); decIndex++) {
+                if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getInProgress()) {
+                    CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setTurnsProgress(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() + 1);
+                    if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() >= CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnLength()) {
+                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).applyDecisionChange_Expired(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex));
+
+                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_UpperClass));
+                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_MiddleClass));
+                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_LowerClass));
+
+                        if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).isRepeatable()) {
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setInProgress(false);
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setTurnsProgress(0);
+                        } else {
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.removeDecision(decIndex);
+                            --decIndex;
+                        }
+                        //CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.messageBox.addMessage(new Message_DecisionCompleted(CFG.game.getPlayer(i).getCivID(), decIndex));
+                    }
+                }
+            }
+        }
+    }
+
     protected final void updatePlayableProvinces() {
         CFG.oAI.PLAYABLE_PROVINCES = 0;
         for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {

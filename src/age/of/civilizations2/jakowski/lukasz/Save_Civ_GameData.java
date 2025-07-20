@@ -143,79 +143,39 @@ class Save_Civ_GameData implements Serializable {
          this.fModifier_MovementPoints -= this.leaderData.fModifier_MovementPoints;
       }
 
+      this.leaderData = new LeaderOfCiv_GameData();
       if (nLeaderData != null) {
-         if (nLeaderData.fModifier_PopGrowth > 0.25F) {
-            nLeaderData.fModifier_PopGrowth = 0.25F;
-         } else if (nLeaderData.fModifier_PopGrowth < -0.25F) {
-            nLeaderData.fModifier_PopGrowth = -0.25F;
-         }
+         leaderData.setTag(nLeaderData.getTag());
+         leaderData.setName(nLeaderData.getName());
+         leaderData.setImage(nLeaderData.getImage());
+         leaderData.setWiki(nLeaderData.getWiki());
+         leaderData.setYear(nLeaderData.getYear());
+         leaderData.setMonth(nLeaderData.getMonth());
+         leaderData.setDay(nLeaderData.getDay());
+         leaderData.setIncumbentYear(nLeaderData.isIncumbentYear());
+         leaderData.setRandom(nLeaderData.isRandom());
 
-         if (nLeaderData.fModifier_EconomyGrowth > 0.25F) {
-            nLeaderData.fModifier_EconomyGrowth = 0.25F;
-         } else if (nLeaderData.fModifier_EconomyGrowth < -0.25F) {
-            nLeaderData.fModifier_EconomyGrowth = -0.25F;
-         }
+         leaderData.fModifier_PopGrowth = nLeaderData.fModifier_PopGrowth;
+         leaderData.fModifier_EconomyGrowth = nLeaderData.fModifier_EconomyGrowth;
+         leaderData.fModifier_IncomeTaxation = nLeaderData.fModifier_IncomeTaxation;
+         leaderData.fModifier_IncomeProduction = nLeaderData.fModifier_IncomeProduction;
+         leaderData.fModifier_Administration = nLeaderData.fModifier_Administration;
+         leaderData.fModifier_Research = nLeaderData.fModifier_Research;
+         leaderData.fModifier_MilitaryUpkeep = nLeaderData.fModifier_MilitaryUpkeep;
+         leaderData.fModifier_AttackBonus = nLeaderData.fModifier_AttackBonus;
+         leaderData.fModifier_DefenseBonus = nLeaderData.fModifier_DefenseBonus;
+         leaderData.fModifier_MovementPoints = nLeaderData.fModifier_MovementPoints;
 
-         if (nLeaderData.fModifier_IncomeTaxation > 0.25F) {
-            nLeaderData.fModifier_IncomeTaxation = 0.25F;
-         } else if (nLeaderData.fModifier_IncomeTaxation < -0.25F) {
-            nLeaderData.fModifier_IncomeTaxation = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_IncomeProduction > 0.25F) {
-            nLeaderData.fModifier_IncomeProduction = 0.25F;
-         } else if (nLeaderData.fModifier_IncomeProduction < -0.25F) {
-            nLeaderData.fModifier_IncomeProduction = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_Administration > 0.25F) {
-            nLeaderData.fModifier_Administration = 0.25F;
-         } else if (nLeaderData.fModifier_Administration < -0.25F) {
-            nLeaderData.fModifier_Administration = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_Research > 0.25F) {
-            nLeaderData.fModifier_Research = 0.25F;
-         } else if (nLeaderData.fModifier_Research < -0.25F) {
-            nLeaderData.fModifier_Research = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_MilitaryUpkeep > 0.25F) {
-            nLeaderData.fModifier_MilitaryUpkeep = 0.25F;
-         } else if (nLeaderData.fModifier_MilitaryUpkeep < -0.25F) {
-            nLeaderData.fModifier_MilitaryUpkeep = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_AttackBonus > 0.25F) {
-            nLeaderData.fModifier_AttackBonus = 0.25F;
-         } else if (nLeaderData.fModifier_AttackBonus < -0.25F) {
-            nLeaderData.fModifier_AttackBonus = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_DefenseBonus > 0.25F) {
-            nLeaderData.fModifier_DefenseBonus = 0.25F;
-         } else if (nLeaderData.fModifier_DefenseBonus < -0.25F) {
-            nLeaderData.fModifier_DefenseBonus = -0.25F;
-         }
-
-         if (nLeaderData.fModifier_MovementPoints > 0.25F) {
-            nLeaderData.fModifier_MovementPoints = 0.25F;
-         } else if (nLeaderData.fModifier_MovementPoints < -0.25F) {
-            nLeaderData.fModifier_MovementPoints = -0.25F;
-         }
-
-         this.fModifier_PopGrowth += nLeaderData.fModifier_PopGrowth;
-         this.fModifier_EconomyGrowth += nLeaderData.fModifier_EconomyGrowth;
-         this.fModifier_IncomeTaxation += nLeaderData.fModifier_IncomeTaxation;
-         this.fModifier_IncomeProduction += nLeaderData.fModifier_IncomeProduction;
-         this.fModifier_Administration += nLeaderData.fModifier_Administration;
-         this.fModifier_Research += nLeaderData.fModifier_Research;
-         this.fModifier_MilitaryUpkeep += nLeaderData.fModifier_MilitaryUpkeep;
-         this.fModifier_AttackBonus += nLeaderData.fModifier_AttackBonus;
-         this.fModifier_DefenseBonus += nLeaderData.fModifier_DefenseBonus;
-         this.fModifier_MovementPoints += nLeaderData.fModifier_MovementPoints;
+         this.fModifier_PopGrowth += leaderData.fModifier_PopGrowth;
+         this.fModifier_EconomyGrowth += leaderData.fModifier_EconomyGrowth;
+         this.fModifier_IncomeTaxation += leaderData.fModifier_IncomeTaxation;
+         this.fModifier_IncomeProduction += leaderData.fModifier_IncomeProduction;
+         this.fModifier_Administration += leaderData.fModifier_Administration;
+         this.fModifier_Research += leaderData.fModifier_Research;
+         this.fModifier_MilitaryUpkeep += leaderData.fModifier_MilitaryUpkeep;
+         this.fModifier_AttackBonus += leaderData.fModifier_AttackBonus;
+         this.fModifier_DefenseBonus += leaderData.fModifier_DefenseBonus;
+         this.fModifier_MovementPoints += leaderData.fModifier_MovementPoints;
       }
-
-      this.leaderData = nLeaderData;
    }
 }
