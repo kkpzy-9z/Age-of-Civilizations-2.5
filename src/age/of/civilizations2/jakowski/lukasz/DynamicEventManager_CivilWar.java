@@ -336,6 +336,7 @@ class DynamicEventManager_CivilWar implements Serializable {
         eventGameData.setup_EventTriggers(
                 eventConditionsCivExist
         );
+        eventGameData.setEventSound("eventCivilWar.mp3");
         eventGameData.superEvent = true;
 
         lCivilWarDefenders.add(nCivID);

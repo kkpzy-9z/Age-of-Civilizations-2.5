@@ -178,6 +178,7 @@ class DynamicEventManager_War implements Serializable {
                 eventConditionsCivExist
         );
         eventGameData.superEvent = true;
+        eventGameData.setEventSound("eventWar.mp3");
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
     }

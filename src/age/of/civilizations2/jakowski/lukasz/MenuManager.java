@@ -251,6 +251,7 @@ class MenuManager {
     private int CREATE_SCENARIO_EVENTS_COND_PORT = -1;
     private int CREATE_SCENARIO_EVENTS_COND_FARM = -1;
     private int CREATE_SCENARIO_EVENTS_SELECT_PROVINCES = -1;
+    private int CREATE_SCENARIO_EVENTS_SELECT_AUTONOMY = -1;
     private int CREATE_SCENARIO_EVENTS_SELECTDECISION = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_CREATEVASSAL = -1;
     private int CREATE_SCENARIO_EVENTS_OUT_JOINALLIANCE = -1;
@@ -1900,6 +1901,14 @@ class MenuManager {
                         this.menus.get(this.CREATE_SCENARIO_EVENTS_SELECT_PROVINCES).set(0, new Menu_CreateScenario_Events_SelectProvinces());
                     }
                     return this.CREATE_SCENARIO_EVENTS_SELECT_PROVINCES;
+                }
+                case eCREATE_SCENARIO_EVENTS_SELECT_AUTONOMY: {
+                    if (this.CREATE_SCENARIO_EVENTS_SELECT_AUTONOMY == -1) {
+                        this.CREATE_SCENARIO_EVENTS_SELECT_AUTONOMY = this.addMenu(new Menu_CreateScenario_Events_SelectAutonomy());
+                    } else {
+                        this.menus.get(this.CREATE_SCENARIO_EVENTS_SELECT_AUTONOMY).set(0, new Menu_CreateScenario_Events_SelectAutonomy());
+                    }
+                    return this.CREATE_SCENARIO_EVENTS_SELECT_AUTONOMY;
                 }
                 case eCREATE_SCENARIO_EVENTS_OUT_CREATEVASSAL: {
                     if (this.CREATE_SCENARIO_EVENTS_OUT_CREATEVASSAL == -1) {

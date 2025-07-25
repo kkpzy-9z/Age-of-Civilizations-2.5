@@ -12,7 +12,7 @@ class Menu_ManageDiplomacy_Vassals_List extends SliderMenu {
    protected Menu_ManageDiplomacy_Vassals_List() {
       int tempW = CFG.CIV_INFO_MENU_WIDTH;
       int tempElemH = (int)((float)CFG.BUTTON_HEIGHT * 0.6F);
-      List menuElements = new ArrayList();
+      final List<MenuElement> menuElements = new ArrayList<MenuElement>();
       if (CFG.MANAGE_DIPLOMACY_CUSTOMIZE_ALLIANCE_ID > 0) {
          int i = 1;
 
@@ -21,17 +21,18 @@ class Menu_ManageDiplomacy_Vassals_List extends SliderMenu {
                menuElements.add(new Button_New_Game_Players_CivID_LEFT(i, CFG.game.getCiv(i).getCivName(), -1, CFG.PADDING, CFG.PADDING * (multiplePosY + 1) + tempElemH * multiplePosY, (tempW - CFG.PADDING * 2 - ((int)((float)CFG.BUTTON_HEIGHT * 0.6F) * 2)), true));
 
                //new vassal autonomy button
-               //pass civid through text (rachet)
-               menuElements.add(new Button_New_Game_Players("" + i, -1, tempW - CFG.PADDING - (2 * (int)((float)CFG.BUTTON_HEIGHT * 0.6F)), CFG.PADDING * (multiplePosY + 1) + tempElemH * multiplePosY, ((int)((float)CFG.BUTTON_HEIGHT * 0.6F)), true) {
+               //pass civid through final variable
+               int finalI = i;
+               menuElements.add(new Button_New_Game_Players("", -1, tempW - CFG.PADDING - (2 * (int)((float)CFG.BUTTON_HEIGHT * 0.6F)), CFG.PADDING * (multiplePosY + 1) + tempElemH * multiplePosY, ((int)((float)CFG.BUTTON_HEIGHT * 0.6F)), true) {
                   protected void buildElementHover() {
-                     List nElements = new ArrayList();
-                     List nData = new ArrayList();
+                     ArrayList<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
+                     ArrayList<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
                      nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("ChangeAutonomyLevel"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
                      nElements.add(new MenuElement_Hover_v2_Element2(nData));
                      nData.clear();
 
                      nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Autonomy") + ": ", CFG.COLOR_TEXT_NUM_OF_PROVINCES));
-                     nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(CFG.game.getCiv(Integer.parseInt(this.getText())).getPuppetOfCivID()).getVassal_AutonomyStatus(Integer.parseInt(this.getText())).getName(), CFG.COLOR_INGAME_GOLD));
+                     nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(CFG.game.getCiv(finalI).getPuppetOfCivID()).getVassal_AutonomyStatus(finalI).getName(), CFG.COLOR_INGAME_GOLD));
                      nElements.add(new MenuElement_Hover_v2_Element2(nData));
                      nData.clear();
 
@@ -56,8 +57,8 @@ class Menu_ManageDiplomacy_Vassals_List extends SliderMenu {
 
                menuElements.add(new Button_New_Game_Players_Players_RIGHT("", -1, tempW - CFG.PADDING - (int)((float)CFG.BUTTON_HEIGHT * 0.6F), CFG.PADDING * (multiplePosY + 1) + tempElemH * multiplePosY, (int)((float)CFG.BUTTON_HEIGHT * 0.6F), true) {
                   protected void buildElementHover() {
-                     List nElements = new ArrayList();
-                     List nData = new ArrayList();
+                     ArrayList<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
+                     ArrayList<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
                      nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Delete"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
                      nElements.add(new MenuElement_Hover_v2_Element2(nData));
                      nData.clear();

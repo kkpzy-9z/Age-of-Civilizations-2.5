@@ -2,6 +2,7 @@ package age.of.civilizations2.jakowski.lukasz;
 
 import com.badlogic.gdx.*;
 import java.util.*;
+import java.util.Map;
 
 class Game_NextTurnUpdate
 {
@@ -19,7 +20,7 @@ class Game_NextTurnUpdate
     protected static final float EMPLOYEMENT_PER_ECONOMY_OLD = 1.775f;
     protected static final float DEFENSIVE_POSITION_MILITARY_UPKEEP_PER_TUR = 0.008f;
     protected static final int BUDGET_MAX = 200;
-    
+
     Game_NextTurnUpdate() {
         super();
     }
@@ -27,25 +28,103 @@ class Game_NextTurnUpdate
     protected final void updateDecisions() {
         for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
             for (int decIndex = 0; decIndex < CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecisionsCount(); decIndex++) {
-                if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getInProgress()) {
-                    CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setTurnsProgress(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() + 1);
-                    if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() >= CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnLength()) {
-                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).applyDecisionChange_Expired(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex));
+                try {
+                    if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getInProgress()) {
+                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setTurnsProgress(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() + 1);
 
-                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_UpperClass));
-                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_MiddleClass));
-                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_LowerClass));
-
-                        if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).isRepeatable()) {
-                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setInProgress(false);
-                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setTurnsProgress(0);
-                        } else {
-                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.removeDecision(decIndex);
-                            --decIndex;
+                        if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).isCostEveryTurn()) {
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setMoney((long) (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getMoney() - (long) CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getGoldCost()));
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setDiplomacyPoints(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getDiplomacyPoints() - (int) CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost());
                         }
-                        //CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.messageBox.addMessage(new Message_DecisionCompleted(CFG.game.getPlayer(i).getCivID(), decIndex));
+
+                        if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() >= CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnLength()) {
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).applyDecisionChange_Expired(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex));
+
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_UpperClass));
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_MiddleClass));
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_LowerClass));
+
+                            if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).isRepeatable()) {
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setInProgress(false);
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).setTurnsProgress(0);
+                            } else {
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.removeDecision(decIndex);
+                                --decIndex;
+                            }
+                            //CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.messageBox.addMessage(new Message_DecisionCompleted(CFG.game.getPlayer(i).getCivID(), decIndex));
+                        }
                     }
+                } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                    DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
+                    CFG.gameAction.updatePlayerDecisions();
                 }
+            }
+        }
+    }
+
+    public static float adjustClassApproval(float current, float optimal) {
+        float baseFactor = 0.0025F;
+        float scale = 0.0025F;
+        float maxFactor = 0.01F;
+
+        baseFactor = Math.min(baseFactor + scale * Math.abs(optimal - current), maxFactor);
+        return current + (optimal - current) * baseFactor;
+    }
+
+    protected final void updateClassPerceptions() {
+        for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+            try {
+                float stabFactor = (0.60F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getStability());
+
+                stabFactor += (-0.90F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+
+                stabFactor += (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
+                updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 0, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0), stabFactor), true);
+                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0), stabFactor));
+                stabFactor -= (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
+
+                stabFactor += (-0.05F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 1, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1), stabFactor), true);
+                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1), stabFactor));
+                stabFactor -= (-0.05F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+
+                stabFactor += (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods());
+                updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 2, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2), stabFactor), true);
+                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2), stabFactor));
+            } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
+                CFG.gameAction.updateClassPerceptions();
+            }
+        }
+    }
+
+    protected static float getClassPerceptionBoosts(float fChangeTo) {
+        fChangeTo = Math.max(Math.min(fChangeTo, 1.00F), 0.00F);
+        return (fChangeTo - 0.5F) * 0.4F;
+    }
+
+    protected static void updateClassPerceptionBoosts(final int iCivID, final int iClassID, float fChangeTo, final boolean accountForPrevValue) {
+        if (fChangeTo != CFG.game.getCiv(iCivID).civGameData.leaderData.getClassViews(iClassID)) {
+            float iCalculation = getClassPerceptionBoosts(fChangeTo);
+            if (accountForPrevValue) {
+                iCalculation -= getClassPerceptionBoosts(CFG.game.getCiv(iCivID).civGameData.leaderData.getClassViews(iClassID));
+            }
+
+            switch (iClassID) {
+                case 0:
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_EconomyGrowth += iCalculation;
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_Administration += iCalculation;
+                    return;
+                case 1:
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_IncomeProduction += iCalculation;
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_Research += iCalculation;
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_PopGrowth += iCalculation;
+                    return;
+                case 2:
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_IncomeTaxation += iCalculation;
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_EconomyGrowth += iCalculation;
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_PopGrowth += iCalculation;
+                    return;
             }
         }
     }
@@ -68,7 +147,7 @@ class Game_NextTurnUpdate
         CFG.oAI.NUM_OF_CIVS_IN_THE_GAME = Math.max(1, CFG.oAI.NUM_OF_CIVS_IN_THE_GAME);
         CFG.oAI.updateMinRivals();
     }
-    
+
     protected final void updateInflationPeakValue() {
         Game_NextTurnUpdate.INFLATION_PEAK_VALUE = 1;
         for (int i = 1; i < CFG.game.getCivsSize(); ++i) {
@@ -89,7 +168,7 @@ class Game_NextTurnUpdate
             }
         }
     }
-    
+
     protected final void updateCivs_Money() {
         Gdx.app.log("AoC", "updateCivs_Money 0000");
         for (int i = 1; i < CFG.game.getCivsSize(); ++i) {
@@ -109,7 +188,7 @@ class Game_NextTurnUpdate
         }
         Gdx.app.log("AoC", "updateCivs_Money END");
     }
-    
+
     protected final void updateProvinceStability() {
         for (int i = 1; i < CFG.game.getCivsSize(); ++i) {
             CFG.game.getCiv(i).lProvincesWithLowStability.clear();
@@ -133,15 +212,15 @@ class Game_NextTurnUpdate
             CFG.game.getCiv(i).setStability(CFG.game.getCiv(i).fStability / CFG.game.getCiv(i).getNumOfProvinces());
         }
     }
-    
+
     protected final int getBalance(final int nCivID) {
         return (int)(this.getIncome(nCivID) - this.getExpenses(nCivID));
     }
-    
+
     protected final int getAdministration_Capital(final int nCivID) {
         return (CFG.game.getCiv(nCivID).getCapitalProvinceID() < 0) ? ((CFG.game.getCiv(nCivID).getNumOfProvinces() > 0) ? CFG.game.getCiv(nCivID).getProvinceID(0) : 0) : CFG.game.getCiv(nCivID).getCapitalProvinceID();
     }
-    
+
     protected final void getBalance_UpdateBudget_Prepare(final int nCivID) {
         CFG.game.getCiv(nCivID).iIncomeTaxation = 0;
         CFG.game.getCiv(nCivID).iIncomeProduction = 0;
@@ -179,15 +258,15 @@ class Game_NextTurnUpdate
         }
         CFG.game.getCiv(nCivID).iBudget = (int)(this.getIncome(nCivID) - CFG.game.getCiv(nCivID).iAdministrationCosts);
     }
-    
+
     protected final float getHappinessChange_ByTaxation(final int nCivID) {
         return 0.042f + ((CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).ACCEPTABLE_TAXATION + CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).ACCEPTABLE_TAXATION * CFG.game.getCiv(nCivID).getTechnologyLevel() / 21.73f) * 100.0f - CFG.game.getCiv(nCivID).getTaxationLevel() * 100.0f) * ((CFG.game.getCiv(nCivID).getTaxationLevel() > CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).ACCEPTABLE_TAXATION) ? 1.45f : 1.0f) * 0.02675f;
     }
-    
+
     protected final float getHappinessChange_ByTaxation_Occupied(final int nCivID) {
         return 0.034f + ((CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).ACCEPTABLE_TAXATION + CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).ACCEPTABLE_TAXATION * CFG.game.getCiv(nCivID).getTechnologyLevel() / 21.73f) * 100.0f - CFG.game.getCiv(nCivID).getTaxationLevel() * 100.0f) * ((CFG.game.getCiv(nCivID).getTaxationLevel() > CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).ACCEPTABLE_TAXATION) ? 1.45f : 1.0f) * 0.02675f;
     }
-    
+
     protected float taxIncome_Modifier(final int nCivID) {
         if (CFG.game.getCiv(nCivID).getControlledByPlayer()) {
             switch (CFG.DIFFICULTY) {
@@ -228,11 +307,11 @@ class Game_NextTurnUpdate
             }
         }
     }
-    
+
     protected final int getMilitarySpendings(final int nCivID, final int iBudget) {
         return Math.max(0, (int)(this.getMilitaryUpkeep_Total(nCivID) / iBudget * 100.0f));
     }
-    
+
     protected final float getIncome(final int nCivID) {
         float tempTotal = 0.0f;
         tempTotal += CFG.game.getCiv(nCivID).iIncomeTaxation;
@@ -243,11 +322,11 @@ class Game_NextTurnUpdate
         tempTotal += this.getIncome_Debuff_WarReparations(nCivID);
         return (float)(int)tempTotal;
     }
-    
+
     protected final float getIncome_TaxesLevel(final int nCivID) {
         return this.getIncome_TaxesLevel_Taxation(nCivID) + this.getIncome_TaxesLevel_Production(nCivID);
     }
-    
+
     protected final float getIncome_TaxesLevel_Taxation(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
@@ -255,7 +334,7 @@ class Game_NextTurnUpdate
         }
         return tempTotal;
     }
-    
+
     protected final float getIncome_TaxesLevel_Production(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
@@ -263,14 +342,14 @@ class Game_NextTurnUpdate
         }
         return tempTotal;
     }
-    
+
     protected final float getIncome_Debuff_IsVassal(final int nCivID) {
         if (CFG.game.getCiv(nCivID).getPuppetOfCivID() != nCivID) {
             return -this.getIncome_Vassals(CFG.game.getCiv(nCivID).getPuppetOfCivID(), nCivID);
         }
         return 0.0f;
     }
-    
+
     protected final float getIncome_FromVassalsOfCiv(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = CFG.game.getCiv(nCivID).civGameData.lVassals.size() - 1; i >= 0; --i) {
@@ -284,7 +363,7 @@ class Game_NextTurnUpdate
         }
         return tempTotal;
     }
-    
+
     protected final float getIncome_Debuff_WarReparations(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = CFG.game.getCiv(nCivID).getWarReparationsPaysSize() - 1; i >= 0; --i) {
@@ -292,7 +371,7 @@ class Game_NextTurnUpdate
         }
         return tempTotal;
     }
-    
+
     protected final float getIncome_Buff_WarReparations(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = CFG.game.getCiv(nCivID).getWarReparationsGetsSize() - 1; i >= 0; --i) {
@@ -300,7 +379,7 @@ class Game_NextTurnUpdate
         }
         return tempTotal;
     }
-    
+
     protected final float getIncome_Vassals(final int nForCivID, final int nIsVassal) {
         if (CFG.game.getCiv(nIsVassal).getPuppetOfCivID() == nForCivID) {
             //only add tribute if unintegrated vassal economy
@@ -311,38 +390,38 @@ class Game_NextTurnUpdate
         }
         return 0.0f;
     }
-    
+
     protected final float getVassalizationMoney(final int nVassalID) {
         return CFG.game.getCiv(nVassalID).iIncomeTaxation * (CFG.game.getCiv(CFG.game.getCiv(nVassalID).getPuppetOfCivID()).getVassal_Tribute(nVassalID) / 100.0f);
     }
-    
+
     protected final float getWarReparationsMoney(final int nCivID) {
         return CFG.game.getCiv(nCivID).iIncomeTaxation * 0.08f;
     }
-    
+
     protected final float getProvinceIncomeAndExpenses_Total(final int nProvinceID) {
         return this.getProvinceIncome_Taxation(nProvinceID) + this.getProvinceIncome_Production(nProvinceID) - ((CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getCapitalProvinceID() >= 0) ? this.getProvinceAdministration(nProvinceID, CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getCapitalProvinceID()) : 0.0f);
     }
-    
+
     protected final float getProvinceIncome_Taxation(final int nProvinceID) {
         return this.getProvinceIncome_Taxation(nProvinceID, CFG.game.getProvince(nProvinceID).getCivID(), this.taxIncome_Modifier(CFG.game.getProvince(nProvinceID).getCivID()));
     }
-    
+
     protected final float getProvinceIncome_Taxation(final int nProvinceID, final int nCivID, final float incomeModifer) {
         if (CFG.game.getProvince(nProvinceID).isOccupied()) {
             return this.getProvinceAdministration(nProvinceID, CFG.game_NextTurnUpdate.getAdministration_Capital(nCivID));
         }
         return (float)(Math.pow(this.getProvince_EmploymentPopulation(nProvinceID) * (CFG.gameAges.getAge_IncomeTaxation_Base(Game_Calendar.CURRENT_AGEID) + CFG.gameAges.getAge_IncomeTaxation_PerTechnology(Game_Calendar.CURRENT_AGEID) * CFG.game.getCiv(nCivID).getTechnologyLevel() * 21.923813f), 0.8386) + Math.pow(this.getProvince_UnemploymentPopulation(nProvinceID) * (CFG.gameAges.getAge_IncomeTaxation_Base(Game_Calendar.CURRENT_AGEID) + CFG.gameAges.getAge_IncomeTaxation_PerTechnology(Game_Calendar.CURRENT_AGEID) * CFG.game.getCiv(nCivID).getTechnologyLevel() * 21.923813f), 0.7936)) * CFG.gameAges.getAge_TreasuryModifier(Game_Calendar.CURRENT_AGEID) * (0.675f + 0.325f * CFG.game.getProvince(nProvinceID).getProvinceStability()) * (CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).INCOME_TAXATION + CFG.game.getCiv(nCivID).getModifier_IncomeTaxation() + (CFG.game.getProvince(nProvinceID).getIsCapital() ? 0.1f : 0.0f) - 0.16584f + 0.3674786f * CFG.game.getProvince(nProvinceID).getHappiness()) * (0.7f + 0.3f * CFG.game.getCiv(nCivID).getTaxationLevel()) * incomeModifer * Game_Calendar.GAME_SPEED;
     }
-    
+
     protected final int getProvince_EmploymentPopulation(final int nProvinceID) {
         return (int)Math.min((float)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation(), CFG.game.getProvince(nProvinceID).getEconomy() * (1.775f + 0.1725f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel() + 0.0925f * CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getTechnologyLevel()));
     }
-    
+
     protected final int getProvince_UnemploymentPopulation(final int nProvinceID) {
         return Math.max(CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation() - this.getProvince_EmploymentPopulation(nProvinceID), 0);
     }
-    
+
     protected final int getEmploymentPopulation(final int nCivID) {
         int out = 0;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
@@ -350,7 +429,7 @@ class Game_NextTurnUpdate
         }
         return out;
     }
-    
+
     protected final int getUnemploymentPopulation(final int nCivID) {
         int out = 0;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
@@ -358,18 +437,18 @@ class Game_NextTurnUpdate
         }
         return out;
     }
-    
+
     protected final float getProvinceIncome_Production(final int nProvinceID) {
         return this.getProvinceIncome_Production(nProvinceID, CFG.game.getProvince(nProvinceID).getCivID(), this.taxIncome_Modifier(CFG.game.getProvince(nProvinceID).getCivID()));
     }
-    
+
     protected final float getProvinceIncome_Production(final int nProvinceID, final int nCivID, final float incomeModifer) {
         if (CFG.game.getProvince(nProvinceID).isOccupied()) {
             return (int)Math.min(CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation() * (1.025f + 0.1725f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel() + 0.0425f * CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getTechnologyLevel()), (float)CFG.game.getProvince(nProvinceID).getEconomy()) * (CFG.gameAges.getAge_IncomeProduction_Base(Game_Calendar.CURRENT_AGEID) + CFG.gameAges.getAge_IncomeProduction_PerDevelopment(Game_Calendar.CURRENT_AGEID) * CFG.game.getProvince(nProvinceID).getDevelopmentLevel()) * (0.0685f + 0.575f * CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getTechnologyLevel() + 0.8625f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel()) * (0.425f + 0.575f * CFG.game.getProvince(nProvinceID).getProvinceStability()) * CFG.gameAges.getAge_TreasuryModifier_Production(Game_Calendar.CURRENT_AGEID) * (CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getIdeologyID()).INCOME_PRODUCTION + BuildingsManager.getPort_IncomeProduction(CFG.game.getProvince(nProvinceID).getLevelOfPort()) + CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getModifier_IncomeProduction() + (CFG.game.getProvince(nProvinceID).getIsCapital() ? 0.2f : 0.0f) + BuildingsManager.getWorkshop_IncomeProduction(CFG.game.getProvince(nProvinceID).getLevelOfWorkshop())) * (0.825f + 0.175f * CFG.game.getCiv(nCivID).getTaxationLevel()) * incomeModifer * Game_Calendar.GAME_SPEED * 0.1f;
         }
         return (int)Math.min(CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation() * (1.025f + 0.1725f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel() + 0.0425f * CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getTechnologyLevel()), (float)CFG.game.getProvince(nProvinceID).getEconomy()) * (CFG.gameAges.getAge_IncomeProduction_Base(Game_Calendar.CURRENT_AGEID) + CFG.gameAges.getAge_IncomeProduction_PerDevelopment(Game_Calendar.CURRENT_AGEID) * CFG.game.getProvince(nProvinceID).getDevelopmentLevel()) * (0.0685f + 0.575f * CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getTechnologyLevel() + 0.8625f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel()) * (0.425f + 0.575f * CFG.game.getProvince(nProvinceID).getProvinceStability()) * CFG.gameAges.getAge_TreasuryModifier_Production(Game_Calendar.CURRENT_AGEID) * (CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getIdeologyID()).INCOME_PRODUCTION + BuildingsManager.getPort_IncomeProduction(CFG.game.getProvince(nProvinceID).getLevelOfPort()) + CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getModifier_IncomeProduction() + (CFG.game.getProvince(nProvinceID).getIsCapital() ? 0.2f : 0.0f) + BuildingsManager.getWorkshop_IncomeProduction(CFG.game.getProvince(nProvinceID).getLevelOfWorkshop())) * (0.825f + 0.175f * CFG.game.getCiv(nCivID).getTaxationLevel()) * incomeModifer * Game_Calendar.GAME_SPEED;
     }
-    
+
     protected final float getExpenses(final int nCivID) {
         float tempTotal = 0.0f;
         tempTotal += CFG.game.getCiv(nCivID).iAdministrationCosts;
@@ -399,7 +478,7 @@ class Game_NextTurnUpdate
         //tempTotal += CFG.game.getCiv(nCivID).getLoans_GoldTotalPerTurn();
         return (float)(int)Math.ceil(tempTotal);
     }
-    
+
     protected final float getExpenses_Budget(final int nCivID) {
         float tempTotal = 0.0f;
         tempTotal += CFG.game.getCiv(nCivID).iAdministrationCosts;
@@ -464,18 +543,18 @@ class Game_NextTurnUpdate
         }
         return 0.0f;
     }
-    
+
     protected final float getInflationPerc(final int nCivID) {
         return Math.max(this.getInflation(nCivID) / CFG.game.getCiv(nCivID).getMoney(), 0.0f);
     }
-    
+
     protected final float getInterestCost(final int nCivID) {
         if (CFG.game.getCiv(nCivID).getMoney() < 0L) {
             return Math.min(Math.abs(CFG.game.getCiv(nCivID).getMoney()) * 0.01274f, Math.abs(CFG.game.getCiv(nCivID).iBudget * 0.075f));
         }
         return 0.0f;
     }
-    
+
     protected final float getAdministrationCost_Update(final int nCivID) {
         float tempTotal = 0.0f;
         try {
@@ -490,11 +569,11 @@ class Game_NextTurnUpdate
         }
         return tempTotal;
     }
-    
+
     protected final float getProvinceAdministration(final int nProvinceID, final int nCapital) {
         return (float)Math.pow(CFG.game.getProvince(nProvinceID).getEconomy() * Math.min(1.0f, CFG.game.getProvince(nProvinceID).getEconomy() / (float)CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation()) * 0.003248f + CFG.game.getProvince(nProvinceID).getPopulationData().getPopulation() * (0.0024f + 7.25E-4f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel()), 0.93478) * (1.0f + (this.getDistanceFromCapital_PercOfMax(nCapital, nProvinceID) / (1.5275f + CFG.game.getProvince(nProvinceID).getProvinceStability() / 8.0f) * CFG.gameAges.getAge_AdministrationCost_Distance(Game_Calendar.CURRENT_AGEID) + 0.13468f - 0.13468f * CFG.game.getProvince(nProvinceID).getHappiness()) * CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getIdeologyID()).ADMINISTRATION_COST_DISTANCE) * (0.9325f + 0.0715f * CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getTaxationLevel() + 0.0325f * (1.0f - CFG.game.getProvince(nProvinceID).getProvinceStability())) * CFG.gameAges.getAge_TreasuryModifier_Administration(Game_Calendar.CURRENT_AGEID) * (CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getIdeologyID()).ADMINISTRATION_COST + CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getModifier_Administation()) * ((nProvinceID == nCapital) ? CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getProvince(nProvinceID).getCivID()).getIdeologyID()).ADMINISTRATION_COST_CAPITAL : 1.0f) * Game_Calendar.GAME_SPEED;
     }
-    
+
     protected final float getDistanceFromCapital(final int nCapital, final int toProvinceID) {
         try {
             if (CFG.map.getMapWorldMap(CFG.map.getActiveMapID())) {
@@ -506,15 +585,15 @@ class Game_NextTurnUpdate
             return (float)CFG.map.getMapBG().getMaxDistance();
         }
     }
-    
+
     protected final float getDistanceFromCapital_PercOfMax(final int nCapital, final int toProvinceID) {
         return this.getDistanceFromCapital(nCapital, toProvinceID) / CFG.map.getMapBG().getMaxDistance();
     }
-    
+
     protected final float getDistanceFromAToB_PercOfMax(final int nProvinceA, final int nProvinceB) {
         return this.getDistanceFromCapital(nProvinceA, nProvinceB) / CFG.map.getMapBG().getMaxDistance();
     }
-    
+
     protected final float getMilitaryUpkeep_Total(final int nCivID) {
         float tempTotal = 0.0f;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {
@@ -531,11 +610,11 @@ class Game_NextTurnUpdate
         }
         return (float)(int)Math.ceil(tempTotal);
     }
-    
+
     protected final float getMilitaryUpkeep(final int nProvinceID, final int nCivID) {
         return this.getMilitaryUpkeep(nProvinceID, CFG.game.getProvince(nProvinceID).getArmyCivID(nCivID), nCivID);
     }
-    
+
     protected final float getMilitaryUpkeep_WithAllRecruitmentsInProcess(final int nProvinceID, final int nArmy, final int nCivID) {
         int out = 0;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getRecruitArmySize(); ++i) {
@@ -545,7 +624,7 @@ class Game_NextTurnUpdate
         }
         return out + this.getMilitaryUpkeep(nProvinceID, nArmy, nCivID);
     }
-    
+
     protected final float getMilitaryUpkeep_WithAllRecruitmentsInProcess_Disband(final int nProvinceID, final int nArmy, final int nCivID) {
         int out = 0;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getRecruitArmySize(); ++i) {
@@ -555,7 +634,7 @@ class Game_NextTurnUpdate
         }
         return out - this.getMilitaryUpkeep(nProvinceID, nArmy, nCivID);
     }
-    
+
     protected final float getMilitaryUpkeep(final int nProvinceID, final int nArmy, final int nCivID) {
         //if sandbox return no upkeep
         if (CFG.SANDBOX_MODE && nCivID == CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()) {
@@ -564,15 +643,15 @@ class Game_NextTurnUpdate
 
         return (float)Math.pow(nArmy * CFG.gameAges.getAge_MilitaryUpkeep(Game_Calendar.CURRENT_AGEID), 1.03f - 0.1275f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel() - 0.10479f * CFG.game.getCiv(nCivID).getTechnologyLevel()) * (1.0f + CFG.terrainTypesManager.getMilitaryUpkeep(CFG.game.getProvince(nProvinceID).getTerrainTypeID())) * CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).MILITARY_UPKEEP * CFG.gameAges.getAge_TreasuryModifier_MilitaryUpkeep(Game_Calendar.CURRENT_AGEID) * (1.0f + CFG.game.getCiv(nCivID).getNumOfProvinces() / (float)CFG.game.getProvincesSize() * 0.425f + CFG.game.getCiv(nCivID).getWarWeariness() + CFG.game.getCiv(nCivID).getModifier_MilitaryUpkeep() - BuildingsManager.getSupply_Bonus(CFG.game.getProvince(nProvinceID).getLevelOfSupply())) * Game_Calendar.GAME_SPEED * (1.0f - this.getMilitaryUpkeep_DefensivePosition(nProvinceID));
     }
-    
+
     protected final float getMilitaryUpkeep_WithoutDefensivePosition(final int nProvinceID, final int nArmy, final int nCivID) {
         return (float)Math.pow(nArmy * CFG.gameAges.getAge_MilitaryUpkeep(Game_Calendar.CURRENT_AGEID), 1.03f - 0.1275f * CFG.game.getProvince(nProvinceID).getDevelopmentLevel() - 0.10479f * CFG.game.getCiv(nCivID).getTechnologyLevel()) * (1.0f + CFG.terrainTypesManager.getMilitaryUpkeep(CFG.game.getProvince(nProvinceID).getTerrainTypeID())) * CFG.ideologiesManager.getIdeology(CFG.game.getCiv(nCivID).getIdeologyID()).MILITARY_UPKEEP * CFG.gameAges.getAge_TreasuryModifier_MilitaryUpkeep(Game_Calendar.CURRENT_AGEID) * (1.0f + CFG.game.getCiv(nCivID).getNumOfProvinces() / (float)CFG.game.getProvincesSize() * 0.425f + CFG.game.getCiv(nCivID).getWarWeariness() + CFG.game.getCiv(nCivID).getModifier_MilitaryUpkeep() - BuildingsManager.getSupply_Bonus(CFG.game.getProvince(nProvinceID).getLevelOfSupply())) * Game_Calendar.GAME_SPEED;
     }
-    
+
     protected final float getMilitaryUpkeep_DefensivePosition(final int nProvinceID) {
         return 0.008f * CFG.game.getProvince(nProvinceID).getDefensivePosition();
     }
-    
+
     protected final float getResearchSpendings(final int nCivID, final int iBudget) {
         return iBudget * CFG.game.getCiv(nCivID).getSpendings_Research();
     }
@@ -584,11 +663,11 @@ class Game_NextTurnUpdate
     protected final float getGoodsSpendings(final int nCivID, final int iBudget) {
         return iBudget * CFG.game.getCiv(nCivID).getSpendings_Goods();
     }
-    
+
     protected final float getInvestmentsSpendings(final int nCivID, final int iBudget) {
         return iBudget * CFG.game.getCiv(nCivID).getSpendings_Investments();
     }
-    
+
     protected final void updateSpendingsOfCiv(final int nCivID, final int iBudget) {
         if (CFG.game.getCiv(nCivID).getCapitalProvinceID() >= 0 && CFG.game.getCiv(nCivID).getNumOfProvinces() > 0) {
             if (CFG.game.getCiv(nCivID).getMoney() < -500L) {
@@ -655,7 +734,7 @@ class Game_NextTurnUpdate
             this.updateCities(i);
         }
     }
-    
+
     protected final void updateCities(final int nCivID) {
         final int tempNumOfCities = (int)Math.ceil(CFG.game.getCiv(nCivID).getNumOfProvinces() * CFG.settingsManager.PERCETANGE_OF_CITIES_ON_MAP / 100.0f);
         int tMaxPopulation = 1;
@@ -691,7 +770,7 @@ class Game_NextTurnUpdate
         }
         tempProvinces.clear();
     }
-    
+
     protected int getLevelOfCity(final int nMaxPopulation, final int nPopulation, final int nCityID) {
         final float nScore = nPopulation / (float)nMaxPopulation;
         int out = 4;
@@ -709,7 +788,7 @@ class Game_NextTurnUpdate
         }
         return CFG.getEditorCityLevel(out);
     }
-    
+
     protected final void buildLevelsOfCities() {
         for (int i = 0; i < CFG.game.getProvincesSize(); ++i) {
             for (int j = 0; j < CFG.game.getProvince(i).getCitiesSize(); ++j) {
@@ -720,7 +799,7 @@ class Game_NextTurnUpdate
             this.buildLevelsOfCities(i);
         }
     }
-    
+
     protected final void buildLevelsOfCities(final int nCivID) {
         int tMaxPop = 0;
         for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); ++i) {

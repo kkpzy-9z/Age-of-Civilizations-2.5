@@ -256,6 +256,7 @@ class Turn_NewTurn extends Thread {
          CFG.game_NextTurnUpdate.updateProvinceStability();
          CFG.game_NextTurnUpdate.updateInflationPeakValue();
          CFG.game_NextTurnUpdate.updateDecisions();
+         CFG.game_NextTurnUpdate.updateClassPerceptions();
          Game_Calendar.updateDateNextTurn();
          Gdx.app.log("AoC", "STA42: " + (System.currentTimeMillis() - tempTime));
          Commands.addMessage("STA42: " + (System.currentTimeMillis() - tempTime));

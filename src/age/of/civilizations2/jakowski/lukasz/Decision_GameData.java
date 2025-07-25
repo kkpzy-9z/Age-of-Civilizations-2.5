@@ -11,8 +11,11 @@ public class Decision_GameData implements Serializable {
     private int Day;
     private int progress;
     private int turnLength;
+    private float goldCost;
+    private float diploCost;
     private boolean inProgress = false;
     private boolean repeatable = false;
+    private boolean costEveryTurn = false;
 
     protected float fModifier_UpperClass;
     protected float fModifier_MiddleClass;
@@ -33,13 +36,16 @@ public class Decision_GameData implements Serializable {
         super();
         this.sName = "";
         this.sDesc = "";
-        this.Year = 3;
-        this.Month = 1;
-        this.Day = 1;
+        this.Year = -9999;
+        this.Month = 0;
+        this.Day = 0;
         this.progress = 0;
         this.turnLength = 10;
         this.inProgress = false;
         this.repeatable = false;
+        this.goldCost = 0.0f;
+        this.diploCost = 0.0f;
+        this.costEveryTurn = false;
 
         this.fModifier_UpperClass = 0.0f;
         this.fModifier_MiddleClass = 0.0f;
@@ -80,6 +86,30 @@ public class Decision_GameData implements Serializable {
 
     protected final void setTurnLength(final int turnLength) {
         this.turnLength = Math.max(1, turnLength);
+    }
+
+    protected final float getGoldCost() {
+        return this.goldCost;
+    }
+
+    protected final void setGoldCost(final float goldCost) {
+        this.goldCost = Math.max(0.0f, goldCost);
+    }
+
+    protected final float getDiploCost() {
+        return this.diploCost;
+    }
+
+    protected final void setDiploCost(final float diploCost) {
+        this.diploCost = Math.max(0.0f, diploCost);
+    }
+
+    protected final boolean isCostEveryTurn() {
+        return this.costEveryTurn;
+    }
+
+    protected final void setCostEveryTurn(final boolean costEveryTurn) {
+        this.costEveryTurn = costEveryTurn;
     }
 
     protected final int getMonth() {
@@ -133,17 +163,35 @@ public class Decision_GameData implements Serializable {
         this.repeatable = repeatable;
     }
 
+    protected final boolean canEnactDecision(int nCivID) {
+        if (this.inProgress) return false;
+        if (CFG.game.getCiv(nCivID).getMoney() < this.goldCost) return false;
+        if (CFG.game.getCiv(nCivID).getDiplomacyPoints() < this.diploCost) return false;
+        //if (!this.repeatable && CFG.game.getCiv(nCivID).civGameData.leaderData.hasEnactedDecision(this.sName)) return false;
+        if (Game_Calendar.currentYear < this.Year) return false;
+        if (Game_Calendar.currentYear == this.Year && Game_Calendar.currentMonth < this.Month) return false;
+        if (Game_Calendar.currentYear == this.Year && Game_Calendar.currentMonth == this.Month && Game_Calendar.currentDay < this.Day) return false;
+
+        return true;
+    }
+
     protected final Decision_GameData copy() {
         Decision_GameData d = new Decision_GameData();
         d.sName = this.sName;
         d.sDesc = this.sDesc;
+
         d.Year = this.Year;
         d.Month = this.Month;
         d.Day = this.Day;
+
         d.progress = this.progress;
         d.turnLength = this.turnLength;
+
+        d.goldCost = this.goldCost;
+        d.diploCost = this.diploCost;
         d.inProgress = this.inProgress;
         d.repeatable = this.repeatable;
+        d.costEveryTurn = this.costEveryTurn;
 
         d.fModifier_UpperClass = this.fModifier_UpperClass;
         d.fModifier_MiddleClass = this.fModifier_MiddleClass;

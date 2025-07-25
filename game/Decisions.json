@@ -1,0 +1,39 @@
+{
+	Decisions: [
+		{
+			"__comment": "This is a comment explaining this JSON object, NOT a decision property.The following decisions are all 'default' leader decisions available generally to all civilizations, not civilization specific decisions. If you want to edit civilization-specific decisions, use the new integrated editor menu! Both name and descriptions of decisions here are run through the game's language manager, meaning that you can assign a decision name keyword in the game's language bundle files and it will load that, so long as the strings in this JSON match that keyword. The year, month, and day properties all signal the LOWEST possible date at which that decision becomes available to player civilizations. Lastly, all the modifiers are the decision's outcomes, and are expressed in percentages (10% = 0.10).",
+
+
+			Name: "Levy Taxes",
+			Description: "Increase taxes to fund the kingdom's army and infrastructure.",
+
+			TurnLength: 10,
+
+			YearAvailable: -9999,
+			MonthAvailable: 0,
+			DayAvailable: 0,
+
+			Repeatable: true,
+			Cost_Gold: 500.0,
+			Cost_Diplomacy: 5.00,
+			Cost_Every_Turn: false,
+
+			Modifier_UpperClass: -0.05,
+			Modifier_MiddleClass: -0.1,
+			Modifier_LowerClass: -0.2,
+
+			Modifier_PopGrowth: 0.0,
+			Modifier_EconomyGrowth: 0.0,
+			Modifier_IncomeTaxation: 0.1,
+			Modifier_IncomeProduction: -0.05,
+			Modifier_Administration: 0.0,
+			Modifier_Research: 0.0,
+			Modifier_MilitaryUpkeep: 0.0,
+			Modifier_AttackBonus: 0.0,
+			Modifier_DefenseBonus: 0.0,
+			Modifier_MovementPoints: 0.0
+		},
+	],
+	
+	Age_of_Civilizations: Decisions
+}

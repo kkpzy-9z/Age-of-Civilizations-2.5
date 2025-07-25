@@ -621,6 +621,7 @@ class EventsManager {
          case OUT_SELECTCIV_CREATEVASSAL_A:
          case OUT_SELECTCIV_CREATEVASSAL_B:
          case OUT_SELECTPROVINCES_CREATEVASSAL:
+         case OUT_SELECTAUTONOMY_CREATEVASSAL:
             CFG.menuManager.setViewID(Menu.eCREATE_SCENARIO_EVENTS_OUT_CREATEVASSAL);
             break;
          case OUT_SELECTCIV_JOINALLIANCE_A:

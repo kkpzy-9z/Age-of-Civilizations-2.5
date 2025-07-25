@@ -51,11 +51,17 @@ class SoundsManager {
    protected static int SOUND_SUPPLY;
    protected static int SOUND_LIBRARY;
    protected static int SOUND_RANDOM;
+   protected static int SOUND_COINS;
    protected static float PERC_VOLUME_SELECT_PROVINCE = 0.95F;
    protected static float PERC_VOLUME_KEYBOARD = 0.9F;
    private final Random oR = new Random();
 
    protected SoundsManager() {
+      //stop auto-sound play
+      this.masterVolume = CFG.settingsManager.VOLUME_MASTER;
+      this.setSoundsVolume(CFG.settingsManager.VOLUME_SOUNDS);
+      this.setMusicVolume(CFG.settingsManager.VOLUME_MUSIC);
+
       this.lTitles = new ArrayList<String>();
       this.lSounds = new ArrayList<Sound>();
       ArrayList menuElements = new ArrayList();
@@ -105,12 +111,6 @@ class SoundsManager {
       if (this.lTitles.size() < 1) return;
 
       this.randomizePlayList();
-      //if start music detected
-      if (!Objects.equals(START_MUSIC, "")) {
-         this.playStartMusic();
-      } else {
-         this.loadNextMusic();
-      }
 
       SOUND_MOVE_ARMY = this.addSound("move_army." + (CFG.isIOS() ? "mp3" : "ogg"));
       SOUND_MOVE_ARMY2 = this.addSound("move_army2." + (CFG.isIOS() ? "mp3" : "ogg"));
@@ -136,6 +136,7 @@ class SoundsManager {
       SOUND_SUPPLY = this.addSound("supply." + (CFG.isIOS() ? "mp3" : "ogg"));
       SOUND_LIBRARY = this.addSound("library." + (CFG.isIOS() ? "mp3" : "ogg"));
       SOUND_RANDOM = this.addSound("random." + (CFG.isIOS() ? "mp3" : "ogg"));
+      SOUND_COINS = this.addSound("coins." + (CFG.isIOS() ? "mp3" : "ogg"));
       this.masterVolume = CFG.settingsManager.VOLUME_MASTER;
       this.setSoundsVolume(CFG.settingsManager.VOLUME_SOUNDS);
       this.setMusicVolume(CFG.settingsManager.VOLUME_MUSIC);
@@ -171,8 +172,8 @@ class SoundsManager {
       try {
          this.currentMusic = Gdx.audio.newMusic(Gdx.files.internal("music/" + (String)this.lTitles.get(this.iCurrentMusicID)));
          this.currentMusic.setLooping(false);
-         this.currentMusic.play();
          this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+         this.currentMusic.play();
          this.currentMusic.setOnCompletionListener(new Music.OnCompletionListener() {
             public void onCompletion(Music music) {
                SoundsManager.this.loadNextMusic();
@@ -189,8 +190,8 @@ class SoundsManager {
          try {
             this.currentMusic = Gdx.audio.newMusic(Gdx.files.local("music/" + (String)this.lTitles.get(this.iCurrentMusicID)));
             this.currentMusic.setLooping(false);
-            this.currentMusic.play();
             this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+            this.currentMusic.play();
             this.currentMusic.setOnCompletionListener(new Music.OnCompletionListener() {
                public void onCompletion(Music music) {
                   SoundsManager.this.loadNextMusic();
@@ -233,8 +234,8 @@ class SoundsManager {
          this.disposeCurrentMusic();
          this.currentMusic = Gdx.audio.newMusic(Gdx.files.internal("music/" + START_MUSIC));
          this.currentMusic.setLooping(false);
-         this.currentMusic.play();
          this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+         this.currentMusic.play();
          this.currentMusic.setOnCompletionListener(new Music.OnCompletionListener() {
             public void onCompletion(Music music) {
                SoundsManager.this.loadNextMusic();
@@ -245,14 +246,22 @@ class SoundsManager {
       }
    }
 
-   protected final void playEventMusic(String fileName) {
+    protected final void playEventMusic(String fileName) {
+        this.playEventMusic(fileName, false);
+    }
+
+   protected final void playEventMusic(String fileName, boolean ignoreVolume) {
       try {
          Music loaded = Gdx.audio.newMusic(Gdx.files.internal(fileName));
          this.disposeCurrentMusic();
          this.currentMusic = loaded;
          this.currentMusic.setLooping(false);
          this.currentMusic.play();
-         this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+         if (ignoreVolume) {
+            this.currentMusic.setVolume(1.0F);
+         } else {
+             this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+         }
          this.currentMusic.setOnCompletionListener(new Music.OnCompletionListener() {
             public void onCompletion(Music music) {
                SoundsManager.this.loadNextMusic();
@@ -267,7 +276,11 @@ class SoundsManager {
             this.currentMusic = loaded;
             this.currentMusic.setLooping(false);
             this.currentMusic.play();
-            this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+            if (ignoreVolume) {
+               this.currentMusic.setVolume(1.0F);
+            } else {
+               this.currentMusic.setVolume(this.musicVolume * this.masterVolume);
+            }
             this.currentMusic.setOnCompletionListener(new Music.OnCompletionListener() {
                public void onCompletion(Music music) {
                   SoundsManager.this.loadNextMusic();

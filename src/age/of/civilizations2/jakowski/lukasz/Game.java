@@ -1467,6 +1467,45 @@ class Game {
                 CFG.dynamicEventManager = new DynamicEventManager();
                 CFG.exceptionStack(ex);
             }
+            try {
+                Gdx.app.log("LOADSAVE", "loadDecisions");
+                for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+                    if (CFG.game.getPlayer(i).getCivID() > 0) {
+                        try {
+                            for (int decision = 0; decision < CFG.gameDecisions.lDecisions.size(); decision++) {
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decision);
+                            }
+                        } catch (Exception ex) {
+                            Gdx.app.log("LOADSAVE", "loadDecisions failed, updating");
+                            CFG.gameAction.updatePlayerDecisions();
+                            break;
+                        }
+                    }
+                }
+                Gdx.app.log("LOADSAVE", "loadClassViews");
+                for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+                    if (CFG.game.getPlayer(i).getCivID() > 0) {
+                        try {
+                            if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) == -1.0F ||
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) == -1.0F ||
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) == -1.0F) {
+                                Gdx.app.log("LOADSAVE", "loadClassViews default, updating");
+                                CFG.gameAction.updateClassPerceptions();
+                                break;
+                            }
+                        } catch (NullPointerException | GdxRuntimeException ex) {
+                            Gdx.app.log("LOADSAVE", "loadClassViews failed, updating");
+                            CFG.gameAction.updateClassPerceptions();
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                CFG.exceptionStack(e);
+                Gdx.app.log("LOADSAVE", "loadDecisions/Views failed, updating");
+                CFG.gameAction.updatePlayerDecisions();
+                CFG.gameAction.updateClassPerceptions();
+            }
         } catch (final Exception ex) {
             CFG.exceptionStack(ex);
         }
@@ -2633,35 +2672,84 @@ class Game {
             CFG.holyRomanEmpire_Manager.getHRE().updateHRE_AfterRemoveCivilization(nRemoveCivID);
         }
         catch (final Exception ex7) {}
-        this.lCivs.remove(nRemoveCivID);
-        this.iCivsSize = this.lCivs.size();
-        try {
-            for (int i = 1; i < this.iCivsSize; ++i) {
-                if (this.getCiv(i).getCivID() != this.getCiv(i).getPuppetOfCivID()) {
-                    if (this.getCiv(i).getPuppetOfCivID() > nRemoveCivID) {
-                        //this.getCiv(i).civGameData.iPuppetOfCivID -= 1;
 
-                        this.getCiv(i).setPuppetOfCivID(this.getCiv(i).getPuppetOfCivID() - 1);
-                    }
-                    else if (this.getCiv(i).getPuppetOfCivID() == nRemoveCivID) {
-                        this.getCiv(i).setPuppetOfCivID(this.getCiv(i).getCivID());
-                    }
-                }
-                if (this.getCiv(i).getCivID() == this.getCiv(i).getPuppetOfCivID()) {
-                    this.getCiv(i).setPuppetOfCivID(i);
-                }
-                this.getCiv(i).setCivID_Just(i);
+        //first create a map to store the puppet relations and autonomy
+        //w adjusted civids for movement
+        LinkedHashMap<Integer, int[]> hmTemp = new LinkedHashMap<Integer, int[]>();
+        for (int i = 1; i < this.iCivsSize; ++i) {
+            if (i == nRemoveCivID || !this.getCiv(i).getIsPupet()) {
+                continue;
             }
-            for (int i = 0; i < this.iCivsSize; i++) {
-                //iterate through vassals
-                for (int j = 0; j < this.getCiv(i).civGameData.iVassalsSize; j++) {
-                    if (this.getCiv(i).civGameData.lVassals.get(j).iCivID > nRemoveCivID) {
-                        this.getCiv(i).civGameData.lVassals.get(j).iCivID -= 1;
+
+            if (this.getCiv(i).getPuppetOfCivID() > nRemoveCivID) {
+                try {
+                    if (i > nRemoveCivID) {
+                        hmTemp.put(i - 1, new int[] {this.getCiv(this.getCiv(i).getPuppetOfCivID()).getCivID() - 1, this.getCiv(this.getCiv(i).getPuppetOfCivID()).getVassal_AutonomyStatus(i).getIndexOf(), i - 1});
+                    } else {
+                        hmTemp.put(i, new int[] {this.getCiv(this.getCiv(i).getPuppetOfCivID()).getCivID() - 1, this.getCiv(this.getCiv(i).getPuppetOfCivID()).getVassal_AutonomyStatus(i).getIndexOf(), i});
                     }
+                } catch (NullPointerException ex) {
+                }
+            } else if (this.getCiv(i).getPuppetOfCivID() == nRemoveCivID) {
+                if (i > nRemoveCivID) {
+                    hmTemp.put(i - 1, new int[] {i - 1, -1, i - 1});
+                } else {
+                    hmTemp.put(i, new int[] {i, -1, i});
                 }
             }
         }
-        catch (final Exception ex8) {}
+
+        for (int[] values : hmTemp.values()) {
+            if (values[0] < 0 || values[2] < 0) {
+                Gdx.app.log("PreRemoveCiv", "Skipping invalid puppet values: " + values[0] + ", " + values[2]);
+                continue;
+            }
+            Gdx.app.log("PreRemoveCiv", "Civ: " + CFG.game.getCiv(values[2]).getCivName() + " PuppetOfCiv: " + CFG.game.getCiv(values[0]).getCivName() + " Autonomy: " + CFG.gameAutonomy.getAutonomy(values[1]).getName());
+        }
+
+        //now actually remove the civ and adjust ids
+        this.lCivs.remove(nRemoveCivID);
+        this.iCivsSize = this.lCivs.size();
+
+        //delete all vassal relations data in first pass
+        //done seperately bc dont want to delete valid vassal data during second pass if lord civid is after puppets
+        for (int i = 1; i < this.iCivsSize; ++i) {
+            this.getCiv(i).setCivID_Just(i);
+            this.getCiv(i).civGameData.iVassalsSize = 0;
+            this.getCiv(i).civGameData.lVassals.clear();
+            this.getCiv(i).setPuppetOfCivID(i);
+        }
+
+        Gdx.app.log("RemoveCiv", "Removing civilization with ID: " + nRemoveCivID + ", new size: " + this.iCivsSize);
+        for (int[] values : hmTemp.values()) {
+            if (values[0] < 0 || values[2] < 0) {
+                Gdx.app.log("RemoveCiv", "Skipping invalid puppet values: " + values[0] + ", " + values[2]);
+                continue;
+            }
+            Gdx.app.log("AftRemoveCiv", "Civ: " + CFG.game.getCiv(values[2]).getCivName() + " PuppetOfCiv: " + CFG.game.getCiv(values[0]).getCivName() + " Autonomy: " + CFG.gameAutonomy.getAutonomy(values[1]).getName());
+        }
+
+        //second pass, set puppet relations to those seen in adjusted hashmap
+        for (int i = 1; i < this.iCivsSize; ++i) {
+            try {
+                if (hmTemp.get(i) != null) {
+                    int puppetOfCivID = hmTemp.get(i)[0];
+                    int autonomyIndex = hmTemp.get(i)[1];
+                    if (autonomyIndex >= 0) {
+                        this.getCiv(i).setPuppetOfCivID(puppetOfCivID, autonomyIndex);
+                        Gdx.app.log("RemoveCiv", "Setting puppet civ for " + this.getCiv(i).getCivName() + " to " + this.getCiv(puppetOfCivID).getCivName() + " with autonomy " + CFG.gameAutonomy.getAutonomy(autonomyIndex).getName());
+                    } else {
+                        this.getCiv(i).setPuppetOfCivID(puppetOfCivID);
+                        Gdx.app.log("RemoveCiv", "Setting puppet civ for " + this.getCiv(i).getCivName() + " to " + this.getCiv(puppetOfCivID).getCivName() + " with no autonomy");
+                    }
+                }
+
+            } catch (NullPointerException | IndexOutOfBoundsException ex) {
+            }
+        }
+
+        hmTemp.clear();
+
         CFG.eventsManager.updateEventsAferRemoveCiv(nRemoveCivID);
         try {
             for (int i = 0; i < this.getProvincesSize(); ++i) {
@@ -10108,21 +10196,11 @@ class Game {
         nData.clear();
 
         if (decision.getInProgress()) {
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InProgress") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Yes"), CFG.COLOR_TEXT_MODIFIER_POSITIVE));
-            nElements.add(new MenuElement_Hover_v2_Element2(nData));
-            nData.clear();
-
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Expires") + ": "));
             nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + (decision.getTurnLength() - decision.getTurnsProgress()), CFG.COLOR_TEXT_MODIFIER_POSITIVE));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
         } else {
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("InProgress") + ": "));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("No"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
-            nElements.add(new MenuElement_Hover_v2_Element2(nData));
-            nData.clear();
-
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("TurnLength") + ": "));
             nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + decision.getTurnLength(), CFG.COLOR_TEXT_MODIFIER_NEUTRAL));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
@@ -10131,6 +10209,30 @@ class Game {
 
         nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Repeatable") + ": "));
         nData.add(new MenuElement_Hover_v2_Element_Type_Text((decision.isRepeatable()) ? CFG.langManager.get("Yes") : CFG.langManager.get("No"), (decision.isRepeatable()) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text(""));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text((decision.isCostEveryTurn()) ? CFG.langManager.get("ChargedEveryTurn") : CFG.langManager.get("ChargedOnce"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Gold") + ": "));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + decision.getGoldCost()), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("DiplomacyPoints") + ": "));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (((double)decision.getDiploCost())/10.0)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_diplomacy_points, CFG.PADDING, 0));
+        nElements.add(new MenuElement_Hover_v2_Element2(nData));
+        nData.clear();
+
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text(""));
         nElements.add(new MenuElement_Hover_v2_Element2(nData));
         nData.clear();
 
@@ -10228,6 +10330,86 @@ class Game {
         }
 
         return new MenuElement_Hover_v2(nElements);
+    }
+
+    protected final MenuElement_Hover_v2 getHover_Class(final int nCivID, final int iClassID) {
+        try {
+            final List<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
+            final List<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Flag(nCivID));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(nCivID).getCivName(), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Class") + ": "));
+            final float fBoost = ((int)(10000.0f * Game_NextTurnUpdate.getClassPerceptionBoosts(CFG.game.getCiv(nCivID).civGameData.leaderData.getClassViews(iClassID)))) / 100.0F;
+            if (iClassID == 0) {
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("UpperClass"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("EconomyGrowthModifier") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.economy, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Administration") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold2, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+            } else if (iClassID == 1) {
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MiddleClass"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("IncomeProduction") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.development, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Research") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.research, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("PopulationGrowthModifier") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.population_growth, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+            } else if (iClassID == 2) {
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("LowerClass"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("IncomeTaxation") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("EconomyGrowthModifier") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.economy, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("PopulationGrowthModifier") + ": "));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Text(((fBoost > 0.0f) ? "+" : "") + fBoost + "%", (fBoost > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+                nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.population_growth, CFG.PADDING, 0));
+                nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                nData.clear();
+            }
+
+            return new MenuElement_Hover_v2(nElements);
+        }
+        catch (final IndexOutOfBoundsException ex) {
+            return null;
+        }
     }
 
     protected final MenuElement_Hover_v2 getHover_LeaderOfCiv(final int nCivID) {
@@ -10801,6 +10983,14 @@ class Game {
             this.getCiv(iCivID_Lord).setPuppetOfCivID(iCivID_Lord);
         }
         this.getCiv(iCivID_Vassal).setPuppetOfCivID(iCivID_Lord);
+    }
+
+
+    protected final void setVassal_OfCiv(final int iCivID_Lord, final int iCivID_Vassal, final int autonomyLevel) {
+        if (this.getCiv(iCivID_Lord).getPuppetOfCivID() == iCivID_Vassal) {
+            this.getCiv(iCivID_Lord).setPuppetOfCivID(iCivID_Lord, autonomyLevel);
+        }
+        this.getCiv(iCivID_Vassal).setPuppetOfCivID(iCivID_Lord, autonomyLevel);
     }
     
     protected final float getCivRelation_OfCivB(final int iCivA, final int iCivB) {

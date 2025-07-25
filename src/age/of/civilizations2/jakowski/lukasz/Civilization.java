@@ -54,6 +54,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Civilization {
@@ -2052,7 +2053,11 @@ class Civilization {
 
         //if freed, reset color, return
         if (iPuppetOfCivID == this.iCivID) {
-            CFG.palletManager.loadCivilizationStandardColor(this.iCivID);
+            try {
+                CFG.palletManager.loadCivilizationPalletColor(CFG.palletManager.getActivePalletID(), this.iCivID);
+            } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                CFG.palletManager.loadCivilizationStandardColor(this.iCivID);
+            }
             return;
         }
 
@@ -2063,7 +2068,6 @@ class Civilization {
 
         //set color
         CFG.game.getCiv(iPuppetOfCivID).updateVassalCivilizationsColor();
-        //this.updateCivilizationColor(CFG.game.getCiv(iPuppetOfCivID).getR(), CFG.game.getCiv(iPuppetOfCivID).getG(), CFG.game.getCiv(iPuppetOfCivID).getB(), CFG.game.getCiv(this.civGameData.iPuppetOfCivID).civGameData.lVassals.get(index).autonomyStatus.getColorStatus());
 
         //set this civ's vassals to be overseen by new lord
         if (CFG.menuManager.getInManageDiplomacy() || CFG.menuManager.getInCreateScenario_Civilizations()) {

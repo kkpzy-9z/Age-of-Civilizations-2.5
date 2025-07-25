@@ -210,6 +210,7 @@ class Images {
    protected static int editor_leaders;
    protected static int icon_save;
    protected static int gameLogo;
+   protected static int gameIntro;
    protected static int icon_check_true;
    protected static int icon_check_false;
    protected static int pickerSV;

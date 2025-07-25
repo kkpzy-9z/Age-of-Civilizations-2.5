@@ -3,9 +3,17 @@
 package age.of.civilizations2.jakowski.lukasz;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadLocalRandom;
 import com.badlogic.gdx.graphics.Texture;
@@ -44,12 +52,13 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
     protected static boolean drawFPS;
     private RequestRendering requestRendering;
     protected static ShaderProgram defaultShader;
+    protected static ShaderProgram extraShader;
     protected static ShaderProgram blackWhiteShader;
     protected static ShaderProgram nextPlayerTurnShader;
     protected static ShaderProgram shaderAlpha;
     protected static ShaderProgram shaderAlpha2;
     protected static boolean isShiftDown;
-    protected static boolean isPasting;
+    protected static int introShown;
     private final String VERTEX = "attribute vec4 a_position;attribute vec4 a_color;attribute vec2 a_texCoord0;uniform mat4 u_projTrans;varying vec4 vColor;varying vec2 vTexCoord;void main() {\tvColor = a_color;\tvTexCoord = a_texCoord0;\tgl_Position =  u_projTrans * a_position;}";
     private String vertexShader;
     private String fragmentShader;
@@ -158,7 +167,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
         }
         return new Vector2();
     }
-    
+
     @Override
     public void create() {
         ConfigINI.readConfig();
@@ -268,6 +277,8 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
         }
         AoCGame.updateArmyFontSize();
         Images.gameLogo = ImageManager.addImage("UI/" + CFG.getRescouresPath() + "game_logo.png");
+        Images.gameIntro = ImageManager.addImage("UI/events/AoCIntro.png");
+        introShown = 1;
 
         //check background directory
         File folder = new File("UI/bg/");
@@ -335,9 +346,11 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
         AoCGame.shaderAlpha2.setUniformf("u_maskScale", 20.0f);
         AoCGame.shaderAlpha2.setUniformf("u_maskOffset", 0.0f, 0.0f);
         final String defaultFragment = Gdx.files.internal("game/shader/default_fragment.glsl").readString();
+        final String extraFragment = Gdx.files.internal("game/shader/twopointfive_fragment.glsl").readString();
         final String blackWhiteFragment = Gdx.files.internal("game/shader/blackWhite_fragment.glsl").readString();
         final String nextPlayerTurnFragment = Gdx.files.internal("game/shader/nextPlayerTurn_fragment.glsl").readString();
         AoCGame.defaultShader = new ShaderProgram(defaultVertex, defaultFragment);
+        AoCGame.extraShader = new ShaderProgram(defaultVertex, extraFragment);
         AoCGame.blackWhiteShader = new ShaderProgram(defaultVertex, blackWhiteFragment);
         AoCGame.nextPlayerTurnShader = new ShaderProgram(nextPlayerTurnVertex, nextPlayerTurnFragment);
         final long time = System.currentTimeMillis();
@@ -487,6 +500,58 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
             }
         }
         else {
+            if (introShown > 0) {
+                try {
+                    float alpha;
+                    if (introShown <= 175) {
+                        alpha = Math.min(0.01F * (introShown * 1.25F), 1.0F);
+                        if (introShown == 40) {
+                            CFG.soundsManager.playEventMusic("UI/events/AoCIntro.mp3", true);
+                        }
+                    } else {
+                        alpha = Math.max((100.0F - ((introShown) - 175) * 2) / 100.0F, 0.0F);
+                        if (alpha == 0.0F) {
+                            //if start music detected
+                            if (!Objects.equals(SoundsManager.START_MUSIC, "")) {
+                                CFG.soundsManager.playStartMusic();
+                            } else {
+                                CFG.soundsManager.loadNextMusic();
+                            }
+                            introShown = -1;
+                            return;
+                        }
+                    }
+
+                    Gdx.gl.glClearColor(CFG.BACKGROUND_COLOR.r, CFG.BACKGROUND_COLOR.g, CFG.BACKGROUND_COLOR.b, CFG.BACKGROUND_COLOR.a);
+                    Gdx.gl.glClear(16640);
+                    AoCGame.viewport.setWorldSize(CFG.GAME_WIDTH / CFG.map.getMapScale().getCurrentScale(), CFG.GAME_HEIGHT / CFG.map.getMapScale().getCurrentScale());
+                    AoCGame.viewport.apply();
+                    AoCGame.camera.setToOrtho(true, CFG.GAME_WIDTH / CFG.map.getMapScale().getCurrentScale(), -CFG.GAME_HEIGHT / CFG.map.getMapScale().getCurrentScale());
+                    this.oSB.setProjectionMatrix(AoCGame.camera.combined);
+
+                    oSB.begin();
+                    oSB.setColor(new Color(1.0F, 1.0F, 1.0F, (float) 255));
+                    oSB.setColor(1.0F, 1.0F, 1.0F, alpha);
+                    ImageManager.getImage(Images.gameIntro).draw2(oSB, 0, 0, CFG.GAME_WIDTH, CFG.GAME_HEIGHT);
+                    oSB.setColor(new Color(1.0F, 1.0F, 1.0F, (float) 255));
+                    oSB.setColor(1.0F, 1.0F, 1.0F, alpha);
+                    oSB.draw(ImageManager.getImage(Images.gameIntro).getTexture(), 0.0F, (float) (-CFG.GAME_HEIGHT), (float) CFG.GAME_WIDTH, (float) CFG.GAME_HEIGHT);
+                    oSB.end();
+
+                    introShown += 1;
+                    return;
+                } catch (final Exception ex6) {
+                    //if start music detected
+                    if (!Objects.equals(SoundsManager.START_MUSIC, "")) {
+                        CFG.soundsManager.playStartMusic();
+                    } else {
+                        CFG.soundsManager.loadNextMusic();
+                    }
+                    introShown = -1;
+                    return;
+                }
+            }
+
             try {
                 if (CFG.RENDER3) {
                     CFG.RENDER3 = false;
@@ -497,6 +562,9 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                 else {
                     CFG.RENDER = false;
                 }
+                FrameBuffer fbo = new FrameBuffer(Pixmap.Format.RGBA8888, CFG.GAME_WIDTH, CFG.GAME_HEIGHT, false);
+                fbo.begin();
+
                 Gdx.gl.glClearColor(CFG.BACKGROUND_COLOR.r, CFG.BACKGROUND_COLOR.g, CFG.BACKGROUND_COLOR.b, CFG.BACKGROUND_COLOR.a);
                 Gdx.gl.glClear(16640);
                 AoCGame.viewport.setWorldSize(CFG.GAME_WIDTH / CFG.map.getMapScale().getCurrentScale(), CFG.GAME_HEIGHT / CFG.map.getMapScale().getCurrentScale());
@@ -540,6 +608,18 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                 }
                 this.oSB.setColor(Color.WHITE);
                 this.oSB.end();
+                fbo.end();
+
+                //draw post-processing effect
+                AoCGame.camera.setToOrtho(false, (float)CFG.GAME_WIDTH, (float)(CFG.GAME_HEIGHT));
+                AoCGame.viewport.setWorldSize((float)CFG.GAME_WIDTH, (float)CFG.GAME_HEIGHT);
+                AoCGame.viewport.apply();
+                this.oSB.setProjectionMatrix(AoCGame.camera.combined);
+                this.oSB.begin();
+                this.oSB.setShader(AoCGame.extraShader);
+                this.oSB.draw(fbo.getColorBufferTexture(), 0.0f, 0.0f, (float)CFG.GAME_WIDTH, (float)(CFG.GAME_HEIGHT), 0, 0, 1, 1);
+                this.oSB.end();
+                fbo.dispose();
             }
             catch (final IllegalStateException ex6) {
                 if (CFG.LOGS) {

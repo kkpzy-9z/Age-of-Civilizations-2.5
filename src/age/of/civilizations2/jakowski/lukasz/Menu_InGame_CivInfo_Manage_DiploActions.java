@@ -57,11 +57,24 @@ class Menu_InGame_CivInfo_Manage_DiploActions extends SliderMenu {
 
             menuElements.add(new Button_Diplomacy_Action(Images.diplo_message, CFG.langManager.get(CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionIndex).getName()), 0, 1 + CFG.PADDING * 2, nPosY + CFG.PADDING, tempElemW, tempElemH, true) {
                protected boolean getClickable() {
-                  return super.getClickable() && !CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(this.getCurrent()).getInProgress();
+                  return super.getClickable() && CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(this.getCurrent()).canEnactDecision(iCivID);
                }
 
                protected void buildElementHover() {
                   this.menuElementHover = CFG.game.getHover_Decision(CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(this.getCurrent()));
+               }
+
+               protected int getSFX() {
+                  return SoundsManager.SOUND_COINS;
+               }
+
+               @Override
+               protected void drawText(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean isActive) {
+                  ImageManager.getImage(Images.diplo_message).draw(oSB, this.getPosX() + (Button_Diplomacy.iDiploWidth - ImageManager.getImage(Images.diplo_message).getWidth()) / 2 + iTranslateX, this.getPosY() + this.getHeight() / 2 - ImageManager.getImage(Images.diplo_message).getHeight() / 2 + iTranslateY);
+                  CFG.fontMain.getData().setScale(0.6F);
+                  CFG.drawText(oSB, this.getText(), this.getPosX() + Button_Diplomacy.iDiploWidth + iTranslateX, this.getPosY() + this.getHeight() / 2 - (int)((float)this.getTextHeight() * 0.6F / 2.0F) + iTranslateY, this.getColor(isActive));
+                  CFG.drawText(oSB, String.valueOf(CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(this.getCurrent()).getTurnLength() - CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(this.getCurrent()).getTurnsProgress()), ((this.getPosX() + iTranslateX + this.getWidth()) - ((Button_Diplomacy.iDiploWidth - ImageManager.getImage(Images.diplo_message).getWidth()) / 2)) - CFG.PADDING, this.getPosY() + this.getHeight() / 2 - (int)((float)this.getTextHeight() * 0.6F / 2.0F) + iTranslateY, this.getColor(isActive));
+                  CFG.fontMain.getData().setScale(1.0F);
                }
             });
             menuElements.get(menuElements.size() - 1).setCurrent(decisionIndex);
@@ -148,11 +161,14 @@ class Menu_InGame_CivInfo_Manage_DiploActions extends SliderMenu {
             CFG.updateActiveCivManagement_InGame();
             break;
          default:
-            CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(this.getMenuElement(iID).getCurrent()).setInProgress(true);
-            CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).applyDecisionChange(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(this.getMenuElement(iID).getCurrent()));
-            CFG.toast.setInView(CFG.langManager.get(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(this.getMenuElement(iID).getCurrent()).getName()));
-            CFG.updateActiveCivManagement_InGame();
-            break;
+            if (DiplomacyManager.acceptDecision(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), this.getMenuElement(iID).getCurrent())) {
+               CFG.toast.setInView(CFG.langManager.get(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(this.getMenuElement(iID).getCurrent()).getName()));
+               CFG.menuManager.updateInGame_TOP_All(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+               CFG.updateActiveCivManagement_InGame();
+               break;
+            } else {
+                CFG.toast.setInView(CFG.langManager.get("DecisionNotAvailable"), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2);
+            }
       }
 
    }

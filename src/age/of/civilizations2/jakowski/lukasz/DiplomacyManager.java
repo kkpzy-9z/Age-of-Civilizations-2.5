@@ -1295,6 +1295,20 @@ class DiplomacyManager
         CFG.game.getCiv(iFromCivID).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_Vassalization_Rejected(iCivID));
     }
 
+    protected static final boolean acceptDecision(final int iCivID, final int decisionID) {
+        if (CFG.game.getCiv(iCivID).getDiplomacyPoints() >= CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID).getDiploCost() && CFG.game.getCiv(iCivID).getMoney() >= CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID).getGoldCost()) {
+            CFG.game.getCiv(iCivID).setMoney((long) (CFG.game.getCiv(iCivID).getMoney() - (long) CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID).getGoldCost()));
+            CFG.game.getCiv(iCivID).setDiplomacyPoints(CFG.game.getCiv(iCivID).getDiplomacyPoints() - (int) CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID).getDiploCost());
+
+            CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID).setInProgress(true);
+            CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID).setTurnsProgress(1);
+            CFG.game.getCiv(iCivID).applyDecisionChange(CFG.game.getCiv(iCivID).civGameData.leaderData.getDecision(decisionID));
+
+            return true;
+        }
+        return false;
+    }
+
     protected static final void sendMilitaryAccess_AskProposal(final int iToCivID, final int iFromCivID, final int iValue) {
         if (CFG.game.getCiv(iFromCivID).getDiplomacyPoints() >= 10) {
             CFG.game.getCiv(iToCivID).getCivilization_Diplomacy_GameData().messageBox.addMessage(new Message_MilitaryAccess_Ask(iFromCivID, iValue));

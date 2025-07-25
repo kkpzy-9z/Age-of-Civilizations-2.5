@@ -20,7 +20,7 @@ class Menu_InGame_Manage_Stats extends SliderMenu {
       offsetY += CFG.TEXT_HEIGHT + CFG.PADDING;
       menuElements.add(new Graph_Circle_Politics(CFG.PADDING * 2, offsetY, CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), (MenuElement_Hover)null, CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(0), 1.0F - CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(0)) {
          protected void buildElementHover() {
-            this.menuElementHover = CFG.game.getHover_PopulationOfCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+            this.menuElementHover = CFG.game.getHover_Class(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), 0);
          }
       });
       ((Graph_Circle_Politics)menuElements.get(menuElements.size() - 1)).setWidth((CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4));
@@ -30,7 +30,7 @@ class Menu_InGame_Manage_Stats extends SliderMenu {
       offsetY += CFG.TEXT_HEIGHT + CFG.PADDING;
       menuElements.add(new Graph_Circle_Politics(CFG.PADDING * 2, offsetY, CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), (MenuElement_Hover)null, CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(1), 1.0F - CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(1)) {
          protected void buildElementHover() {
-            this.menuElementHover = CFG.game.getHover_PopulationOfCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+            this.menuElementHover = CFG.game.getHover_Class(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), 1);
          }
       });
       ((Graph_Circle_Politics)menuElements.get(menuElements.size() - 1)).setWidth((CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4));
@@ -40,7 +40,7 @@ class Menu_InGame_Manage_Stats extends SliderMenu {
       offsetY += CFG.TEXT_HEIGHT + CFG.PADDING;
       menuElements.add(new Graph_Circle_Politics(CFG.PADDING * 2, offsetY, CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), (MenuElement_Hover)null, CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(2), 1.0F - CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(2)) {
          protected void buildElementHover() {
-            this.menuElementHover = CFG.game.getHover_PopulationOfCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+            this.menuElementHover = CFG.game.getHover_Class(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), 2);
          }
       });
       ((Graph_Circle_Politics)menuElements.get(menuElements.size() - 1)).setWidth((CFG.CIV_INFO_MENU_WIDTH - CFG.PADDING * 4));

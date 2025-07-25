@@ -18,7 +18,7 @@ class LeaderOfCiv_GameData implements Serializable
     private boolean wasRandom = false;
     private boolean incumbentYear = false;
     private final List<Decision_GameData> decisions;
-    private float[] lClassViews = new float[] { 0.0F, 0.0F, 0.0F };; //upper, middle, lower
+    private float[] lClassViews; //upper, middle, lower
     protected float fModifier_PopGrowth;
     protected float fModifier_EconomyGrowth;
     protected float fModifier_IncomeTaxation;
@@ -36,13 +36,13 @@ class LeaderOfCiv_GameData implements Serializable
         this.sName = "";
         this.sImage = "";
         this.sWiki = "";
-        this.Year = 3;
+        this.Year = 1;
         this.Month = 1;
         this.Day = 1;
         this.incumbentYear = true;
         this.wasRandom = false;
         this.decisions = new ArrayList<Decision_GameData>();
-        this.lClassViews = new float[] { 0.0F, 0.0F, 0.0F };
+        this.lClassViews = new float[] { -1.0F, -1.0F, -1.0F };
         this.fModifier_PopGrowth = 0.0f;
         this.fModifier_EconomyGrowth = 0.0f;
         this.fModifier_IncomeTaxation = 0.0f;

@@ -38,11 +38,14 @@ class Game_Decisions
                 tempDecision.setDesc(tempData.Description);
                 tempDecision.setTurnLength(tempData.TurnLength);
 
-                tempDecision.setYear(tempData.Year);
-                tempDecision.setMonth(tempData.Month);
-                tempDecision.setDay(tempData.Day);
+                tempDecision.setYear(tempData.YearAvailable);
+                tempDecision.setMonth(tempData.MonthAvailable);
+                tempDecision.setDay(tempData.DayAvailable);
 
                 tempDecision.setRepeatable(tempData.Repeatable);
+                tempDecision.setGoldCost(tempData.Cost_Gold);
+                tempDecision.setDiploCost(tempData.Cost_Diplomacy * 10);
+                tempDecision.setCostEveryTurn(tempData.Cost_Every_Turn);
 
                 tempDecision.fModifier_UpperClass = tempData.Modifier_UpperClass;
                 tempDecision.fModifier_MiddleClass = tempData.Modifier_MiddleClass;
@@ -75,7 +78,7 @@ class Game_Decisions
             decision.setName(CFG.langManager.get(decision.getName()));
         }
     }
-    
+
     protected final void updateLanguage() {
         this.loadDecisions();
     }
@@ -101,11 +104,14 @@ class Game_Decisions
         protected String Description;
         protected int TurnLength;
 
-        protected int Year;
-        protected int Month;
-        protected int Day;
+        protected int YearAvailable;
+        protected int MonthAvailable;
+        protected int DayAvailable;
 
         protected boolean Repeatable;
+        protected int Cost_Gold;
+        protected int Cost_Diplomacy;
+        protected boolean Cost_Every_Turn;
 
         protected float Modifier_UpperClass;
         protected float Modifier_MiddleClass;
