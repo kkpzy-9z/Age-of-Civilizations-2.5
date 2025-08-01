@@ -1,31 +1,30 @@
 {
 	Decisions: [
 		{
-			"__comment": "This is a comment explaining this JSON object, NOT a decision property.The following decisions are all 'default' leader decisions available generally to all civilizations, not civilization specific decisions. If you want to edit civilization-specific decisions, use the new integrated editor menu! Both name and descriptions of decisions here are run through the game's language manager, meaning that you can assign a decision name keyword in the game's language bundle files and it will load that, so long as the strings in this JSON match that keyword. The year, month, and day properties all signal the LOWEST possible date at which that decision becomes available to player civilizations. Lastly, all the modifiers are the decision's outcomes, and are expressed in percentages (10% = 0.10).",
+			"__comment": "This is a comment explaining this JSON object, NOT a decision property.The following decisions are all 'default' leader decisions available generally to all civilizations, not civilization specific decisions. If you want to edit civilization-specific decisions, use the new integrated editor menu! Both name and descriptions of decisions here are run through the game's language manager, meaning that you can assign a decision name keyword in the game's language bundle files and it will load that, so long as the strings in this JSON match that keyword. The year, month, and day properties all signal the LOWEST possible date at which that decision becomes available to player civilizations. You may assign negative cost values for diplomacy and gold points, which will then grant the player points upon enacted the decision. Furthermore, enabling the Cost_Every_Turn property will charge (or give) the player the decision's diplomacy and gold cost every turn it is active, whereas disabling it will only charge the player when they initially enact the decision. Lastly, all the modifiers are the decision's outcomes, and are expressed in percentages (10% = 0.10).",
 
+			Name: "ExpWelfare",
+			Description: "ExpWelfareDesc",
 
-			Name: "Levy Taxes",
-			Description: "Increase taxes to fund the kingdom's army and infrastructure.",
-
-			TurnLength: 10,
+			TurnLength: 20,
 
 			YearAvailable: -9999,
 			MonthAvailable: 0,
 			DayAvailable: 0,
 
 			Repeatable: true,
-			Cost_Gold: 500.0,
-			Cost_Diplomacy: 5.00,
-			Cost_Every_Turn: false,
+			Cost_Gold: 5000.0,
+			Cost_Diplomacy: 0.50,
+			Cost_Every_Turn: true,
 
 			Modifier_UpperClass: -0.05,
-			Modifier_MiddleClass: -0.1,
-			Modifier_LowerClass: -0.2,
+			Modifier_MiddleClass: -0.075,
+			Modifier_LowerClass: 0.1,
 
-			Modifier_PopGrowth: 0.0,
+			Modifier_PopGrowth: 0.15,
 			Modifier_EconomyGrowth: 0.0,
-			Modifier_IncomeTaxation: 0.1,
-			Modifier_IncomeProduction: -0.05,
+			Modifier_IncomeTaxation: -0.2,
+			Modifier_IncomeProduction: 0.0,
 			Modifier_Administration: 0.0,
 			Modifier_Research: 0.0,
 			Modifier_MilitaryUpkeep: 0.0,
@@ -33,7 +32,157 @@
 			Modifier_DefenseBonus: 0.0,
 			Modifier_MovementPoints: 0.0
 		},
+		{
+			Name: "ExpTaxCredit",
+			Description: "ExpTaxCreditDesc",
+
+			TurnLength: 15,
+
+			YearAvailable: -9999,
+			MonthAvailable: 0,
+			DayAvailable: 0,
+
+			Repeatable: true,
+			Cost_Gold: 100.0,
+			Cost_Diplomacy: 0.50,
+			Cost_Every_Turn: true,
+
+			Modifier_UpperClass: -0.05,
+			Modifier_MiddleClass: 0.035,
+			Modifier_LowerClass: 0.05,
+
+			Modifier_PopGrowth: 0.15,
+			Modifier_EconomyGrowth: 0.0,
+			Modifier_IncomeTaxation: -0.15,
+			Modifier_IncomeProduction: 0.025,
+			Modifier_Administration: 0.0,
+			Modifier_Research: 0.0,
+			Modifier_MilitaryUpkeep: 0.0,
+			Modifier_AttackBonus: 0.0,
+			Modifier_DefenseBonus: 0.0,
+			Modifier_MovementPoints: 0.0
+		},
+		{
+			Name: "ExpPublicService",
+			Description: "ExpPublicServiceDesc",
+
+			TurnLength: 20,
+
+			YearAvailable: -9999,
+			MonthAvailable: 0,
+			DayAvailable: 0,
+
+			Repeatable: true,
+			Cost_Gold: 2500.0,
+			Cost_Diplomacy: 0.75,
+			Cost_Every_Turn: true,
+
+			Modifier_UpperClass: -0.025,
+			Modifier_MiddleClass: 0.05,
+			Modifier_LowerClass: 0.05,
+
+			Modifier_PopGrowth: 0.00,
+			Modifier_EconomyGrowth: 0.10,
+			Modifier_IncomeTaxation: -0.05,
+			Modifier_IncomeProduction: 0.20,
+			Modifier_Administration: 0.10,
+			Modifier_Research: 0.0,
+			Modifier_MilitaryUpkeep: 0.0,
+			Modifier_AttackBonus: 0.0,
+			Modifier_DefenseBonus: 0.0,
+			Modifier_MovementPoints: 0.0
+		},
+		{
+			Name: "DecMartialLaw",
+			Description: "DecMartialLawDesc",
+
+			TurnLength: 40,
+
+			YearAvailable: -9999,
+			MonthAvailable: 0,
+			DayAvailable: 0,
+
+			Repeatable: true,
+			Cost_Gold: 1000.0,
+			Cost_Diplomacy: 2.50,
+			Cost_Every_Turn: true,
+
+			Modifier_UpperClass: -0.05,
+			Modifier_MiddleClass: -0.275,
+			Modifier_LowerClass: -0.2,
+
+			Modifier_PopGrowth: 0.0,
+			Modifier_EconomyGrowth: 0.0,
+			Modifier_IncomeTaxation: -0.25,
+			Modifier_IncomeProduction: 0.0,
+			Modifier_Administration: -0.25,
+			Modifier_Research: 0.0,
+			Modifier_MilitaryUpkeep: 0.40,
+			Modifier_AttackBonus: 0.55,
+			Modifier_DefenseBonus: 0.70,
+			Modifier_MovementPoints: 0.25
+		},
+		{
+			Name: "DecMandatoryMilitaryService",
+			Description: "DecMandatoryMilitaryServiceDesc",
+
+			TurnLength: 40,
+
+			YearAvailable: -9999,
+			MonthAvailable: 0,
+			DayAvailable: 0,
+
+			Repeatable: true,
+			Cost_Gold: 1000.0,
+			Cost_Diplomacy: 1.50,
+			Cost_Every_Turn: true,
+
+			Modifier_UpperClass: 0.025,
+			Modifier_MiddleClass: -0.10,
+			Modifier_LowerClass: -0.15,
+
+			Modifier_PopGrowth: 0.0,
+			Modifier_EconomyGrowth: 0.0,
+			Modifier_IncomeTaxation: -0.15,
+			Modifier_IncomeProduction: -0.20,
+			Modifier_Administration: 0.0,
+			Modifier_Research: 0.0,
+			Modifier_MilitaryUpkeep: -0.20,
+			Modifier_AttackBonus: 0.35,
+			Modifier_DefenseBonus: 0.35,
+			Modifier_MovementPoints: 0.10
+		},
+		{
+			Name: "HirePMC",
+			Description: "HirePMCDesc",
+
+			TurnLength: 40,
+
+			YearAvailable: -9999,
+			MonthAvailable: 0,
+			DayAvailable: 0,
+
+			Repeatable: true,
+			Cost_Gold: 3000.0,
+			Cost_Diplomacy: 1.00,
+			Cost_Every_Turn: true,
+
+			Modifier_UpperClass: 0.5,
+			Modifier_MiddleClass: 0.0,
+			Modifier_LowerClass: 0.0,
+
+			Modifier_PopGrowth: 0.0,
+			Modifier_EconomyGrowth: 0.0,
+			Modifier_IncomeTaxation: 0.0,
+			Modifier_IncomeProduction: 0.0,
+			Modifier_Administration: 0.0,
+			Modifier_Research: 0.0,
+			Modifier_MilitaryUpkeep: 0.40,
+			Modifier_AttackBonus: 0.65,
+			Modifier_DefenseBonus: 0.25,
+			Modifier_MovementPoints: 0.30
+		}
 	],
-	
+
 	Age_of_Civilizations: Decisions
 }

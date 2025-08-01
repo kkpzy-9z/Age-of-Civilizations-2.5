@@ -338,10 +338,14 @@ class MenuManager {
     private int MAP_EDITOR_WASTELAND_MAPS_EDIT = -1;
     private int GAME_LEADERS = -1;
     private int GAME_RANDOM_LEADERS = -1;
+    private int GAME_DECISIONS_EDITOR = -1;
     private int GAME_LEADERS_EDIT = -1;
     private int GAME_RANDOM_LEADERS_EDIT = -1;
+    private int GAME_DECISIONS_EDITOR_EDIT = -1;
     private int GAME_LEADERS_EDIT_DATA = -1;
     private int GAME_LEADERS_EDIT_CIVS = -1;
+    private int GAME_DECISIONS_EDITOR_EDIT_DATA = -1;
+    private int GAME_DECISIONS_EDITOR_EDIT_CIVS = -1;
     private int GAME_RANDOM_LEADERS_EDIT_DATA = -1;
     private int GAME_RANDOM_LEADERS_EDIT_CIVS = -1;
     private int GAME_RANDOM_LEADERS_EDIT_AITYPE = -1;
@@ -349,7 +353,10 @@ class MenuManager {
     private int GAME_LEADERS_EDIT_SELECT_CIVS_ALPHABET = -1;
     private int GAME_LEADERS_EDIT_SELECT_CIVS_LIST = -1;
     private int GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS = -1;
+    private int GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS = -1;
+    private int GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_ALPHABET = -1;
     private int GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST = -1;
+    private int GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_LIST = -1;
     private int GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE = -1;
     private int GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE_LIST = -1;
     private int MAP_EDITOR_FORMABLE_CIVS = -1;
@@ -2308,6 +2315,18 @@ class MenuManager {
                     }
                     return this.GAME_RANDOM_LEADERS;
                 }
+                case eGAME_DECISIONS_EDITOR: {
+                    if (this.GAME_DECISIONS_EDITOR == -1) {
+                        this.GAME_DECISIONS_EDITOR = this.addMenu(new Menu_Leaders());
+                        this.addNextMenuToView(this.GAME_DECISIONS_EDITOR, new Menu_DecisionsEditor_Options());
+                        this.addNextMenuToView(this.GAME_DECISIONS_EDITOR, new Menu_DecisionsEditor_Alphabet());
+                    } else {
+                        this.menus.get(this.GAME_DECISIONS_EDITOR).get(1).setVisible(false);
+                        this.menus.get(this.GAME_DECISIONS_EDITOR).set(1, new Menu_DecisionsEditor_Options());
+                        this.menus.get(this.GAME_DECISIONS_EDITOR).set(2, new Menu_DecisionsEditor_Alphabet());
+                    }
+                    return this.GAME_DECISIONS_EDITOR;
+                }
                 case eMAP_EDITOR_FORMABLE_CIVS: {
                     if (this.MAP_EDITOR_FORMABLE_CIVS == -1) {
                         this.MAP_EDITOR_FORMABLE_CIVS = this.addMenu(new Menu_MapEditor_FormableCivs());
@@ -2352,6 +2371,21 @@ class MenuManager {
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(this.GAME_RANDOM_LEADERS_EDIT_DATA, new Menu_Random_Leader_Edit_Data());
                     }
                     return this.GAME_RANDOM_LEADERS_EDIT;
+                }
+                case eGAME_DECISIONS_EDITOR_EDIT: {
+                    if (this.GAME_DECISIONS_EDITOR_EDIT == -1) {
+                        this.GAME_DECISIONS_EDITOR_EDIT = this.addMenu(new Menu_Decisions_Editor_Edit());
+                        this.GAME_DECISIONS_EDITOR_EDIT_CIVS = this.addNextMenuToView(this.GAME_DECISIONS_EDITOR_EDIT, new Menu_Decisions_Editor_Edit_Civs());
+                        this.GAME_DECISIONS_EDITOR_EDIT_DATA = this.addNextMenuToView(this.GAME_DECISIONS_EDITOR_EDIT, new Menu_Decisions_Editor_Edit_Data());
+                    } else {
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).get(0).onBackPressed();
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).set(0, new Menu_Decisions_Editor_Edit());
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).get(this.GAME_DECISIONS_EDITOR_EDIT_CIVS).onBackPressed();
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).set(this.GAME_DECISIONS_EDITOR_EDIT_CIVS, new Menu_Decisions_Editor_Edit_Civs());
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).get(this.GAME_DECISIONS_EDITOR_EDIT_DATA).onBackPressed();
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).set(this.GAME_DECISIONS_EDITOR_EDIT_DATA, new Menu_Decisions_Editor_Edit_Data());
+                    }
+                    return this.GAME_DECISIONS_EDITOR_EDIT;
                 }
                 case eMAP_EDITOR_FORMABLE_CIVS_EDIT: {
                     if (this.MAP_EDITOR_FORMABLE_CIVS_EDIT == -1) {
@@ -2408,6 +2442,18 @@ class MenuManager {
                         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).set(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS_LIST, new Menu_Random_Leader_Edit_SelectCiv_List());
                     }
                     return this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS;
+                }
+                case eGAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS: {
+                    if (this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS == -1) {
+                        this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS = this.addMenu(new Menu_Decisions_Edit_SelectCiv());
+                        this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_ALPHABET = this.addNextMenuToView(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS, new Menu_Decisions_Edit_SelectCiv_Alphabet());
+                        this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_LIST = this.addNextMenuToView(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS, new Menu_Decisions_Edit_SelectCiv_List());
+                    } else {
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).set(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_ALPHABET, new Menu_Decisions_Edit_SelectCiv_Alphabet());
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_LIST).onBackPressed();
+                        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).set(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_LIST, new Menu_Decisions_Edit_SelectCiv_List());
+                    }
+                    return this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS;
                 }
                 case eGAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE: {
                     if (this.GAME_RANDOM_LEADERS_EDIT_SELECT_AITYPE == -1) {
@@ -3704,6 +3750,10 @@ class MenuManager {
         return this.viewID == this.GAME_LEADERS_EDIT_SELECT_CIVS;
     }
 
+    protected final boolean getInDecisions_Edit_SelectCivs() {
+        return this.viewID == this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS;
+    }
+
     protected final boolean getInRandom_Leader_Edit_SelectCivs() {
         return this.viewID == this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS;
     }
@@ -3774,6 +3824,10 @@ class MenuManager {
 
     protected final boolean getInLeaders() {
         return this.viewID == this.GAME_LEADERS;
+    }
+
+    protected final boolean getInDecisionsEditor() {
+        return this.viewID == this.GAME_DECISIONS_EDITOR;
     }
 
     protected final boolean getInRandom_Leaders() {
@@ -4313,6 +4367,11 @@ class MenuManager {
         this.menus.get(this.GAME_LEADERS).set(1, new Menu_Leaders_Options());
     }
 
+    protected final void rebuildDecisionsEditor() {
+        this.menus.get(this.GAME_DECISIONS_EDITOR).get(1).setVisible(false);
+        this.menus.get(this.GAME_DECISIONS_EDITOR).set(1, new Menu_DecisionsEditor_Options());
+    }
+
     protected final void rebuildRandom_Leaders() {
         this.menus.get(this.GAME_RANDOM_LEADERS).get(1).setVisible(false);
         this.menus.get(this.GAME_RANDOM_LEADERS).set(1, new Menu_Random_Leaders_Options());
@@ -4331,6 +4390,11 @@ class MenuManager {
     protected final void rebuildLeader_Edit_SelectCivs_List() {
         this.menus.get(this.GAME_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_LEADERS_EDIT_SELECT_CIVS_LIST).onBackPressed();
         this.menus.get(this.GAME_LEADERS_EDIT_SELECT_CIVS).set(this.GAME_LEADERS_EDIT_SELECT_CIVS_LIST, new Menu_Leader_Edit_SelectCiv_List());
+    }
+
+    protected final void rebuildDecisions_Edit_SelectCivs_List() {
+        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_LIST).onBackPressed();
+        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).set(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_LIST, new Menu_Decisions_Edit_SelectCiv_List());
     }
 
     protected final void rebuildRandom_Leader_Edit_SelectCivs_List() {
@@ -4356,6 +4420,11 @@ class MenuManager {
     protected final void rebuildRandom_Leaders_Edit_Civs() {
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).get(this.GAME_RANDOM_LEADERS_EDIT_CIVS).onBackPressed();
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT).set(this.GAME_RANDOM_LEADERS_EDIT_CIVS, new Menu_Random_Leader_Edit_Civs());
+    }
+
+    protected final void rebuildDecisions_Edit_Civs() {
+        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).get(this.GAME_DECISIONS_EDITOR_EDIT_CIVS).onBackPressed();
+        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).set(this.GAME_DECISIONS_EDITOR_EDIT_CIVS, new Menu_Decisions_Editor_Edit_Civs());
     }
 
     protected final void rebuildRandom_Leaders_Edit_AIType() {
@@ -4458,6 +4527,14 @@ class MenuManager {
         }
     }
 
+    protected final void getDecisions_Alphabet() {
+        if (CFG.sSearch == null) {
+            this.menus.get(this.GAME_DECISIONS_EDITOR).get(2).getMenuElement(0).setText("");
+        } else {
+            this.menus.get(this.GAME_DECISIONS_EDITOR).get(2).getMenuElement(0).setText(CFG.sSearch);
+        }
+    }
+
     protected final void getRandom_Leaders_Alphabet() {
         if (CFG.sSearch == null) {
             this.menus.get(this.GAME_RANDOM_LEADERS).get(2).getMenuElement(0).setText("");
@@ -4487,6 +4564,14 @@ class MenuManager {
             this.menus.get(this.GAME_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_LEADERS_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText("");
         } else {
             this.menus.get(this.GAME_LEADERS_EDIT_SELECT_CIVS).get(this.GAME_LEADERS_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText(CFG.sSearch);
+        }
+    }
+
+    protected final void getDecisions_SelectCivs_Alphabet() {
+        if (CFG.sSearch == null) {
+            this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText("");
+        } else {
+            this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS_ALPHABET).getMenuElement(0).setText(CFG.sSearch);
         }
     }
 
@@ -4650,6 +4735,10 @@ class MenuManager {
 
     protected final void clearRandom_Leaders__SelectCiv() {
         this.menus.get(this.GAME_RANDOM_LEADERS_EDIT_SELECT_CIVS).get(2).onBackPressed();
+    }
+
+    protected final void clearDecisions__SelectCiv() {
+        this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT_SELECT_CIVS).get(2).onBackPressed();
     }
 
     protected final void clearRandom_Leaders__SelectAIType() {
@@ -4872,6 +4961,14 @@ class MenuManager {
         CFG.leader_Random_GameData.getLeaderOfCiv().setDay(Game_Calendar.currentDay);
         CFG.leader_Random_GameData.getLeaderOfCiv().setMonth(Game_Calendar.currentMonth);
         CFG.leader_Random_GameData.getLeaderOfCiv().setYear(Game_Calendar.currentYear);
+    }
+
+    protected final void saveDecisions_Edit_Data() {
+        CFG.civDecision_GameData.setName(this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).get(this.GAME_DECISIONS_EDITOR_EDIT_DATA).getMenuElement(0).getText());
+        CFG.civDecision_GameData.setDesc(this.menus.get(this.GAME_DECISIONS_EDITOR_EDIT).get(this.GAME_DECISIONS_EDITOR_EDIT_DATA).getMenuElement(1).getText());
+        CFG.civDecision_GameData.setDay(Game_Calendar.currentDay);
+        CFG.civDecision_GameData.setMonth(Game_Calendar.currentMonth);
+        CFG.civDecision_GameData.setYear(Game_Calendar.currentYear);
     }
 
     protected MenuManager() {

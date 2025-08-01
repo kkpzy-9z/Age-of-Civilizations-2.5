@@ -519,6 +519,8 @@ class Menu_InGame extends SliderMenu {
                nData.clear();
             }
 
+            //remove friendly civ + vassals diplo points debuff (diplomacymanager getCostOfCurrentDiplomaticActions for actual subtraction)
+            /*
             for(i = 0; i < CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getFriendlyCivsSize(); ++i) {
                if (CFG.game.getCiv(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getFriendlyCiv(i).iCivID).getNumOfProvinces() > 0) {
                   nData.add(new MenuElement_Hover_v2_Element_Type_Color(new Color((float)CFG.game.getCiv(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getFriendlyCiv(i).iCivID).getR() / 255.0F, (float)(CFG.game.getCiv(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getFriendlyCiv(i).iCivID).getG() / 255), (float)CFG.game.getCiv(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getFriendlyCiv(i).iCivID).getB() / 255.0F, 1.0F)));
@@ -531,6 +533,7 @@ class Menu_InGame extends SliderMenu {
                }
             }
 
+
             if (CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.iVassalsSize > 0) {
                nData.add(new MenuElement_Hover_v2_Element_Type_Color(new Color((float)CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getR() / 255.0F, (float)(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getG() / 255), (float)CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getB() / 255.0F, 1.0F)));
                nData.add(new MenuElement_Hover_v2_Element_Type_Flag(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()));
@@ -540,6 +543,7 @@ class Menu_InGame extends SliderMenu {
                nElements.add(new MenuElement_Hover_v2_Element2(nData));
                nData.clear();
             }
+            */
 
             for(i = 1; i < CFG.game.getCivsSize(); ++i) {
                if (CFG.game.getCiv(i).getNumOfProvinces() > 0 && i != CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()) {
@@ -585,6 +589,8 @@ class Menu_InGame extends SliderMenu {
                }
             }
 
+            //no more relations debuff (Civilization_Diplomacy_ImproveRelations_GameData for actual substraction)
+            /*
             if (CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getCivilization_Diplomacy_GameData().getImproveRelationsSize() > 0) {
                nData.add(new MenuElement_Hover_v2_Element_Type_Space());
                nElements.add(new MenuElement_Hover_v2_Element2(nData));
@@ -605,6 +611,28 @@ class Menu_InGame extends SliderMenu {
                   nElements.add(new MenuElement_Hover_v2_Element2(nData));
                   nData.clear();
                }
+            }*/
+
+            //new decisions menu, if cost per turn then show diplo points change
+            try {
+               nData.add(new MenuElement_Hover_v2_Element_Type_Space());
+               nElements.add(new MenuElement_Hover_v2_Element2(nData));
+               nData.clear();
+
+               for (int decIndex = 0; decIndex < CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecisionsCount(); decIndex++) {
+                  if (CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).getInProgress()
+                     && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).isCostEveryTurn()
+                     && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost() != 0.0F
+                  ) {
+                     nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).getName()));
+                     nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_message, CFG.PADDING, CFG.PADDING));
+                     nData.add(new MenuElement_Hover_v2_Element_Type_Text((CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost() >= 0.0F ? "-" : "+") + Math.abs(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost()/10.0F), (CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost() > 0.0F ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_POSITIVE)));
+                     nElements.add(new MenuElement_Hover_v2_Element2(nData));
+                     nData.clear();
+                  }
+               }
+            } catch (IndexOutOfBoundsException | NullPointerException e) {
+
             }
 
             this.menuElementHover = new MenuElement_Hover_v2(nElements);

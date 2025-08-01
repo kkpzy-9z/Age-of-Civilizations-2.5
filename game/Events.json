@@ -1,0 +1,63 @@
+{
+	EconomyEvents: [
+		{
+			"__comment": "Economy events scan SCAN_TOPECONOMIES nations with the highest economies after x turns (random number between TURNS_UPPER_BOUND and TURNS_LOWER_BOUND). CRASH_INVESTMENT_THRESHOLD and MIRACLE_INVESTMENT_THRESHOLD decide whether or not that civilization experiences a respective economic event, comparing their current investment spendings with their expected (calculated via ideology and other variables), granting the civilization if above or below by the thresholds. Upon an event, the civilization affected has their economy decreased by CRASH_ECONOMY_DECREASE or MIRACLE_ECONOMY_INCREASE (percentage). The next turn, surrounding civilizations, and potentially the player, will experience a changein their economy by a percentage between CRASH_ECONOMY_RIPPLE_DECREASE / MIRACLE_ECONOMY_RIPPLE_INCREASE and CRASH_ECONOMY_RIPPLE_MIN / MIRACLE_ECONOMY_RIPPLE_MIN, depending on their distance and relationship to the initial civilization.",
+
+			TURNS_UPPER_BOUND: 50,
+			TURNS_LOWER_BOUND: 35,
+			SCAN_TOPECONOMIES: 10,
+			
+			CRASH_INVESTMENT_THRESHOLD: 0.25,
+			MIRACLE_INVESTMENT_THRESHOLD: 0.1,
+
+			CRASH_ECONOMY_DECREASE: 15,
+			CRASH_ECONOMY_RIPPLE_DECREASE: 15,
+			CRASH_ECONOMY_RIPPLE_MIN: 5,
+
+			MIRACLE_ECONOMY_INCREASE: 15,
+			MIRACLE_ECONOMY_RIPPLE_INCREASE: 15,
+			MIRACLE_ECONOMY_RIPPLE_MIN: 5
+		}
+	],
+
+	ClassEvents: [
+		{
+			TURNS_UPPER_BOUND: 40,
+			TURNS_LOWER_BOUND: 25,
+
+			CHANGE_NEEDED_FOR_EVENT: 0.10,
+
+			REVOLT_MAX_APPROVAL: 0.10,
+			UNREST_MAX_APPROVAL: 0.30,
+			OBEY_MIN_APPROVAL: 0.70,
+			LOYAL_MIN_APPROVAL: 0.90
+		}
+	],
+
+	WarEvents: [
+		{
+			SCAN_TOPCIVILIZATIONS: 12,
+
+			"__comment": "Below properties are for civil war dynamic events, specifically for the partioning of civilizations!",
+
+			MAX_ARMY_DISSENTERS: 0.75,
+			MIN_ARMY_DISSENTERS: 0.35,
+
+			MAX_ARMY_DISSENTERS_BUFFER: 0.35,
+			MIN_ARMY_DISSENTERS_BUFFER: 0.15,
+
+			MAX_TREASURY_TRANSFER: 0.75,
+			MIN_TREASURY_TRANSFER: 0.35,
+
+			MAX_PERC_PROVINCES_TO_TAKE: 0.50,
+			MIN_PROVINCES_WAR: 5
+		}
+	],
+
+	LeaderEvents: [
+		{
+			TURNS_UPPER_BOUND: 17,
+			TURNS_LOWER_BOUND: 25
+		},
+	],
+}

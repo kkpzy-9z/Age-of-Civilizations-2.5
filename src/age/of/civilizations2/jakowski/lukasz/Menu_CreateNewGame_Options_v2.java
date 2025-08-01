@@ -226,7 +226,39 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 9, tempW, tempElemH, true) {
+      //capitulation slider setting
+      menuElements.add(new Slider_BG_CNG("", CFG.PADDING * 2, tempElemH * 7 + CFG.PADDING, tempW - CFG.PADDING * 4, tempElemH - CFG.PADDING * 2, 0, 2, CFG.CAPITULATION) {
+         protected String getDrawText() {
+            return this.getText();
+         }
+
+         protected void buildElementHover() {
+            List nElements = new ArrayList();
+            List nData = new ArrayList();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Capitulation") + ": ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.getFogOfWarName(CFG.FOG_OF_WAR)));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Space());
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Off") + ": ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("OffTip") + "."));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Capital") + ": ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("CapitalTip") + "."));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Complete") + ": ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("CompleteTip") + "."));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+            this.menuElementHover = new MenuElement_Hover_v2(nElements);
+         }
+      });
+
+      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 10, tempW, tempElemH, true) {
          protected void buildElementHover() {
             List nElements = new ArrayList();
             List nData = new ArrayList();
@@ -236,7 +268,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 10, tempW, tempElemH, true, CFG.FILL_THE_MAP) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 11, tempW, tempElemH, true, CFG.FILL_THE_MAP) {
          protected boolean getCheckboxState() {
             return CFG.FILL_THE_MAP;
          }
@@ -250,7 +282,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 12, tempW, tempElemH, true, CFG.RANDOM_PLACMENT) {
+      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 13, tempW, tempElemH, true, CFG.RANDOM_PLACMENT) {
          protected boolean getCheckboxState() {
             return CFG.RANDOM_PLACMENT;
          }
@@ -264,7 +296,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 13, tempW, tempElemH, true, CFG.RANDOM_FILL) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 14, tempW, tempElemH, true, CFG.RANDOM_FILL) {
          protected boolean getCheckboxState() {
             return CFG.RANDOM_FILL;
          }
@@ -278,7 +310,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 14, tempW, tempElemH, true) {
+      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 15, tempW, tempElemH, true) {
          protected void buildElementHover() {
             List nElements = new ArrayList();
             List nData = new ArrayList();
@@ -288,12 +320,12 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 15, tempW, tempElemH, true, CFG.SANDBOX_MODE) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 16, tempW, tempElemH, true, CFG.SANDBOX_MODE) {
          protected boolean getCheckboxState() {
             return CFG.SANDBOX_MODE;
          }
       });
-      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 19, tempW, tempElemH, true, CFG.TOTAL_WAR_MODE) {
+      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 20, tempW, tempElemH, true, CFG.TOTAL_WAR_MODE) {
          protected boolean getCheckboxState() {
             return CFG.TOTAL_WAR_MODE;
          }
@@ -307,7 +339,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options2("", CFG.PADDING * 2, 0, tempElemH * 11, tempW, tempElemH, true) {
+      menuElements.add(new Button_CNG_Options2("", CFG.PADDING * 2, 0, tempElemH * 12, tempW, tempElemH, true) {
          protected void drawText(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean isActive) {
             if (CFG.palletManager.getActivePalletID() == 0) {
                CFG.palletManager.drawSampleColors_Standard(oSB, this.getPosX() + CFG.PADDING * 2 + iTranslateX, this.getPosY() + CFG.PADDING * 2 + iTranslateY, this.getWidth() - CFG.PADDING * 4, this.getHeight() - CFG.PADDING * 4, 0, isActive);
@@ -326,7 +358,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 16, tempW, tempElemH, true, CFG.SPECTATOR_MODE) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 17, tempW, tempElemH, true, CFG.SPECTATOR_MODE) {
          protected boolean getCheckboxState() {
             return CFG.SPECTATOR_MODE;
          }
@@ -340,7 +372,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 17, tempW, tempElemH, true, Game_Calendar.ENABLE_COLONIZATION) {
+      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 18, tempW, tempElemH, true, Game_Calendar.ENABLE_COLONIZATION) {
          protected boolean getCheckboxState() {
             return Game_Calendar.ENABLE_COLONIZATION;
          }
@@ -355,7 +387,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 18, tempW, tempElemH, true, Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES) {
+      menuElements.add(new Button_CNG_Options((String)null, CFG.PADDING * 2, 0, tempElemH * 19, tempW, tempElemH, true, Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES) {
          protected boolean getCheckboxState() {
             return Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES;
          }
@@ -373,12 +405,12 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             this.menuElementHover = new MenuElement_Hover_v2(nElements);
          }
       });
-      menuElements.add(new Slider_BG_CNG("", CFG.PADDING * 2, tempElemH * 7 + CFG.PADDING, tempW - CFG.PADDING * 4, tempElemH - CFG.PADDING * 2, (int)(Game_Calendar.GAME_SPEED_MIN * 10.0F), (int)(Game_Calendar.GAME_SPEED_MAX * 10.0F), (int)(Game_Calendar.GAME_SPEED * 10.0F)) {
+      menuElements.add(new Slider_BG_CNG("", CFG.PADDING * 2, tempElemH * 8 + CFG.PADDING, tempW - CFG.PADDING * 4, tempElemH - CFG.PADDING * 2, (int)(Game_Calendar.GAME_SPEED_MIN * 10.0F), (int)(Game_Calendar.GAME_SPEED_MAX * 10.0F), (int)(Game_Calendar.GAME_SPEED * 10.0F)) {
          protected String getDrawText() {
             return this.getText() + this.getCurrent() * 10 + "%";
          }
       });
-      menuElements.add(new Slider_BG_CNG("", CFG.PADDING * 2, tempElemH * 8 + CFG.PADDING, tempW - CFG.PADDING * 4, tempElemH - CFG.PADDING * 2, 0, 400, (int)(Game_Calendar.AI_AGGRESSIVNESS * 100.0F)) {
+      menuElements.add(new Slider_BG_CNG("", CFG.PADDING * 2, tempElemH * 9 + CFG.PADDING, tempW - CFG.PADDING * 4, tempElemH - CFG.PADDING * 2, 0, 400, (int)(Game_Calendar.AI_AGGRESSIVNESS * 100.0F)) {
          protected String getDrawText() {
             return this.getText() + this.getCurrent() + "%";
          }
@@ -388,7 +420,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
          }
       });
       //player-led peace toggle change//
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 20, tempW, tempElemH, true, CFG.PLAYER_PEACE) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 21, tempW, tempElemH, true, CFG.PLAYER_PEACE) {
          protected boolean getCheckboxState() {
             return CFG.PLAYER_PEACE;
          }
@@ -403,7 +435,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
          }
       });
       //dynamic events toggle change//
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 21, tempW, tempElemH, true, CFG.DYNAMIC_EVENTS) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 22, tempW, tempElemH, true, CFG.DYNAMIC_EVENTS) {
          protected boolean getCheckboxState() {
             return CFG.DYNAMIC_EVENTS;
          }
@@ -418,7 +450,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
          }
       });
       //vassalization toggle change//
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 22, tempW, tempElemH, true, CFG.AI_VASSALS) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 23, tempW, tempElemH, true, CFG.AI_VASSALS) {
          protected boolean getCheckboxState() {
             return CFG.AI_VASSALS;
          }
@@ -433,7 +465,7 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
          }
       });
       //ai diplomacy toggle change//
-      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 23, tempW, tempElemH, true, CFG.AI_DIPLOMACY) {
+      menuElements.add(new Button_CNG_Options2((String)null, CFG.PADDING * 2, 0, tempElemH * 24, tempW, tempElemH, true, CFG.AI_DIPLOMACY) {
          protected boolean getCheckboxState() {
             return CFG.AI_DIPLOMACY;
          }
@@ -482,22 +514,23 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
       this.getMenuElement(4).setText(CFG.langManager.get("VictoryConditions") + ": " + CFG.langManager.get("Domination"));
       this.getMenuElement(5).setText(CFG.langManager.get("Difficulty") + ": " + CFG.getDifficultyName(CFG.DIFFICULTY));
       this.getMenuElement(6).setText(CFG.langManager.get("Fogofwar") + ": " + CFG.getFogOfWarName(CFG.FOG_OF_WAR));
-      this.getMenuElement(7).setText(CFG.langManager.get("ManageDiplomacy"));
-      this.getMenuElement(8).setText(CFG.langManager.get("FillTheMap"));
-      this.getMenuElement(9).setText(CFG.langManager.get("RandomPlacement"));
-      this.getMenuElement(10).setText(CFG.langManager.get("RandomFill"));
-      this.getMenuElement(11).setText(CFG.langManager.get("ShuffleCivilizations"));
-      this.getMenuElement(12).setText(CFG.langManager.get("SandboxMode"));
-      this.getMenuElement(13).setText(CFG.langManager.get("EternalWar"));
-      this.getMenuElement(15).setText(CFG.langManager.get("ESSM"));
-      this.getMenuElement(16).setText(CFG.langManager.get("ColonizationofWastelandProvinces"));
-      this.getMenuElement(17).setText(CFG.langManager.get("NeutralProvinces") + ": " + (Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES ? CFG.langManager.get("Colonization") : CFG.langManager.get("Conquering")));
-      this.getMenuElement(18).setText(CFG.langManager.get("GameSpeed") + ": ");
-      this.getMenuElement(19).setText(CFG.langManager.get("AIAggressiveness") + ": ");
-      this.getMenuElement(20).setText(CFG.langManager.get("PlayerPeace"));
-      this.getMenuElement(21).setText(CFG.langManager.get("DynamicEvents"));
-      this.getMenuElement(22).setText(CFG.langManager.get("AIVassalization"));
-      this.getMenuElement(23).setText(CFG.langManager.get("AIDiplomacy"));
+      this.getMenuElement(7).setText(CFG.langManager.get("Capitulation") + ": " + CFG.getCapitulationName(CFG.CAPITULATION));
+      this.getMenuElement(8).setText(CFG.langManager.get("ManageDiplomacy"));
+      this.getMenuElement(9).setText(CFG.langManager.get("FillTheMap"));
+      this.getMenuElement(10).setText(CFG.langManager.get("RandomPlacement"));
+      this.getMenuElement(11).setText(CFG.langManager.get("RandomFill"));
+      this.getMenuElement(12).setText(CFG.langManager.get("ShuffleCivilizations"));
+      this.getMenuElement(13).setText(CFG.langManager.get("SandboxMode"));
+      this.getMenuElement(14).setText(CFG.langManager.get("EternalWar"));
+      this.getMenuElement(16).setText(CFG.langManager.get("ESSM"));
+      this.getMenuElement(17).setText(CFG.langManager.get("ColonizationofWastelandProvinces"));
+      this.getMenuElement(18).setText(CFG.langManager.get("NeutralProvinces") + ": " + (Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES ? CFG.langManager.get("Colonization") : CFG.langManager.get("Conquering")));
+      this.getMenuElement(19).setText(CFG.langManager.get("GameSpeed") + ": ");
+      this.getMenuElement(20).setText(CFG.langManager.get("AIAggressiveness") + ": ");
+      this.getMenuElement(21).setText(CFG.langManager.get("PlayerPeace"));
+      this.getMenuElement(22).setText(CFG.langManager.get("DynamicEvents"));
+      this.getMenuElement(23).setText(CFG.langManager.get("AIVassalization"));
+      this.getMenuElement(24).setText(CFG.langManager.get("AIDiplomacy"));
    }
 
    protected void draw(SpriteBatch oSB, int iTranslateX, int iTranslateY, boolean sliderMenuIsActive) {
@@ -597,85 +630,89 @@ class Menu_CreateNewGame_Options_v2 extends SliderMenu {
             }
             break;
          case 7:
-            CFG.game.setActiveProvinceID(-1);
-            CFG.menuManager.rebuildManageDiplomacy_Alliances();
-            CFG.game.disableDrawCivlizationsRegions_Players();
-            CFG.chosen_AlphabetCharachter = null;
-            CFG.resetManageDiplomacyIDs();
-            CFG.backToMenu = Menu.eCREATE_NEW_GAME;
-            CFG.menuManager.setViewID(Menu.eMANAGE_DIPLOMACY);
-            Game_Render_Province.updateDrawProvinces();
-            CFG.map.getMapTouchManager().update_ExtraAction();
+            CFG.CAPITULATION = this.getMenuElement(iID).getCurrent();
+            this.getMenuElement(iID).setText(CFG.langManager.get("Capitulation") + ": " + CFG.getCapitulationName(CFG.CAPITULATION));
             break;
          case 8:
-            clickFillTheMap();
-            break;
-         case 9:
-            CFG.RANDOM_PLACMENT = !CFG.RANDOM_PLACMENT;
-            this.getMenuElement(iID).setCheckboxState(CFG.RANDOM_PLACMENT);
-            break;
-         case 10:
-            CFG.RANDOM_FILL = !CFG.RANDOM_FILL;
-            this.getMenuElement(iID).setCheckboxState(CFG.RANDOM_FILL);
-            break;
-         case 11:
-            CFG.setDialogType(Dialog.SHUFFLE_CIVILIZATIONS);
-            break;
-         case 12:
-            CFG.SANDBOX_MODE = !CFG.SANDBOX_MODE;
-            this.getMenuElement(iID).setCheckboxState(CFG.SANDBOX_MODE);
-            break;
-         case 13:
-            CFG.TOTAL_WAR_MODE = !CFG.TOTAL_WAR_MODE;
-            this.getMenuElement(iID).setCheckboxState(CFG.TOTAL_WAR_MODE);
-            if (CFG.TOTAL_WAR_MODE) {
-               CFG.toast.setInView(CFG.langManager.get("TotalWar") + " - " + CFG.langManager.get("Enabled"));
-            } else {
-               CFG.toast.setInView(CFG.langManager.get("TotalWar") + " - " + CFG.langManager.get("Disabled"));
-            }
-            break;
-         case 14:
-            CFG.menuManager.setVisible_CreateNewGame_Options_Pallets(true);
-            break;
-         case 15:
-            CFG.SPECTATOR_MODE = !CFG.SPECTATOR_MODE;
-            this.getMenuElement(iID).setCheckboxState(CFG.SPECTATOR_MODE);
-            break;
-         case 16:
-            Game_Calendar.ENABLE_COLONIZATION = !Game_Calendar.ENABLE_COLONIZATION;
-            if (Game_Calendar.ENABLE_COLONIZATION) {
-               CFG.toast.setInView(CFG.langManager.get("Colonization") + " - " + CFG.langManager.get("Enabled"));
-            } else {
-               CFG.toast.setInView(CFG.langManager.get("Colonization") + " - " + CFG.langManager.get("Disabled"));
-            }
-            break;
-         case 17:
-            Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES = !Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES;
-            this.updateLanguage();
-            CFG.toast.setInView(this.getMenuElement(iID).getText());
-            break;
-         case 18:
-            Game_Calendar.GAME_SPEED = (float)this.getMenuElement(iID).getCurrent() / 10.0F;
-            break;
-         case 19:
-            Game_Calendar.AI_AGGRESSIVNESS = (float)this.getMenuElement(iID).getCurrent() / 100.0F;
-            break;
-         case 20:
-            CFG.PLAYER_PEACE = !CFG.PLAYER_PEACE;
-            this.getMenuElement(iID).setCheckboxState(CFG.PLAYER_PEACE);
-            break;
-         case 21:
-            CFG.DYNAMIC_EVENTS = !CFG.DYNAMIC_EVENTS;
-            this.getMenuElement(iID).setCheckboxState(CFG.DYNAMIC_EVENTS);
-            break;
-         case 22:
-            CFG.AI_VASSALS = !CFG.AI_VASSALS;
-            this.getMenuElement(iID).setCheckboxState(CFG.AI_VASSALS);
-            break;
-         case 23:
-            CFG.AI_DIPLOMACY = !CFG.AI_DIPLOMACY;
-            this.getMenuElement(iID).setCheckboxState(CFG.AI_DIPLOMACY);
-            break;
+               CFG.game.setActiveProvinceID(-1);
+               CFG.menuManager.rebuildManageDiplomacy_Alliances();
+               CFG.game.disableDrawCivlizationsRegions_Players();
+               CFG.chosen_AlphabetCharachter = null;
+               CFG.resetManageDiplomacyIDs();
+               CFG.backToMenu = Menu.eCREATE_NEW_GAME;
+               CFG.menuManager.setViewID(Menu.eMANAGE_DIPLOMACY);
+               Game_Render_Province.updateDrawProvinces();
+               CFG.map.getMapTouchManager().update_ExtraAction();
+               break;
+            case 9:
+               clickFillTheMap();
+               break;
+            case 10:
+               CFG.RANDOM_PLACMENT = !CFG.RANDOM_PLACMENT;
+               this.getMenuElement(iID).setCheckboxState(CFG.RANDOM_PLACMENT);
+               break;
+            case 11:
+               CFG.RANDOM_FILL = !CFG.RANDOM_FILL;
+               this.getMenuElement(iID).setCheckboxState(CFG.RANDOM_FILL);
+               break;
+            case 12:
+               CFG.setDialogType(Dialog.SHUFFLE_CIVILIZATIONS);
+               break;
+            case 13:
+               CFG.SANDBOX_MODE = !CFG.SANDBOX_MODE;
+               this.getMenuElement(iID).setCheckboxState(CFG.SANDBOX_MODE);
+               break;
+            case 14:
+               CFG.TOTAL_WAR_MODE = !CFG.TOTAL_WAR_MODE;
+               this.getMenuElement(iID).setCheckboxState(CFG.TOTAL_WAR_MODE);
+               if (CFG.TOTAL_WAR_MODE) {
+                  CFG.toast.setInView(CFG.langManager.get("TotalWar") + " - " + CFG.langManager.get("Enabled"));
+               } else {
+                  CFG.toast.setInView(CFG.langManager.get("TotalWar") + " - " + CFG.langManager.get("Disabled"));
+               }
+               break;
+            case 15:
+               CFG.menuManager.setVisible_CreateNewGame_Options_Pallets(true);
+               break;
+            case 16:
+               CFG.SPECTATOR_MODE = !CFG.SPECTATOR_MODE;
+               this.getMenuElement(iID).setCheckboxState(CFG.SPECTATOR_MODE);
+               break;
+            case 17:
+               Game_Calendar.ENABLE_COLONIZATION = !Game_Calendar.ENABLE_COLONIZATION;
+               if (Game_Calendar.ENABLE_COLONIZATION) {
+                  CFG.toast.setInView(CFG.langManager.get("Colonization") + " - " + CFG.langManager.get("Enabled"));
+               } else {
+                  CFG.toast.setInView(CFG.langManager.get("Colonization") + " - " + CFG.langManager.get("Disabled"));
+               }
+               break;
+            case 18:
+               Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES = !Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES;
+               this.updateLanguage();
+               CFG.toast.setInView(this.getMenuElement(iID).getText());
+               break;
+            case 19:
+               Game_Calendar.GAME_SPEED = (float)this.getMenuElement(iID).getCurrent() / 10.0F;
+               break;
+            case 20:
+               Game_Calendar.AI_AGGRESSIVNESS = (float)this.getMenuElement(iID).getCurrent() / 100.0F;
+               break;
+            case 21:
+               CFG.PLAYER_PEACE = !CFG.PLAYER_PEACE;
+               this.getMenuElement(iID).setCheckboxState(CFG.PLAYER_PEACE);
+               break;
+            case 22:
+               CFG.DYNAMIC_EVENTS = !CFG.DYNAMIC_EVENTS;
+               this.getMenuElement(iID).setCheckboxState(CFG.DYNAMIC_EVENTS);
+               break;
+            case 23:
+               CFG.AI_VASSALS = !CFG.AI_VASSALS;
+               this.getMenuElement(iID).setCheckboxState(CFG.AI_VASSALS);
+               break;
+            case 24:
+               CFG.AI_DIPLOMACY = !CFG.AI_DIPLOMACY;
+               this.getMenuElement(iID).setCheckboxState(CFG.AI_DIPLOMACY);
+               break;
       }
 
    }

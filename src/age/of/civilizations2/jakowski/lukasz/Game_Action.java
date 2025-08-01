@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -413,6 +414,51 @@ class Game_Action {
         return Math.max(this.getDiplomacyPoints_BaseValue(nCivID) + this.getDiplomacyPoints_FromEnemies(nCivID) + this.getDiplomacyPoints_FromRank(nCivID) + this.getDiplomacyPoints_FromTechnology(nCivID) - DiplomacyManager.getCostOfCurrentDiplomaticActionsUpdate(nCivID), 5);
     }
 
+    protected final void updateCivDecisions(int iCivID) {
+        String sCivTag = CFG.ideologiesManager.getRealTag(CFG.game.getCiv(iCivID).getCivTag());
+        CFG.civDecision_GameData = null;
+        try {
+            String[] tagsSPLITED = null;
+            if (CFG.isDesktop()) {
+                final List<String> tempFiles = CFG.getFileNames("game/decisions/");
+                for (int i = 0, iSize = tempFiles.size(); i < iSize; ++i) {
+                    if (tempFiles.get(i).equals("Age_of_Civilizations")) {
+                        tempFiles.remove(i);
+                        break;
+                    }
+                }
+                tagsSPLITED = new String[tempFiles.size()];
+                for (int i = 0, iSize = tempFiles.size(); i < iSize; ++i) {
+                    tagsSPLITED[i] = tempFiles.get(i);
+                }
+            } else {
+                final FileHandle tempFileT = Gdx.files.internal("game/decisions/Age_of_Civilizations");
+                final String tempT = tempFileT.readString();
+                tagsSPLITED = tempT.split(";");
+            }
+
+            for (int j = 0, iSize2 = tagsSPLITED.length; j < iSize2; ++j) {
+                try {
+                    try {
+                        final FileHandle file = Gdx.files.local("game/decisions/" + tagsSPLITED[j]);
+                        CFG.civDecision_GameData = (Civ_Decision_GameData) CFG.deserialize(file.readBytes());
+                    } catch (final GdxRuntimeException ex) {
+                        final FileHandle file = Gdx.files.internal("game/decisions/" + tagsSPLITED[j]);
+                        CFG.civDecision_GameData = (Civ_Decision_GameData) CFG.deserialize(file.readBytes());
+                    }
+
+                    //if decision is applied to this civ, add to active civ decisions
+                    if (CFG.civDecision_GameData.containsCiv(sCivTag)) {
+                        CFG.game.getCiv(iCivID).civGameData.addDecision(CFG.civDecision_GameData.copy());
+                    }
+                } catch (final ClassNotFoundException | IOException | NullPointerException e) {
+                    CFG.exceptionStack(e);
+                }
+            }
+        } catch (final GdxRuntimeException ex6) {
+        }
+    }
+
     //add decisions.json decisions to all player civ leaders
     protected final void updatePlayerDecisions() {
         for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
@@ -422,12 +468,14 @@ class Game_Action {
                     for (Decision_GameData decision : CFG.gameDecisions.lDecisions) {
                         CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.addDecision(decision.copy());
                     }
+                    updateCivDecisions(CFG.game.getPlayer(i).getCivID());
                 } catch (NullPointerException | GdxRuntimeException ex) {
                     DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
 
                     for (Decision_GameData decision : CFG.gameDecisions.lDecisions) {
                         CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.addDecision(decision.copy());
                     }
+                    updateCivDecisions(CFG.game.getPlayer(i).getCivID());
                 }
             }
         }
@@ -440,20 +488,20 @@ class Game_Action {
                 try {
                     CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.clearClassViews();
 
-                    float stabFactor = (0.60F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getStability());
-                    stabFactor += (-0.90F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                    float stabFactor = (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getStability());
+                    stabFactor += (-0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
 
-                    stabFactor += (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
+                    stabFactor += (0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
                     Game_NextTurnUpdate.updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 0, stabFactor, false);
                     CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, stabFactor);
-                    stabFactor -= (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
+                    stabFactor -= (0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
 
-                    stabFactor += (-0.05F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                    stabFactor += (0.70F * ((CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods() + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments()) / 2.0F));
                     Game_NextTurnUpdate.updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 1, stabFactor, false);
                     CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, stabFactor);
-                    stabFactor -= (-0.05F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                    stabFactor -= (0.70F * ((CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods() + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments()) / 2.0F));
 
-                    stabFactor += (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods());
+                    stabFactor += (0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods());
                     Game_NextTurnUpdate.updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 2, stabFactor, false);
                     CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, stabFactor);
                 } catch (NullPointerException | GdxRuntimeException ex) {
@@ -1250,6 +1298,7 @@ class Game_Action {
                     }
 
                     CFG.game.getProvince((Integer) joinProvinces.get(i)).getPopulationData().setPopulationOfCivID(declareCivID, j);
+                    DynamicEventManager_Leader.buildUniqueLeader(declareCivID, nCivID);
                 }
 
                 CFG.game.getProvince((Integer) joinProvinces.get(i)).saveProvinceData.iNumOfRevolutions = 0;

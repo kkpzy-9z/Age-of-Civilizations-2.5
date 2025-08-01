@@ -44,7 +44,7 @@ class Game_Decisions
 
                 tempDecision.setRepeatable(tempData.Repeatable);
                 tempDecision.setGoldCost(tempData.Cost_Gold);
-                tempDecision.setDiploCost(tempData.Cost_Diplomacy * 10);
+                tempDecision.setDiploCost(tempData.Cost_Diplomacy * 10.0F);
                 tempDecision.setCostEveryTurn(tempData.Cost_Every_Turn);
 
                 tempDecision.fModifier_UpperClass = tempData.Modifier_UpperClass;
@@ -59,7 +59,7 @@ class Game_Decisions
                 tempDecision.fModifier_Research = tempData.Modifier_Research;
                 tempDecision.fModifier_MilitaryUpkeep = tempData.Modifier_MilitaryUpkeep;
                 tempDecision.fModifier_AttackBonus = tempData.Modifier_AttackBonus;
-                tempDecision.fModifier_DefenseBonus = tempData.Modifier_DefenseBonu;
+                tempDecision.fModifier_DefenseBonus = tempData.Modifier_DefenseBonus;
                 tempDecision.fModifier_MovementPoints = tempData.Modifier_MovementPoint;
 
                 this.lDecisions.add(tempDecision);
@@ -109,8 +109,8 @@ class Game_Decisions
         protected int DayAvailable;
 
         protected boolean Repeatable;
-        protected int Cost_Gold;
-        protected int Cost_Diplomacy;
+        protected float Cost_Gold;
+        protected float Cost_Diplomacy;
         protected boolean Cost_Every_Turn;
 
         protected float Modifier_UpperClass;
@@ -125,7 +125,7 @@ class Game_Decisions
         protected float Modifier_Research;
         protected float Modifier_MilitaryUpkeep;
         protected float Modifier_AttackBonus;
-        protected float Modifier_DefenseBonu;
+        protected float Modifier_DefenseBonus;
         protected float Modifier_MovementPoint;
 
         protected Data_Decisions() {

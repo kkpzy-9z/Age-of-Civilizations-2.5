@@ -34,14 +34,19 @@ class Game_NextTurnUpdate
 
                         if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).isCostEveryTurn()) {
                             CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setMoney((long) (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getMoney() - (long) CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getGoldCost()));
-                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setDiplomacyPoints(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getDiplomacyPoints() - (int) CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost());
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setDiplomacyPoints((int) (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getDiplomacyPoints() - CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getDiploCost()));
                         }
 
                         if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnsProgress() >= CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).getTurnLength()) {
                             CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).applyDecisionChange_Expired(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex));
 
+                            updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_UpperClass), true);
                             CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_UpperClass));
+
+                            updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_MiddleClass), true);
                             CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_MiddleClass));
+
+                            updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_LowerClass), true);
                             CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).fModifier_LowerClass));
 
                             if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getDecision(decIndex).isRepeatable()) {
@@ -51,7 +56,49 @@ class Game_NextTurnUpdate
                                 CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.removeDecision(decIndex);
                                 --decIndex;
                             }
-                            //CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.messageBox.addMessage(new Message_DecisionCompleted(CFG.game.getPlayer(i).getCivID(), decIndex));
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage((Message)new Message_DecisionEnd(CFG.game.getPlayer(i).getCivID(), decIndex, true));
+                        }
+                    }
+                } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                    DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
+                    CFG.gameAction.updatePlayerDecisions();
+                }
+            }
+        }
+    }
+
+    protected final void updateCivDecisions() {
+        for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
+            for (int decIndex = 0; decIndex < CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecisionsCount(); decIndex++) {
+                try {
+                    if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).getInProgress()) {
+                        CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).setTurnsProgress(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).getTurnsProgress() + 1);
+
+                        if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).isCostEveryTurn()) {
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setMoney((long) (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getMoney() - (long) CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).getGoldCost()));
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).setDiplomacyPoints((int) (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getDiplomacyPoints() - CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).getDiploCost()));
+                        }
+
+                        if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).getTurnsProgress() >= CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).getTurnLength()) {
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).applyDecisionChange_Expired(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex));
+
+                            updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).fModifier_UpperClass), true);
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).fModifier_UpperClass));
+
+                            updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).fModifier_MiddleClass), true);
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).fModifier_MiddleClass));
+
+                            updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).fModifier_LowerClass), true);
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2) + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).fModifier_LowerClass));
+
+                            if (CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).isRepeatable()) {
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).setInProgress(false);
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decIndex).setTurnsProgress(0);
+                            } else {
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.removeDecision(decIndex);
+                                --decIndex;
+                            }
+                            CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getCivilization_Diplomacy_GameData().messageBox.addMessage((Message)new Message_DecisionEnd(CFG.game.getPlayer(i).getCivID(), decIndex, false));
                         }
                     }
                 } catch (NullPointerException | IndexOutOfBoundsException ex) {
@@ -63,44 +110,43 @@ class Game_NextTurnUpdate
     }
 
     public static float adjustClassApproval(float current, float optimal) {
-        float baseFactor = 0.0025F;
+        float baseFactor = 0.005F;
         float scale = 0.0025F;
         float maxFactor = 0.01F;
 
-        baseFactor = Math.min(baseFactor + scale * Math.abs(optimal - current), maxFactor);
+        baseFactor = Math.min(baseFactor + (scale * Math.abs(optimal - current)), maxFactor);
         return current + (optimal - current) * baseFactor;
     }
 
     protected final void updateClassPerceptions() {
         for (int i = 0; i < CFG.game.getPlayersSize(); ++i) {
             try {
-                float stabFactor = (0.60F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getStability());
+                float stabFactor = (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getStability());
 
-                stabFactor += (-0.90F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                stabFactor += (-0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
 
-                stabFactor += (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
+                stabFactor += (0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
                 updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 0, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0), stabFactor), true);
                 CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(0, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(0), stabFactor));
-                stabFactor -= (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
+                stabFactor -= (0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments());
 
-                stabFactor += (-0.05F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                stabFactor += (0.70F * ((CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods() + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments()) / 2.0F));
                 updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 1, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1), stabFactor), true);
                 CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(1, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(1), stabFactor));
-                stabFactor -= (-0.05F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getTaxationLevel());
+                stabFactor -= (0.70F * ((CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods() + CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Investments()) / 2.0F));
 
-                stabFactor += (0.50F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods());
+                stabFactor += (0.70F * CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).getSpendings_Goods());
                 updateClassPerceptionBoosts(CFG.game.getPlayer(i).getCivID(), 2, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2), stabFactor), true);
                 CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.setClassViews(2, adjustClassApproval(CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.leaderData.getClassViews(2), stabFactor));
             } catch (NullPointerException | IndexOutOfBoundsException ex) {
                 DynamicEventManager_Leader.safeReplaceLeader(CFG.game.getPlayer(i).getCivID());
-                CFG.gameAction.updateClassPerceptions();
             }
         }
     }
 
     protected static float getClassPerceptionBoosts(float fChangeTo) {
         fChangeTo = Math.max(Math.min(fChangeTo, 1.00F), 0.00F);
-        return (fChangeTo - 0.5F) * 0.4F;
+        return ((fChangeTo - 0.5F) * 0.4F) * 3.0F;
     }
 
     protected static void updateClassPerceptionBoosts(final int iCivID, final int iClassID, float fChangeTo, final boolean accountForPrevValue) {
@@ -113,7 +159,7 @@ class Game_NextTurnUpdate
             switch (iClassID) {
                 case 0:
                     CFG.game.getCiv(iCivID).civGameData.fModifier_EconomyGrowth += iCalculation;
-                    CFG.game.getCiv(iCivID).civGameData.fModifier_Administration += iCalculation;
+                    CFG.game.getCiv(iCivID).civGameData.fModifier_Administration -= iCalculation;
                     return;
                 case 1:
                     CFG.game.getCiv(iCivID).civGameData.fModifier_IncomeProduction += iCalculation;

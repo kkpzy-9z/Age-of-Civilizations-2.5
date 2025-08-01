@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 class DynamicEventManager implements Serializable {
     private static final long serialVersionUID = 0L;
@@ -13,6 +14,7 @@ class DynamicEventManager implements Serializable {
     protected DynamicEventManager_CivilWar eventManagerCivilWar;
     protected DynamicEventManager_War eventManagerWar;
     protected DynamicEventManager_Leader eventManagerLeader;
+    protected DynamicEventManager_Class eventManagerClass;
     protected ArrayList<Integer> lEventIndex;
 
     protected DynamicEventManager() {
@@ -20,6 +22,7 @@ class DynamicEventManager implements Serializable {
         this.eventManagerCivilWar = new DynamicEventManager_CivilWar();
         this.eventManagerWar = new DynamicEventManager_War();
         this.eventManagerLeader = new DynamicEventManager_Leader();
+        this.eventManagerClass = new DynamicEventManager_Class();
         this.lEventIndex = new ArrayList<Integer>();
     }
 
@@ -35,6 +38,7 @@ class DynamicEventManager implements Serializable {
         this.eventManagerWar.invokeWarEvents();
         this.eventManagerEconomy.invokeEconomicEvents();
         this.eventManagerLeader.invokeLeaderEvents();
+        this.eventManagerClass.invokeClassEvents();
         //etc etc
     }
 
@@ -57,7 +61,9 @@ class DynamicEventManager implements Serializable {
     }
 
     protected float randomF(float max, float min, boolean round) {
-        return (float)(round ? Math.round((Math.random() * max) + min) : (Math.random() * max) + min);
+        //if round is false, min inclusive, max exclusive
+        //otherwise both inclusive bc rounding
+        return (float)(round ? Math.round((Math.random() * (max - min)) + min) : (Math.random() * (max - min)) + min);
     }
 
     protected final void clearData() {

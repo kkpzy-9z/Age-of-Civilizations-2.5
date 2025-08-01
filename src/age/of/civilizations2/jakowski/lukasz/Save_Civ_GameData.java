@@ -105,9 +105,40 @@ class Save_Civ_GameData implements Serializable {
    protected List<Civilization_Friends_GameData> lFriendlyCivs = new ArrayList<Civilization_Friends_GameData>();
    protected List<Civilization_SentMessages> lSentMessages = new ArrayList<Civilization_SentMessages>();
    protected List<Civ_Gift_GameData> lGifts_Received = new ArrayList<Civ_Gift_GameData>();
+   private final List<Civ_Decision_GameData> civDecisions = new ArrayList<>();
 
    //trade boolean change//
    protected boolean hasSentTrade = false;
+
+   protected final Decision_GameData getDecision(int index) {
+      if (index < 0 || index >= this.civDecisions.size()) return null;
+      return this.civDecisions.get(index);
+   }
+
+   protected final Decision_GameData getDecisionByName(String name) {
+      for (Decision_GameData d : this.civDecisions) {
+         if (d.getName().equals(name)) return d;
+      }
+      return null;
+   }
+
+   protected final int getDecisionsCount() {
+      return this.civDecisions.size();
+   }
+
+   protected final void addDecision(final Civ_Decision_GameData decision) {
+      if (decision == null) return;
+      this.civDecisions.add(decision);
+   }
+
+   protected final void removeDecision(int index) {
+      if (index < 0 || index >= this.civDecisions.size()) return;
+      this.civDecisions.remove(index);
+   }
+
+   protected final void clearDecisions() {
+      this.civDecisions.clear();
+   }
 
    protected final void addGift_Received(int iCivID) {
       for(int i = this.lGifts_Received.size() - 1; i >= 0; --i) {

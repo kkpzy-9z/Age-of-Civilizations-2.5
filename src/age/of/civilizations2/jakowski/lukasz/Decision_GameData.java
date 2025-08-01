@@ -37,8 +37,8 @@ public class Decision_GameData implements Serializable {
         this.sName = "";
         this.sDesc = "";
         this.Year = -9999;
-        this.Month = 0;
-        this.Day = 0;
+        this.Month = 1;
+        this.Day = 1;
         this.progress = 0;
         this.turnLength = 10;
         this.inProgress = false;
@@ -73,7 +73,7 @@ public class Decision_GameData implements Serializable {
     }
 
     protected final String getDesc() {
-        return this.sDesc;
+        return CFG.langManager.get(this.sDesc);
     }
 
     protected final void setDesc(final String sDesc) {
@@ -93,7 +93,7 @@ public class Decision_GameData implements Serializable {
     }
 
     protected final void setGoldCost(final float goldCost) {
-        this.goldCost = Math.max(0.0f, goldCost);
+        this.goldCost = goldCost;
     }
 
     protected final float getDiploCost() {
@@ -101,7 +101,7 @@ public class Decision_GameData implements Serializable {
     }
 
     protected final void setDiploCost(final float diploCost) {
-        this.diploCost = Math.max(0.0f, diploCost);
+        this.diploCost = diploCost;
     }
 
     protected final boolean isCostEveryTurn() {
@@ -175,7 +175,7 @@ public class Decision_GameData implements Serializable {
         return true;
     }
 
-    protected final Decision_GameData copy() {
+    protected Decision_GameData copy() {
         Decision_GameData d = new Decision_GameData();
         d.sName = this.sName;
         d.sDesc = this.sDesc;

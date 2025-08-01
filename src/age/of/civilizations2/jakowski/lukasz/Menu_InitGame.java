@@ -127,6 +127,8 @@ extends SliderMenu {
                     CFG.gameAutonomy = new Game_Autonomy();
                     //new decisions load
                     CFG.gameDecisions = new Game_Decisions();
+                    //new event settings load
+                    CFG.gameEvents = new Game_Events();
                     CFG.plagueManager = new PlagueManager();
                     ++this.iStepID;
                     break block50;
@@ -549,6 +551,7 @@ extends SliderMenu {
                     CFG.reportData.lDefenders_ArmiesLost.add(0);
                     CFG.map.load_DeleteStatusFile();
                     CFG.FOG_OF_WAR = 2;
+                    CFG.CAPITULATION = 1;
                     if (CFG.settingsManager.LANGUAGE_TAG == null) {
                         CFG.backToMenu = Menu.eMAINMENU;
                         CFG.menuManager.setViewID(Menu.eSELECT_LANGUAGE);

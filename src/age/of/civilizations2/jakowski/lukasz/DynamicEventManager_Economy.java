@@ -14,37 +14,35 @@ class DynamicEventManager_Economy implements Serializable {
     protected int CRASH_SCANAT = -1;
     protected int MIRACLE_SCANAT = -1;
     protected int PLAYER_SCANAT = -1;
-    private final int TURNS_LOWER_BOUND = 15;
-    private final int TURNS_UPPER_BOUND = 35;
-    private final int SCAN_TOPECONOMIES = 10;
-    private final float CRASH_INVESTMENT_BUFFER = 0.25f;
-    private final float MIRACLE_INVESTMENT_BUFFER = 0.25f;
-    private final float CRASH_RIPPLE_INVESTMENT_BUFFER = 0.035f; //increase this (rn doesn't give any crash-bordering nations a chance)
-    private final float MIRACLE_RIPPLE_INVESTMENT_BUFFER = 0.035f; //increase this (rn gives any miracle-bordering nations too much chance)
-    private final float CRASH_INVESTMENT_THRESHOLD = 0.25f; //decrease this (too many crash events)
-    private final float MIRACLE_INVESTMENT_THRESHOLD = 0.1f; //increase this (too many miracle events)
-    private final int CRASH_ECONOMY_DECREASE = 15;
-    private final int CRASH_ECONOMY_RIPPLE_DECREASE = 15;
-    private final int CRASH_ECONOMY_RIPPLE_MIN = 5;
-    private final int MIRACLE_ECONOMY_INCREASE = 15;
-    private final int MIRACLE_ECONOMY_RIPPLE_INCREASE = 15;
-    private final int MIRACLE_ECONOMY_RIPPLE_MIN = 5;
-    private int currentTurn = -1;
+    protected static int TURNS_LOWER_BOUND = 35;
+    protected static int TURNS_UPPER_BOUND = 50;
+    protected static int SCAN_TOPECONOMIES = 10;
+    protected static float CRASH_INVESTMENT_BUFFER = 0.25f;
+    protected static float MIRACLE_INVESTMENT_BUFFER = 0.25f;
+    protected static float CRASH_RIPPLE_INVESTMENT_BUFFER = 0.035f; //increase this (rn doesn't give any crash-bordering nations a chance)
+    protected static float MIRACLE_RIPPLE_INVESTMENT_BUFFER = 0.035f; //increase this (rn gives any miracle-bordering nations too much chance)
+    protected static float CRASH_INVESTMENT_THRESHOLD = 0.25f; //decrease this (too many crash events)
+    protected static float MIRACLE_INVESTMENT_THRESHOLD = 0.1f; //increase this (too many miracle events)
+    protected static int CRASH_ECONOMY_DECREASE = 15;
+    protected static int CRASH_ECONOMY_RIPPLE_DECREASE = 15;
+    protected static int CRASH_ECONOMY_RIPPLE_MIN = 5;
+    protected static int MIRACLE_ECONOMY_INCREASE = 15;
+    protected static int MIRACLE_ECONOMY_RIPPLE_INCREASE = 15;
+    protected static int MIRACLE_ECONOMY_RIPPLE_MIN = 5;
     protected Event_GameData event_lastturn;
     protected ArrayList<Integer> lRippleEffectCivs;
 
     protected void invokeEconomicEvents() {
-        currentTurn = CFG.game.getPlayer(CFG.PLAYER_TURNID).statistics_Civ_GameData.getTurns();
         //onstart set first scan dates
         if (CRASH_SCANAT == -1 || MIRACLE_SCANAT == -1 || PLAYER_SCANAT == -1) {
-            CRASH_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
-            MIRACLE_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
-            PLAYER_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
-            Gdx.app.log("AoC2.5", "Scans C M P: " + (CRASH_SCANAT - currentTurn) + " " + (MIRACLE_SCANAT - currentTurn) + " " + (PLAYER_SCANAT - currentTurn));
+            CRASH_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            MIRACLE_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            PLAYER_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            Gdx.app.log("AoC2.5", "Scans C M P: " + (CRASH_SCANAT - Game_Calendar.TURN_ID) + " " + (MIRACLE_SCANAT - Game_Calendar.TURN_ID) + " " + (PLAYER_SCANAT - Game_Calendar.TURN_ID));
         }
 
         //detect if event fired last turn, if so randomly create "ripple" effect
-        if (event_lastturn != null && (event_lastturn.getFired() - currentTurn == -1)) {
+        if (event_lastturn != null && (event_lastturn.getFired() - Game_Calendar.TURN_ID == -1)) {
             lRippleEffectCivs = new ArrayList<Integer>();
             if (Objects.equals(event_lastturn.getEventTag(), "eventCrash")) {
                 //sort through crashing civ's bordering civilizations
@@ -136,29 +134,29 @@ class DynamicEventManager_Economy implements Serializable {
         }
 
         //SAFECHECKS
-        boolean crs = CRASH_SCANAT == currentTurn;
-        boolean mir = MIRACLE_SCANAT == currentTurn;
-        boolean ply = PLAYER_SCANAT == currentTurn;
+        boolean crs = CRASH_SCANAT == Game_Calendar.TURN_ID;
+        boolean mir = MIRACLE_SCANAT == Game_Calendar.TURN_ID;
+        boolean ply = PLAYER_SCANAT == Game_Calendar.TURN_ID;
         //if ripple effect this turn
-        if (event_lastturn != null && event_lastturn.getFired() == currentTurn) {
+        if (event_lastturn != null && event_lastturn.getFired() == Game_Calendar.TURN_ID) {
             if (crs) {
-                CRASH_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                CRASH_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                 Gdx.app.log("AoC2.5", "Random Turn Conflict Delayed Crash");
                 crs = false;
             }
             if (mir) {
-                MIRACLE_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                MIRACLE_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                 Gdx.app.log("AoC2.5", "Random Turn Conflict Delayed Miracle");
                 mir = false;
             }
             if (ply) {
-                PLAYER_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                PLAYER_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                 Gdx.app.log("AoC2.5", "Random Turn Conflict Delayed Player");
                 ply = false;
             }
         //if player and some other, delay player
         } else if ((crs && ply) || (mir && ply)) {
-            PLAYER_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            PLAYER_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
             Gdx.app.log("AoC2.5", "Random Turn Conflict Delayed Player");
             ply = false;
         }
@@ -166,16 +164,16 @@ class DynamicEventManager_Economy implements Serializable {
         if (crs && mir) {
             if ((int)Math.round(Math.random()) == 1) {
                 //delay crash
-                CRASH_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                CRASH_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                 Gdx.app.log("AoC2.5", "Random Turn Conflict Delayed Crash");
             } else {
                 //delay miracle
-                MIRACLE_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                MIRACLE_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                 Gdx.app.log("AoC2.5", "Random Turn Conflict Delayed Miracle");
             }
         }
 
-        if (currentTurn == CRASH_SCANAT) {
+        if (Game_Calendar.TURN_ID == CRASH_SCANAT) {
             Gdx.app.log("AoC2.5", "Scanning Crash");
 
             //get list of top 10 ecos to scan through, then randomize it
@@ -197,14 +195,14 @@ class DynamicEventManager_Economy implements Serializable {
                     CRASH_CIV = tCivID;
                     invokeCrashEvent();
 
-                    CRASH_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                    CRASH_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                     break;
                 }
             }
 
             topEconomiesList.clear();
             topEcoRandomCivs.clear();
-        } else if (currentTurn == MIRACLE_SCANAT) {
+        } else if (Game_Calendar.TURN_ID == MIRACLE_SCANAT) {
             Gdx.app.log("AoC2.5", "Scanning Miracle");
 
             //get list of top 10 ecos to scan through, then randomize it old table method
@@ -226,7 +224,7 @@ class DynamicEventManager_Economy implements Serializable {
                     MIRACLE_CIV = tCivID;
                     invokeMiracleEvent();
 
-                    MIRACLE_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+                    MIRACLE_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
                     break;
                 }
             }
@@ -235,7 +233,7 @@ class DynamicEventManager_Economy implements Serializable {
         }
 
         //only scan player if no other event
-        if (currentTurn == PLAYER_SCANAT) {
+        if (Game_Calendar.TURN_ID == PLAYER_SCANAT) {
             Gdx.app.log("AoC2.5", "Scanning Player");
             int plyCivID = CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID();
             float randBufferM = CFG.dynamicEventManager.randomF(MIRACLE_INVESTMENT_BUFFER, 0, false);
@@ -271,7 +269,7 @@ class DynamicEventManager_Economy implements Serializable {
                     invokeMiracleEvent();
                 }
             }
-            PLAYER_SCANAT = currentTurn + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            PLAYER_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
         }
     }
 
@@ -374,7 +372,7 @@ class DynamicEventManager_Economy implements Serializable {
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;
-        event_lastturn.setFired(currentTurn);
+        event_lastturn.setFired(Game_Calendar.TURN_ID);
     }
 
     protected void invokeCrashRipple() {
@@ -492,7 +490,7 @@ class DynamicEventManager_Economy implements Serializable {
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;
-        event_lastturn.setFired(currentTurn);
+        event_lastturn.setFired(Game_Calendar.TURN_ID);
     }
 
     protected void invokeMiracleEvent() {
@@ -566,7 +564,7 @@ class DynamicEventManager_Economy implements Serializable {
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;
-        event_lastturn.setFired(currentTurn);
+        event_lastturn.setFired(Game_Calendar.TURN_ID);
     }
 
     protected void invokeMiracleRipple() {
@@ -684,7 +682,7 @@ class DynamicEventManager_Economy implements Serializable {
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;
-        event_lastturn.setFired(currentTurn);
+        event_lastturn.setFired(Game_Calendar.TURN_ID);
     }
 }
 

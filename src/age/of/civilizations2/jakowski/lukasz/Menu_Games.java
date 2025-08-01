@@ -166,6 +166,7 @@ class Menu_Games extends SliderMenu {
          CFG.FOG_OF_WAR = 2;
       }
 
+      CFG.CAPITULATION = 1;
       CFG.SANDBOX_MODE = false;
       CFG.RANDOM_PLACMENT = false;
       CFG.RANDOM_FILL = false;
@@ -193,6 +194,7 @@ class Menu_Games extends SliderMenu {
       Game_Calendar.ENABLE_COLONIZATION = false;
       Game_Calendar.ENABLE_COLONIZATION_NEUTRAL_PROVINCES = false;
       CFG.FOG_OF_WAR = 2;
+      CFG.CAPITULATION = 1;
 
       for(int i = 0; i < CFG.game.getProvincesSize(); ++i) {
          if (!CFG.game.getProvince(i).getSeaProvince()) {

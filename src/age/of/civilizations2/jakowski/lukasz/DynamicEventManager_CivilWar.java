@@ -13,13 +13,14 @@ class DynamicEventManager_CivilWar implements Serializable {
     protected ArrayList<Integer> lCivilWarCivsOldGov;
     protected ArrayList<Integer> lCivilWarAggressors;
     protected ArrayList<Integer> lCivilWarDefenders;
-    protected final float MAX_ARMY_DISSENTERS = 0.75F;
-    protected final float MIN_ARMY_DISSENTERS = 0.35F;
-    protected final float MAX_ARMY_DISSENTERS_BUFFER = 0.35F;
-    protected final float MIN_ARMY_DISSENTERS_BUFFER = 0.15F;
-    protected final float MAX_TREASURY_TRANSFER = 0.75F;
-    protected final float MIN_TREASURY_TRANSFER = 0.35F;
-    protected final int MIN_PROVINCES_WAR = 5;
+    protected static float MAX_ARMY_DISSENTERS = 0.75F;
+    protected static float MIN_ARMY_DISSENTERS = 0.35F;
+    protected static float MAX_ARMY_DISSENTERS_BUFFER = 0.35F;
+    protected static float MIN_ARMY_DISSENTERS_BUFFER = 0.15F;
+    protected static float MAX_TREASURY_TRANSFER = 0.75F;
+    protected static float MIN_TREASURY_TRANSFER = 0.35F;
+    protected static float MAX_PERC_PROVINCES_TO_TAKE = 0.50F;
+    protected static int MIN_PROVINCES_WAR = 5;
     protected DynamicEventManager_CivilWar() {
         lChangingCivs = new ArrayList<>();
         lChangingCivsOldGov = new ArrayList<>();
@@ -169,6 +170,7 @@ class DynamicEventManager_CivilWar implements Serializable {
     protected void invokeCivilWar(int nCivID, int oldGovType) {
         try {
             //sort through every province of civ splitting
+            int maxProvinces = (int) (CFG.game.getCiv(nCivID).getNumOfProvinces() * MAX_PERC_PROVINCES_TO_TAKE);
             ArrayList<Integer> tempProvinces = new ArrayList<>(CFG.game.getCiv(nCivID).lProvincesWithLowStability);
             for (int i = 0; i < CFG.game.getCiv(nCivID).getNumOfProvinces(); i++) {
                 //if capital or in list already, skip
@@ -178,6 +180,8 @@ class DynamicEventManager_CivilWar implements Serializable {
                 if ((int)Math.round(Math.random()) == 1) {
                     tempProvinces.add(CFG.game.getCiv(nCivID).getProvinceID(i));
                 }
+
+                if (tempProvinces.size() > maxProvinces) break;
             }
 
             //sort through every army of civilization getting split
@@ -275,14 +279,8 @@ class DynamicEventManager_CivilWar implements Serializable {
             if ((int)(Math.ceil(Math.random() * (2))) == 1) {
                 CFG.dynamicEventManager.eventManagerLeader.invokeCivilWarLeaderChange(nCivID, iNewCivID);
             } else {
-                //try 10 times to randomize leader and find one that is not original
-                for (int i = 0; i < 10; i++) {
-                    DynamicEventManager_Leader.buildRandomLeader(iNewCivID);
-                    if (!CFG.game.getCiv(iNewCivID).civGameData.leaderData.getName().equals(CFG.game.getCiv(nCivID).civGameData.leaderData.getName())) {
-                        break;
-                    }
-                }
-
+                //try 5 times to randomize leader and find one that is not original
+                DynamicEventManager_Leader.buildUniqueLeader(iNewCivID, nCivID);
             }
 
             //reload for ui

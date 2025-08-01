@@ -16,7 +16,7 @@ class DynamicEventManager_War implements Serializable {
     protected ArrayList<Integer> lCTAsFrom;
     protected ArrayList<Integer> lCaps;
     protected ArrayList<Integer> lCappedCivs;
-    private final int SCAN_TOPCIVILIZATIONS = 12;
+    protected static int SCAN_TOPCIVILIZATIONS = 12;
     protected DynamicEventManager_War() {
         lPlayerWars = new ArrayList<String>();
         lLargeWars = new ArrayList<String>();
@@ -30,8 +30,8 @@ class DynamicEventManager_War implements Serializable {
         //If already event from this same civ scenario skip
         if (lCTAsFrom.contains(iFromCivID) || iFromCivID == CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()) return;
 
-        //if one of the top civs in prestige, not player, and has been met
-        if (topPrestige().indexOf(iCivID) < SCAN_TOPCIVILIZATIONS && iCivID != CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() && CFG.game.getPlayer(CFG.PLAYER_TURNID).getMetCivilization(iCivID)) {
+        //if BOTH of the top civs in prestige, not player, and has been met
+        if ((topPrestige().indexOf(iCivID) < (SCAN_TOPCIVILIZATIONS * 2) && topPrestige().indexOf(iFromCivID) < SCAN_TOPCIVILIZATIONS) && iCivID != CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() && CFG.game.getPlayer(CFG.PLAYER_TURNID).getMetCivilization(iCivID)) {
             //add to CTAs turn index
             lCTAs.add(iCivID);
             lCTAsFrom.add(iFromCivID);
@@ -43,7 +43,7 @@ class DynamicEventManager_War implements Serializable {
         if (lCappedCivs.contains(iCapCivID) || iCapCivID == CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() || CFG.dynamicEventManager.eventManagerCivilWar.inCivilWar(iCapCivID)) return;
 
         //if one of the top civs in prestige, and has been met (or is player)
-        if (topPrestige().indexOf(iCapCivID) < SCAN_TOPCIVILIZATIONS && (CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() == iCivID || CFG.game.getPlayer(CFG.PLAYER_TURNID).getMetCivilization(iCivID))) {
+        if ((topPrestige().indexOf(iCapCivID) < SCAN_TOPCIVILIZATIONS || topPrestige().indexOf(iCivID) < SCAN_TOPCIVILIZATIONS) && (CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID() == iCivID || CFG.game.getPlayer(CFG.PLAYER_TURNID).getMetCivilization(iCivID))) {
             //add to CTAs turn index
             lCaps.add(iCivID);
             lCappedCivs.add(iCapCivID);

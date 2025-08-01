@@ -81,7 +81,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
     private static final int DEFAULT_SCROLL = 15;
     private int iScroll;
     private long lScrollTime;
-    
+
     public AoCGame(final LinkHandler nLinkHandler) {
         this.touch = new Touch();
         this.iNumOfFPS = 0;
@@ -346,7 +346,14 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
         AoCGame.shaderAlpha2.setUniformf("u_maskScale", 20.0f);
         AoCGame.shaderAlpha2.setUniformf("u_maskOffset", 0.0f, 0.0f);
         final String defaultFragment = Gdx.files.internal("game/shader/default_fragment.glsl").readString();
-        final String extraFragment = Gdx.files.internal("game/shader/twopointfive_fragment.glsl").readString();
+
+        String extraFragment;
+        try {
+            extraFragment = Gdx.files.internal("game/shader/twopointfive_fragment.glsl").readString();
+        } catch (GdxRuntimeException | NullPointerException ex) {
+            extraFragment = Gdx.files.internal("game/shader/default_fragment.glsl").readString();
+        }
+
         final String blackWhiteFragment = Gdx.files.internal("game/shader/blackWhite_fragment.glsl").readString();
         final String nextPlayerTurnFragment = Gdx.files.internal("game/shader/nextPlayerTurn_fragment.glsl").readString();
         AoCGame.defaultShader = new ShaderProgram(defaultVertex, defaultFragment);
@@ -500,6 +507,7 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
             }
         }
         else {
+            //this is such a terrible method but whatever
             if (introShown > 0) {
                 try {
                     float alpha;
@@ -940,6 +948,10 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
     public boolean keyDown(final int keycode) {
         try {
             CFG.setRender_3(true);
+            //skip intro w space
+            if (introShown > 0 && keycode == 62) {
+                introShown = -1;
+            }
             if (!CFG.menuManager.getKeyboard().getVisible()) {
                 if (CFG.editorManager.keyDown(keycode)) {
                     return true;

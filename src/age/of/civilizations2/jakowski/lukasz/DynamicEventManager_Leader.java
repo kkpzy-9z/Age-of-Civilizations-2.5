@@ -8,27 +8,77 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import static age.of.civilizations2.jakowski.lukasz.CFG.PLAYER_TURNID;
+
 public class DynamicEventManager_Leader implements Serializable {
     private static final long serialVersionUID = 0L;
     private static int currentAge = -1;
-    private static int currentTurn = -1;
     private static int currentScenario = -1;
     protected Event_GameData event_lastturn;
+    private static int TIME_OF_RULE_WHEN_REPLACABLE = 30;
     final static int MAXIMUM_TIME_OF_RULE = 75;
     final static int MINIMUM_TIME_OF_RULE = 10;
+    protected static int TURNS_UPPER_BOUND = 25;
+    protected static int TURNS_LOWER_BOUND = 17;
+    protected int PLAYER_SCANAT = -1;
 
     DynamicEventManager_Leader() {
         //cacheLeaders();
     }
 
     protected void invokeLeaderEvents() {
-        currentTurn = CFG.game.getPlayer(CFG.PLAYER_TURNID).statistics_Civ_GameData.getTurns();
+        //onstart set first scan dates, archive class perceptions
+        if (this.PLAYER_SCANAT == -1) {
+            this.PLAYER_SCANAT = Game_Calendar.TURN_ID + (int)CFG.dynamicEventManager.randomF(TURNS_UPPER_BOUND, TURNS_LOWER_BOUND, true);
+            try {
+                CFG.game.getCiv(CFG.game.getPlayer(PLAYER_TURNID).getCivID()).civGameData.leaderData.getName();
+            } catch (NullPointerException ex) {
+                //build leader
+                if (!DynamicEventManager_Leader.buildRandomLeader(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID(), true)) {
+                    DynamicEventManager_Leader.buildPlaceholderLeader(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+                }
+            }
 
-        if (currentTurn == 1 && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData != null
-            && CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.isRandom()) {
-            this.invokeInitLeaderEvent();
+            switch (CFG.ideologiesManager.getIdeology(CFG.game.getCiv(CFG.game.getPlayer(PLAYER_TURNID).getCivID()).getIdeologyID()).AI_TYPE.toLowerCase()) {
+                //ideally this should be changed to be a property in each respective aitype's behaviour class
+                case "default":
+                case "fascism":
+                case "communism":
+                    TIME_OF_RULE_WHEN_REPLACABLE = 50;
+                    break;
+                case "democracy":
+                case "horde":
+                case "uncivilized":
+                    TIME_OF_RULE_WHEN_REPLACABLE = 20;
+                    break;
+            }
         }
 
+        if (Game_Calendar.TURN_ID >= PLAYER_SCANAT) {
+            if (CFG.game.getCiv(CFG.game.getPlayer(PLAYER_TURNID).getCivID()).civGameData.leaderData.isRandom()) {
+                int classEvent = -1;
+                //pick class that has changed the most since archived (regardless of direction)
+                for (int i = 0; i < 3; i++) {
+                    if (classEvent == -1 || CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(i) < CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(classEvent)) {
+                        classEvent = i;
+                    }
+                }
+
+                if (CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(classEvent) <= DynamicEventManager_Class.UNREST_MAX_APPROVAL) {
+                    float classPerc = CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getClassViews(classEvent);
+                    if ((CFG.dynamicEventManager.randomF((int)((classPerc/DynamicEventManager_Class.UNREST_MAX_APPROVAL) * 10.0F), 0, true)) == 0.0F) {
+                        invokeAssassinEvent(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID());
+                        return;
+                    }
+                }
+            }
+
+            if (Game_Calendar.currentYear - CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getYear() >= TIME_OF_RULE_WHEN_REPLACABLE) {
+                //potentially invoke leader change event
+            }
+
+            //add other leader change events like meetings, scandals, etc
+        }
     }
 
     private static LinkedHashMap<String, Leader_Random_GameData> leaderCache = new LinkedHashMap<>();
@@ -138,17 +188,40 @@ public class DynamicEventManager_Leader implements Serializable {
 
     protected static void buildPlaceholderLeader(int iCivID) {
          CFG.game.getCiv(iCivID).civGameData.leaderData = new LeaderOfCiv_GameData();
+         CFG.game.getCiv(iCivID).civGameData.leaderData.setRandom(true);
          CFG.game.getCiv(iCivID).civGameData.leaderData.setName(CFG.langManager.get("Leader" + " " + CFG.langManager.get("Of") + " " + CFG.game.getCiv(iCivID).getCivName()));
          CFG.game.getCiv(iCivID).civGameData.leaderData.setYear(Game_Calendar.currentYear - (int) (Math.random() * DynamicEventManager_Leader.MAXIMUM_TIME_OF_RULE));
          CFG.game.getCiv(iCivID).civGameData.leaderData.setMonth(Math.abs(Game_Calendar.currentMonth - (int) (Math.random() * 12)));
          CFG.game.getCiv(iCivID).civGameData.leaderData.setDay(Math.abs(Game_Calendar.currentDay - (int) (Math.random() * 28)));
     }
 
+    protected static void buildUniqueLeader(int iCivID) {
+        buildUniqueLeader(iCivID, iCivID);
+    }
+
+    protected static void buildUniqueLeader(int iCivID, int iCivID2) {
+        //try 5 times
+        for (int i = 0; i < 5; i++) {
+            boolean leader = DynamicEventManager_Leader.buildRandomLeader(iCivID);
+            if (!leader) {
+                DynamicEventManager_Leader.buildPlaceholderLeader(iCivID);
+                break;
+            }
+            if (!CFG.game.getCiv(iCivID).civGameData.leaderData.getName().equals(CFG.game.getCiv(iCivID2).civGameData.leaderData.getName())) {
+                break;
+            }
+        }
+    }
+
     protected static boolean buildRandomLeader(int iCivID) {
-        return buildRandomLeader(iCivID, false);
+        return buildRandomLeader(iCivID, false, false);
     }
 
     protected static boolean buildRandomLeader(int iCivID, boolean atStartGame) {
+        return buildRandomLeader(iCivID, false, false);
+    }
+
+    protected static boolean buildRandomLeader(int iCivID, boolean atStartGame, boolean rebel) {
         if (CFG.game.getCiv(iCivID).getNumOfProvinces() < 1) return false;
         if (currentAge != CFG.gameAges.getAgeOfYear(Game_Calendar.currentYear) || currentScenario != CFG.game.getScenarioID()) {
             cacheLeaders();
@@ -171,7 +244,7 @@ public class DynamicEventManager_Leader implements Serializable {
             for (String leaderKey : leaderCache.keySet()) {
                 CFG.leader_Random_GameData = leaderCache.get(leaderKey);
                 if ((CFG.leader_Random_GameData.containsCiv(sContName) || CFG.leader_Random_GameData.containsCiv("All")) &&
-                   (CFG.leader_Random_GameData.containsAIType(CFG.ideologiesManager.getIdeology(CFG.game.getCiv(iCivID).getIdeologyID()).AI_TYPE) || CFG.leader_Random_GameData.containsAIType("All")) &&
+                   ((rebel && CFG.leader_Random_GameData.containsAIType("REBELS")) || CFG.leader_Random_GameData.containsAIType(CFG.ideologiesManager.getIdeology(CFG.game.getCiv(iCivID).getIdeologyID()).AI_TYPE) || CFG.leader_Random_GameData.containsAIType("All")) &&
                    (CFG.leader_Random_GameData.getLeaderOfCiv().canAppearNaturally() || !atStartGame)) {
 
                     CFG.game.getCiv(iCivID).civGameData.setLeader(CFG.leader_Random_GameData.getLeaderOfCiv());
@@ -201,7 +274,6 @@ public class DynamicEventManager_Leader implements Serializable {
             }
 
         } catch (GdxRuntimeException e) {
-            // Optionally log error
         }
         return false;
     }
@@ -255,7 +327,7 @@ public class DynamicEventManager_Leader implements Serializable {
                 CFG.langManager.get(String.format("EventCivilWarNameLeader_" + (int)(Math.ceil(Math.random() * (3)))), eventOutcomeChangeLeader.iValue.getName()),
                 "EventCivilWarLeader_" + (int)(Math.ceil(Math.random() * (3))),
                 "eventCivilWarLeader",
-                CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()
+                CFG.game.getPlayer(PLAYER_TURNID).getCivID()
         );
         eventGameData.setup_EventPopUp(
                 true,
@@ -271,25 +343,25 @@ public class DynamicEventManager_Leader implements Serializable {
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;
-        event_lastturn.setFired(currentTurn);
+        event_lastturn.setFired(Game_Calendar.TURN_ID);
     }
 
     protected void invokeInitLeaderEvent() {
-        String civRef = CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).getCivName();
+        String civRef = CFG.game.getCiv(CFG.game.getPlayer(PLAYER_TURNID).getCivID()).getCivName();
         Event_GameData eventGameData = new Event_GameData();
         Event_Outcome_ChangeLeader eventOutcomeChangeLeader = new Event_Outcome_ChangeLeader();
         Event_Conditions_CivExist eventConditionsCivExist = new Event_Conditions_CivExist();
 
-        eventOutcomeChangeLeader.iCivID = CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID();
-        eventOutcomeChangeLeader.iValue.setName(CFG.game.getCiv(CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()).civGameData.leaderData.getName());
+        eventOutcomeChangeLeader.iCivID = CFG.game.getPlayer(PLAYER_TURNID).getCivID();
+        eventOutcomeChangeLeader.iValue.setName(CFG.game.getCiv(CFG.game.getPlayer(PLAYER_TURNID).getCivID()).civGameData.leaderData.getName());
         eventOutcomeChangeLeader.bIsLeaderChange = false; //no leader change, just ouput
-        eventConditionsCivExist.iCivID = CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID();
+        eventConditionsCivExist.iCivID = CFG.game.getPlayer(PLAYER_TURNID).getCivID();
 
         eventGameData.setup_Event(
                 CFG.langManager.get(String.format("EventMiracleNamePlayer_" + (int)(Math.ceil(Math.random() * (2))))),
                 "EventMiracle_" + (int)(Math.ceil(Math.random() * (5))),
                 "eventMiracle",
-                CFG.game.getPlayer(CFG.PLAYER_TURNID).getCivID()
+                CFG.game.getPlayer(PLAYER_TURNID).getCivID()
         );
         eventGameData.setup_EventPopUp(
                 true,
@@ -305,6 +377,69 @@ public class DynamicEventManager_Leader implements Serializable {
 
         CFG.dynamicEventManager.addEventIndex(eventGameData);
         event_lastturn = eventGameData;
-        event_lastturn.setFired(currentTurn);
+        event_lastturn.setFired(Game_Calendar.TURN_ID);
+    }
+
+    protected void invokeAssassinEvent(int iCivID) {
+        Event_GameData eventGameData = new Event_GameData();
+
+        String leaderRef = CFG.game.getCiv(iCivID).civGameData.leaderData.getName();
+        buildUniqueLeader(iCivID);
+        CFG.gameAction.updateClassPerceptions();
+        CFG.gameAction.updatePlayerDecisions();
+
+        Event_Outcome_ChangeLeader eventOutcomeChangeLeader = new Event_Outcome_ChangeLeader();
+        eventOutcomeChangeLeader.setCivID(iCivID);
+        LeaderOfCiv_GameData placeholderLeader = new LeaderOfCiv_GameData();
+        if (leaderRef.equals(CFG.game.getCiv(iCivID).civGameData.leaderData.getName())) {
+            placeholderLeader.setName(CFG.langManager.get("InterimLeader"));
+        } else {
+            placeholderLeader.setName(CFG.game.getCiv(iCivID).civGameData.leaderData.getName());
+        }
+        eventOutcomeChangeLeader.setLeader(placeholderLeader);
+        eventOutcomeChangeLeader.bIsLeaderChange = false;
+
+        Event_Outcome_UpdateHappinessOfCiv eventOutcomeUpdateHappinessOfCiv = new Event_Outcome_UpdateHappinessOfCiv();
+        eventOutcomeUpdateHappinessOfCiv.setCivID(iCivID);
+        eventOutcomeUpdateHappinessOfCiv.setValue(-25);
+
+        Event_Outcome_UpdatePopulation eventOutcomeUpdatePopulation = new Event_Outcome_UpdatePopulation();
+        eventOutcomeUpdatePopulation.setCivID(iCivID);
+        eventOutcomeUpdatePopulation.lProvinces.add(CFG.game.getCiv(iCivID).getCapitalProvinceID());
+        eventOutcomeUpdatePopulation.setValue(-1);
+
+        ArrayList<Event_Outcome> outcomesList = new ArrayList<>();
+        outcomesList.add(eventOutcomeChangeLeader);
+        outcomesList.add(eventOutcomeUpdatePopulation);
+
+        List<MenuElement_Hover_v2_Element_Type> tData = new ArrayList<>();
+        tData.add(new MenuElement_Hover_v2_Element_Type_Flag(iCivID));
+        tData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("AssassinTip"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
+        eventOutcomeUpdatePopulation.setSecondaryHoverText(tData);
+
+        Event_Conditions_CivExist eventConditionsCivExist = new Event_Conditions_CivExist();
+        eventConditionsCivExist.iCivID = iCivID;
+
+        eventGameData.setup_Event(
+                CFG.langManager.get(String.format("EventAssassinName_" + (int)(Math.ceil(Math.random() * (3)))), leaderRef),
+                "EventAssassin_" + (int)(Math.ceil(Math.random() * (5))),
+                "eventAssassin",
+                CFG.game.getPlayer(PLAYER_TURNID).getCivID()
+        );
+        eventGameData.setup_EventPopUp(
+                true,
+                String.format("EventAssassinDesc_" + (int)(Math.ceil(Math.random() * (3))))
+        );
+        eventGameData.setup_EventDecisions_List(
+                String.format("EventAssassinDecision_" + (int)(Math.ceil(Math.random() * (3)))),
+                outcomesList
+        );
+        eventGameData.setup_EventTriggers(
+                eventConditionsCivExist
+        );
+        eventGameData.superEvent = true;
+        eventGameData.setEventSound("eventAssassination.mp3");
+
+        CFG.dynamicEventManager.addEventIndex(eventGameData);
     }
 }

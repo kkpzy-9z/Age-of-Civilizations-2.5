@@ -1079,6 +1079,15 @@ class Game {
             CFG.SPECTATOR_MODE = tempSavedGame.SPECTATOR_MODE;
             CFG.DIFFICULTY = tempSavedGame.DIFFICULTY;
             CFG.SANDBOX_MODE = tempSavedGame.SANDBOX_MODE;
+
+            //load capit setting
+            try {
+                CFG.CAPITULATION = tempSavedGame.CAPITULATION;
+            } catch (NullPointerException ex) {
+                Gdx.app.log("LOADSAVE", "No capitulation setting");
+                CFG.CAPITULATION = 1;
+            }
+
             Game_Calendar.TURN_ID = tempSavedGame.iTurnID;
             Game_Calendar.TURNS_SINCE_LAST_WAR = tempSavedGame.TURNS_SINCE_LAST_WAR;
             Game_Calendar.currentDay = tempSavedGame.iDay;
@@ -1452,6 +1461,9 @@ class Game {
                     if (tempDataSav.dynamicEventManager.eventManagerLeader == null) {
                         CFG.dynamicEventManager.eventManagerLeader = new DynamicEventManager_Leader();
                     }
+                    if (tempDataSav.dynamicEventManager.eventManagerClass == null) {
+                        CFG.dynamicEventManager.eventManagerClass = new DynamicEventManager_Class();
+                    }
                 }
                 CFG.PLAYER_PEACE = tempDataSav.PLAYER_PEACE;
                 CFG.AI_VASSALS = tempDataSav.AI_VASSALS;
@@ -1465,7 +1477,7 @@ class Game {
                 CFG.AI_VASSALS = false;
                 CFG.AI_DIPLOMACY = true;
                 CFG.dynamicEventManager = new DynamicEventManager();
-                CFG.exceptionStack(ex);
+                Gdx.app.log("LOADSAVE", "defaultDynEvent");
             }
             try {
                 Gdx.app.log("LOADSAVE", "loadDecisions");
@@ -1477,6 +1489,16 @@ class Game {
                             }
                         } catch (Exception ex) {
                             Gdx.app.log("LOADSAVE", "loadDecisions failed, updating");
+                            CFG.gameAction.updatePlayerDecisions();
+                            break;
+                        }
+
+                        try {
+                            for (int decision = 0; decision < CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecisionsCount(); decision++) {
+                                CFG.game.getCiv(CFG.game.getPlayer(i).getCivID()).civGameData.getDecision(decision);
+                            }
+                        } catch (Exception ex) {
+                            Gdx.app.log("LOADSAVE", "loadCivDecisions failed, updating");
                             CFG.gameAction.updatePlayerDecisions();
                             break;
                         }
@@ -10191,9 +10213,28 @@ class Game {
     protected final MenuElement_Hover_v2 getHover_Decision(final Decision_GameData decision) {
         final List<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
         final List<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
-        nData.add(new MenuElement_Hover_v2_Element_Type_Text(decision.getDesc(), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
-        nElements.add(new MenuElement_Hover_v2_Element2(nData));
-        nData.clear();
+
+        //split description into chucks of 55 characters to avoid cramming screen
+        int start = 0;
+        while (start < decision.getDesc().length()) {
+            int end = Math.min(start + 55, decision.getDesc().length());
+            if (end < decision.getDesc().length()) {
+                int lastSpace = decision.getDesc().lastIndexOf(' ', end);
+                if (lastSpace > start) {
+                    end = lastSpace;
+                }
+            }
+
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(decision.getDesc().substring(start, end).trim(), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+            nElements.add(new MenuElement_Hover_v2_Element2(nData));
+            nData.clear();
+
+            start = end;
+
+            while (start < decision.getDesc().length() && decision.getDesc().charAt(start) == ' ') {
+                start++; // skip spaces at the start of the next line
+            }
+        }
 
         if (decision.getInProgress()) {
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Expires") + ": "));
@@ -10221,13 +10262,13 @@ class Game {
         nData.clear();
 
         nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Gold") + ": "));
-        nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + decision.getGoldCost()), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text((decision.getGoldCost() >= 0.0F ? "-" : "+") + Math.abs(decision.getGoldCost()), (decision.getGoldCost() > 0.0F ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_POSITIVE)));
         nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_gold, CFG.PADDING, 0));
         nElements.add(new MenuElement_Hover_v2_Element2(nData));
         nData.clear();
 
         nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("DiplomacyPoints") + ": "));
-        nData.add(new MenuElement_Hover_v2_Element_Type_Text("" + CFG.getNumberWithSpaces("" + (((double)decision.getDiploCost())/10.0)), CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
+        nData.add(new MenuElement_Hover_v2_Element_Type_Text((decision.getDiploCost() >= 0.0F ? "-" : "+") + Math.abs(decision.getDiploCost()/10.0F), (decision.getDiploCost() > 0.0F ? CFG.COLOR_TEXT_MODIFIER_NEGATIVE2 : CFG.COLOR_TEXT_MODIFIER_POSITIVE)));
         nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.top_diplomacy_points, CFG.PADDING, 0));
         nElements.add(new MenuElement_Hover_v2_Element2(nData));
         nData.clear();
@@ -10239,21 +10280,21 @@ class Game {
         if (decision.fModifier_UpperClass != 0.0f) {
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("UpperClass") + ": "));
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_UpperClass > 0.0f) ? "+" : "") + (int)(decision.fModifier_UpperClass * 100.0f) + "%", (decision.fModifier_UpperClass > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.editor_leaders, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
         }
         if (decision.fModifier_MiddleClass != 0.0f) {
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("MiddleClass") + ": "));
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_MiddleClass > 0.0f) ? "+" : "") + (int)(decision.fModifier_MiddleClass * 100.0f) + "%", (decision.fModifier_MiddleClass > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.editor_leaders, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
         }
         if (decision.fModifier_LowerClass != 0.0f) {
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("LowerClass") + ": "));
             nData.add(new MenuElement_Hover_v2_Element_Type_Text(((decision.fModifier_LowerClass > 0.0f) ? "+" : "") + (int)(decision.fModifier_LowerClass * 100.0f) + "%", (decision.fModifier_LowerClass > 0.0f) ? CFG.COLOR_TEXT_MODIFIER_POSITIVE : CFG.COLOR_TEXT_MODIFIER_NEGATIVE2));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.diplo_rivals, CFG.PADDING, 0));
+            nData.add(new MenuElement_Hover_v2_Element_Type_Image(Images.editor_leaders, CFG.PADDING, 0));
             nElements.add(new MenuElement_Hover_v2_Element2(nData));
             nData.clear();
         }
@@ -10337,11 +10378,8 @@ class Game {
             final List<MenuElement_Hover_v2_Element2> nElements = new ArrayList<MenuElement_Hover_v2_Element2>();
             final List<MenuElement_Hover_v2_Element_Type> nData = new ArrayList<MenuElement_Hover_v2_Element_Type>();
             nData.add(new MenuElement_Hover_v2_Element_Type_Flag(nCivID));
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(nCivID).getCivName(), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
-            nElements.add(new MenuElement_Hover_v2_Element2(nData));
-            nData.clear();
+            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.game.getCiv(nCivID).getCivName() + "  ", CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));
 
-            nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("Class") + ": "));
             final float fBoost = ((int)(10000.0f * Game_NextTurnUpdate.getClassPerceptionBoosts(CFG.game.getCiv(nCivID).civGameData.leaderData.getClassViews(iClassID)))) / 100.0F;
             if (iClassID == 0) {
                 nData.add(new MenuElement_Hover_v2_Element_Type_Text(CFG.langManager.get("UpperClass"), CFG.COLOR_BUTTON_GAME_TEXT_ACTIVE));

@@ -135,6 +135,8 @@ class DiplomacyManager
     }
 
     protected static final boolean checkCapitulate(int occupyCivID) {
+        //if capitulate setting off return
+        if (CFG.CAPITULATION == 0) return false;
         //if not at war or no provinces owned, skip
         if (!CFG.game.getCiv(occupyCivID).isAtWar() || CFG.game.getCiv(occupyCivID).getNumOfProvinces() < 1) return false;
         //if player, skip
@@ -143,11 +145,14 @@ class DiplomacyManager
         float iWeight = 0.0F;
 
         //if capital province core, and occupied by warring, add weight
+        //if capital required and not occupied by any civ, return
         float iCapWeight = 0.0F;
         if (CFG.game.getCiv(occupyCivID).getCoreCapitalProvinceID() > 0 && CFG.game.getProvince(CFG.game.getCiv(occupyCivID).getCoreCapitalProvinceID()).isOccupied()) {
             if (CFG.game.getCivsAtWar(occupyCivID, CFG.game.getProvince(CFG.game.getCiv(occupyCivID).getCoreCapitalProvinceID()).getCivID())) {
                 iCapWeight += 20.0F;
             }
+        } else if (CFG.CAPITULATION == 1) {
+            return false;
         }
 
         //add weight for each occupied province
@@ -699,8 +704,9 @@ class DiplomacyManager
                 if (CFG.game.getMilitaryAccess(nCivID, i) > 0) {
                     ++out;
                 }
-                out += CFG.game.getCiv(nCivID).civGameData.iVassalsSize;
-                out += getCostOfFriendlyCivs(nCivID);
+                //no vassal or friendly civ debuff
+                //out += CFG.game.getCiv(nCivID).civGameData.iVassalsSize;
+                //out += getCostOfFriendlyCivs(nCivID);
             }
         }
         return out;
@@ -1308,6 +1314,21 @@ class DiplomacyManager
         }
         return false;
     }
+
+    protected static final boolean acceptCivDecision(final int iCivID, final int decisionID) {
+        if (CFG.game.getCiv(iCivID).getDiplomacyPoints() >= CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID).getDiploCost() && CFG.game.getCiv(iCivID).getMoney() >= CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID).getGoldCost()) {
+            CFG.game.getCiv(iCivID).setMoney((long) (CFG.game.getCiv(iCivID).getMoney() - (long) CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID).getGoldCost()));
+            CFG.game.getCiv(iCivID).setDiplomacyPoints(CFG.game.getCiv(iCivID).getDiplomacyPoints() - (int) CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID).getDiploCost());
+
+            CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID).setInProgress(true);
+            CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID).setTurnsProgress(1);
+            CFG.game.getCiv(iCivID).applyDecisionChange(CFG.game.getCiv(iCivID).civGameData.getDecision(decisionID));
+
+            return true;
+        }
+        return false;
+    }
+
 
     protected static final void sendMilitaryAccess_AskProposal(final int iToCivID, final int iFromCivID, final int iValue) {
         if (CFG.game.getCiv(iFromCivID).getDiplomacyPoints() >= 10) {

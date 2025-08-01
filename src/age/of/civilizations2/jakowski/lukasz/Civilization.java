@@ -2480,7 +2480,9 @@ class Civilization {
     }
 
     protected final void setDiplomacyPoints(int nDiplomacyPoints) {
-        if ((float)nDiplomacyPoints > 85.0f + 85.0f * this.getTechnologyLevel() / 4.0f && nDiplomacyPoints > this.civGameData.iDiplomacyPoints && (nDiplomacyPoints = this.civGameData.iDiplomacyPoints + 1) > 200) {
+        //this actually sets diplo points to just +1 if it exceeds arbitrary tech level calculations via short circuting
+        //(float)nDiplomacyPoints > 85.0f + 85.0f * this.getTechnologyLevel() / 4.0f => removed "/ 4.0f" to allow for more diplo points
+        if ((float)nDiplomacyPoints > 85.0f + 85.0f * this.getTechnologyLevel() && nDiplomacyPoints > this.civGameData.iDiplomacyPoints && (nDiplomacyPoints = this.civGameData.iDiplomacyPoints + 1) > 200) {
             nDiplomacyPoints = 200;
         }
         this.civGameData.iDiplomacyPoints = nDiplomacyPoints;

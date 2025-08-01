@@ -1,0 +1,2 @@
+The provided JAR file is not necessary and only included for those running on non-Windows machines like Linux. If you are a Windows user, please utilize the AoC2point5.exe (playing) or startwithdebug.bat (debugging) files to launch the game. You may freely delete the AoC2point5.jar or any other previously supplied .jar file from the 2.5 engine with no impact on the game.
+Please ensure that you keep the JRE folder if not using the .JAR file, however!

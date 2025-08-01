@@ -323,6 +323,7 @@ class CFG {
     protected static boolean reverseDirectionY;
     protected static int DIFFICULTY;
     protected static int FOG_OF_WAR;
+    protected static int CAPITULATION;
     protected static boolean FILL_THE_MAP;
     protected static boolean RANDOM_PLACMENT;
     protected static boolean RANDOM_FILL;
@@ -400,6 +401,7 @@ class CFG {
     protected static FormableCivs_GameData formableCivs_GameData;
     protected static Leader_GameData leader_GameData;
     protected static Leader_Random_GameData leader_Random_GameData;
+    protected static Civ_Decision_GameData civDecision_GameData;
     protected static Line_GameData editorLine_GameData;
     protected static final float ALPHA_PROVINCE_REGIONS = 0.45f;
     protected static final float ALPHA_PROVINCE_CONTINENTS = 0.7f;
@@ -496,10 +498,9 @@ class CFG {
     protected static SoundsManager soundsManager;
     protected static EventsManager eventsManager;
     protected static Game game;
-    //new game autonomy load
     protected static Game_Autonomy gameAutonomy;
-    //new game decisions load
     protected static Game_Decisions gameDecisions;
+    protected static Game_Events gameEvents;
     protected static Game_Ages gameAges;
     protected static PlagueManager plagueManager;
     protected static Game_Action gameAction;
@@ -977,6 +978,18 @@ class CFG {
             }
         }
         return langManager.get("Classic");
+    }
+
+    protected static final String getCapitulationName(int i) {
+        switch (i) {
+            case 0: {
+                return langManager.get("Off");
+            }
+            case 2: {
+                return langManager.get("Complete");
+            }
+        }
+        return langManager.get("Capital");
     }
 
     protected static final int getCostOfRecruitArmyMoney(int nProvinceID) {
@@ -2968,6 +2981,14 @@ class CFG {
         return false;
     }
 
+    protected static final boolean isInDecisionCivs(String nCivTag) {
+        for (int i = 0; i < civDecision_GameData.getCivsSize(); ++i) {
+            if (!nCivTag.equals(civDecision_GameData.getCiv(i))) continue;
+            return true;
+        }
+        return false;
+    }
+
     protected static final void addUndoWastelandProvince(int iProvinceID) {
         if (lCreateScenario_UndoWastelandProvinces.size() > 99) {
             lCreateScenario_UndoWastelandProvinces.remove(0);
@@ -3932,6 +3953,52 @@ class CFG {
                     }
                 }
             };
+        }  else if (menuManager.getInDecisionsEditor()) {
+            keyboardSave = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if (keyboardMessage.length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildDecisionsEditor();
+                        menuManager.getDecisions_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildDecisionsEditor();
+                        menuManager.getDecisions_Alphabet();
+                    }
+                }
+            };
+            keyboardDelete = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if ((keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "").length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildDecisionsEditor();
+                        menuManager.getDecisions_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildDecisionsEditor();
+                        menuManager.getDecisions_Alphabet();
+                    }
+                }
+            };
+            keyboardWrite = new Keyboard_Action_Write(){
+
+                @Override
+                public void action(String nChar) {
+                    if ((keyboardMessage = keyboardMessage + nChar).length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildDecisionsEditor();
+                        menuManager.getDecisions_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildDecisionsEditor();
+                        menuManager.getDecisions_Alphabet();
+                    }
+                }
+            };
         } else if (menuManager.getInRandom_Leaders()) {
             keyboardSave = new Keyboard_Action(){
 
@@ -4113,6 +4180,52 @@ class CFG {
                         sSearch = null;
                         menuManager.rebuildLeader_Edit_SelectCivs_List();
                         menuManager.getLeaders_SelectCivs_Alphabet();
+                    }
+                }
+            };
+        }  else if (menuManager.getInDecisions_Edit_SelectCivs()) {
+            keyboardSave = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if (keyboardMessage.length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildDecisions_Edit_SelectCivs_List();
+                        menuManager.getDecisions_SelectCivs_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildDecisions_Edit_SelectCivs_List();
+                        menuManager.getDecisions_SelectCivs_Alphabet();
+                    }
+                }
+            };
+            keyboardDelete = new Keyboard_Action(){
+
+                @Override
+                public void action() {
+                    if ((keyboardMessage = keyboardMessage.length() > 1 ? keyboardMessage.substring(0, keyboardMessage.length() - 1) : "").length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildDecisions_Edit_SelectCivs_List();
+                        menuManager.getDecisions_SelectCivs_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildDecisions_Edit_SelectCivs_List();
+                        menuManager.getDecisions_SelectCivs_Alphabet();
+                    }
+                }
+            };
+            keyboardWrite = new Keyboard_Action_Write(){
+
+                @Override
+                public void action(String nChar) {
+                    if ((keyboardMessage = keyboardMessage + nChar).length() > 0) {
+                        sSearch = keyboardMessage;
+                        menuManager.rebuildDecisions_Edit_SelectCivs_List();
+                        menuManager.getDecisions_SelectCivs_Alphabet();
+                    } else {
+                        sSearch = null;
+                        menuManager.rebuildDecisions_Edit_SelectCivs_List();
+                        menuManager.getDecisions_SelectCivs_Alphabet();
                     }
                 }
             };
@@ -6245,6 +6358,7 @@ class CFG {
         reverseDirectionY = true;
         DIFFICULTY = 1;
         FOG_OF_WAR = 1;
+        CAPITULATION = 1;
         FILL_THE_MAP = true;
         RANDOM_PLACMENT = false;
         RANDOM_FILL = false;
@@ -6285,6 +6399,7 @@ class CFG {
         formableCivs_GameData = null;
         leader_GameData = null;
         leader_Random_GameData = null;
+        civDecision_GameData = null;
         editorLine_GameData = null;
         editor_Region_GameData = null;
         editor_Continent_GameData = null;
