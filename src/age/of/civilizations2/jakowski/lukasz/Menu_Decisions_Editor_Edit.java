@@ -66,6 +66,7 @@ class Menu_Decisions_Editor_Edit extends SliderMenu
                 CFG.menuManager.setViewID(Menu.eGAME_DECISIONS_EDITOR);
                 CFG.menuManager.setBackAnimation(true);
                 break;
+
             }
             case 2: {
                 CFG.map.getMapCoordinates().centerToMinimapClick(Touch.getMousePosX() - this.getMenuElement(iID).getPosX() - this.getPosX(), Touch.getMousePosY() - this.getMenuElement(iID).getPosY() - this.getMenuPosY());
