@@ -69,10 +69,14 @@ class Menu_Random_Leaders_Alphabet extends SliderMenu {
          }
          else {
             FileHandle tempFileT = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
-            if (CFG.readLocalFiles()) {
+            String tempT = tempFileT.readString();
+
+            try {
                tempFileT = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
+               tempT = tempT + tempFileT.readString();
+            } catch (Exception e) {
             }
-            final String tempT = tempFileT.readString();
+
             tagsSPLITED = tempT.split(";");
          }
 

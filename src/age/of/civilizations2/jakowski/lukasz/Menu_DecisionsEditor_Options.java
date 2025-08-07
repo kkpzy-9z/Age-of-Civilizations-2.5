@@ -38,10 +38,14 @@ class Menu_DecisionsEditor_Options extends SliderMenu {
             String[] tagsSPLITED = null;
             if (!CFG.isDesktop()) {
                 FileHandle tempFileT = Gdx.files.internal("game/decisions/Age_of_Civilizations");
-                if (CFG.readLocalFiles()) {
-                    tempFileT = Gdx.files.local("game/decisions/Age_of_Civilizations");
-                }
                 String tempT = tempFileT.readString();
+
+                try {
+                    tempFileT = Gdx.files.local("game/decisions/Age_of_Civilizations");
+                    tempT = tempT + tempFileT.readString();
+                } catch (Exception e) {
+                }
+
                 tagsSPLITED = tempT.split(";");
             } else {
                 List<String> tempFiles = CFG.getFileNames("game/decisions/");

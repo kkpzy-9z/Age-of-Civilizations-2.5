@@ -433,10 +433,14 @@ class Game_Action {
                 }
             } else {
                 FileHandle tempFileT = Gdx.files.internal("game/decisions/Age_of_Civilizations");
-                if (CFG.readLocalFiles()) {
+                String tempT = tempFileT.readString();
+
+                try {
                     tempFileT = Gdx.files.local("game/decisions/Age_of_Civilizations");
+                    tempT = tempT + tempFileT.readString();
+                } catch (Exception e) {
                 }
-                final String tempT = tempFileT.readString();
+
                 tagsSPLITED = tempT.split(";");
             }
 

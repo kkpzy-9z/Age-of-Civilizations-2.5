@@ -95,14 +95,15 @@ class Menu_Random_Leader_Edit extends SliderMenu
             }
         }
         try {
-            FileHandle file;
-            if (CFG.readLocalFiles()) {
-                file = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
+            FileHandle tempFileT = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
+            String tempTags = tempFileT.readString();
+
+            try {
+                tempFileT = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
+                tempTags = tempTags + tempFileT.readString();
+            } catch (Exception e) {
             }
-            else {
-                file = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
-            }
-            final String tempTags = file.readString();
+
             if (!tempTags.contains(CFG.leader_Random_GameData.getLeaderOfCiv().getTag())) {
                 final FileHandle fileSave = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
                 fileSave.writeString(tempTags + CFG.leader_Random_GameData.getLeaderOfCiv().getTag() + ";", false);

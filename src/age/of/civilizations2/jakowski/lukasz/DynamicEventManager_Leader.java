@@ -90,7 +90,21 @@ public class DynamicEventManager_Leader implements Serializable {
         leaderCache.clear();
 
         //randomize leader order
-        List<String> files = CFG.getFileNames("game/leadersRandom/");
+        List<String> files;
+        if (CFG.isDesktop()) {
+            files = CFG.getFileNames("game/leadersRandom/");
+        } else {
+            FileHandle tempFileT = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
+            String tempT = tempFileT.readString();
+
+            try {
+                tempFileT = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
+                tempT = tempT + tempFileT.readString();
+            } catch (Exception e) {
+            }
+
+            files = Arrays.asList(tempT.split(";"));
+        }
         Collections.shuffle(files);
 
         LinkedHashMap<String, Leader_Random_GameData> toAppendtoLeaders = new LinkedHashMap<>();
