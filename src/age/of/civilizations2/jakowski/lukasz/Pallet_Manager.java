@@ -119,12 +119,13 @@ class Pallet_Manager {
                } catch (IOException var6) {
                   this.loadCivilizationStandardColor(i);
                }
-
-               CFG.game.getCiv(i).updateVassalCivilizationsColor();
             } catch (GdxRuntimeException var7) {
                this.loadCivilizationStandardColor(i);
             }
          }
+          for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
+              CFG.game.getCiv(i).updateVassalCivilizationsColor();
+          }
       }
 
    }
@@ -157,7 +158,9 @@ class Pallet_Manager {
       for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
          this.loadCivilizationStandardColor(i);
       }
-
+      for(int i = 1; i < CFG.game.getCivsSize(); ++i) {
+          CFG.game.getCiv(i).updateVassalCivilizationsColor();
+      }
    }
 
    protected final void loadCivilizationStandardColor(int nCivID) {
