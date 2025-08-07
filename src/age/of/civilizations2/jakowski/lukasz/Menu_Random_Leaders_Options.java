@@ -37,7 +37,10 @@ class Menu_Random_Leaders_Options extends SliderMenu
                 }
             }
             else {
-                final FileHandle tempFileT = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
+                FileHandle tempFileT = Gdx.files.internal("game/leadersRandom/Age_of_Civilizations");
+                if (CFG.readLocalFiles()) {
+                    tempFileT = Gdx.files.local("game/leadersRandom/Age_of_Civilizations");
+                }
                 final String tempT = tempFileT.readString();
                 tagsSPLITED = tempT.split(";");
             }

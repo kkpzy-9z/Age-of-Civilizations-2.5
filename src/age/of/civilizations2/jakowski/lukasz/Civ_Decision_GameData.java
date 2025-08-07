@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Civ_Decision_GameData extends Decision_GameData implements Serializable {
+    private static final long serialVersionUID = 0L;
     private List<String> sCivs = new ArrayList<>();
     private String sTag;
 

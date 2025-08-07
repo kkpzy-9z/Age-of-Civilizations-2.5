@@ -350,14 +350,14 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
         String extraFragment;
         try {
             extraFragment = Gdx.files.internal("game/shader/twopointfive_fragment.glsl").readString();
+            AoCGame.extraShader = new ShaderProgram(defaultVertex, extraFragment);
         } catch (GdxRuntimeException | NullPointerException ex) {
-            extraFragment = Gdx.files.internal("game/shader/default_fragment.glsl").readString();
+            AoCGame.extraShader = null;
         }
 
         final String blackWhiteFragment = Gdx.files.internal("game/shader/blackWhite_fragment.glsl").readString();
         final String nextPlayerTurnFragment = Gdx.files.internal("game/shader/nextPlayerTurn_fragment.glsl").readString();
         AoCGame.defaultShader = new ShaderProgram(defaultVertex, defaultFragment);
-        AoCGame.extraShader = new ShaderProgram(defaultVertex, extraFragment);
         AoCGame.blackWhiteShader = new ShaderProgram(defaultVertex, blackWhiteFragment);
         AoCGame.nextPlayerTurnShader = new ShaderProgram(nextPlayerTurnVertex, nextPlayerTurnFragment);
         final long time = System.currentTimeMillis();
@@ -624,7 +624,9 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
                 AoCGame.viewport.apply();
                 this.oSB.setProjectionMatrix(AoCGame.camera.combined);
                 this.oSB.begin();
-                this.oSB.setShader(AoCGame.extraShader);
+                if (AoCGame.extraShader != null) {
+                    this.oSB.setShader(AoCGame.extraShader);
+                }
                 this.oSB.draw(fbo.getColorBufferTexture(), 0.0f, 0.0f, (float)CFG.GAME_WIDTH, (float)(CFG.GAME_HEIGHT), 0, 0, 1, 1);
                 this.oSB.end();
                 fbo.dispose();

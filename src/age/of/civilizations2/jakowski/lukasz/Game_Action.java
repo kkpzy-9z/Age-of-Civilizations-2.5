@@ -432,7 +432,10 @@ class Game_Action {
                     tagsSPLITED[i] = tempFiles.get(i);
                 }
             } else {
-                final FileHandle tempFileT = Gdx.files.internal("game/decisions/Age_of_Civilizations");
+                FileHandle tempFileT = Gdx.files.internal("game/decisions/Age_of_Civilizations");
+                if (CFG.readLocalFiles()) {
+                    tempFileT = Gdx.files.local("game/decisions/Age_of_Civilizations");
+                }
                 final String tempT = tempFileT.readString();
                 tagsSPLITED = tempT.split(";");
             }

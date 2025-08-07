@@ -206,7 +206,7 @@ class SoundsManager {
             }
          } catch (GdxRuntimeException var4) {
          }
-      } catch (NullPointerException var7) {
+      } catch (NullPointerException | IndexOutOfBoundsException var7) {
       }
 
    }
