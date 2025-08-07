@@ -952,6 +952,11 @@ public class AoCGame extends ApplicationAdapter implements InputProcessor
             CFG.setRender_3(true);
             //skip intro w space
             if (introShown > 0 && keycode == 62) {
+                if (!Objects.equals(SoundsManager.START_MUSIC, "")) {
+                    CFG.soundsManager.playStartMusic();
+                } else {
+                    CFG.soundsManager.loadNextMusic();
+                }
                 introShown = -1;
             }
             if (!CFG.menuManager.getKeyboard().getVisible()) {

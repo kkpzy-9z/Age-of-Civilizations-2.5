@@ -68,11 +68,7 @@ class Game_Decisions
         }
         catch (final GdxRuntimeException ex) {
             Gdx.app.log("AoC2.5", "Vassal JSON not detected!");
-            this.lDecisions.add(new Decision_GameData());
-            this.lDecisions.add(new Decision_GameData());
-            this.lDecisions.add(new Decision_GameData());
-            this.lDecisions.add(new Decision_GameData());
-            this.lDecisions.add(new Decision_GameData());
+            //todo manually input placeholder decisions.json like autonomy
         }
         for (Decision_GameData decision : this.lDecisions) {
             decision.setName(CFG.langManager.get(decision.getName()));

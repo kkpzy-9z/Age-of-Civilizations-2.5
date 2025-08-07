@@ -2726,7 +2726,7 @@ class Game {
                 Gdx.app.log("PreRemoveCiv", "Skipping invalid puppet values: " + values[0] + ", " + values[2]);
                 continue;
             }
-            Gdx.app.log("PreRemoveCiv", "Civ: " + CFG.game.getCiv(values[2]).getCivName() + " PuppetOfCiv: " + CFG.game.getCiv(values[0]).getCivName() + " Autonomy: " + CFG.gameAutonomy.getAutonomy(values[1]).getName());
+            //Gdx.app.log("PreRemoveCiv", "Civ: " + CFG.game.getCiv(values[2]).getCivName() + " PuppetOfCiv: " + CFG.game.getCiv(values[0]).getCivName() + " Autonomy: " + CFG.gameAutonomy.getAutonomy(values[1]).getName());
         }
 
         //now actually remove the civ and adjust ids
@@ -2748,7 +2748,7 @@ class Game {
                 Gdx.app.log("RemoveCiv", "Skipping invalid puppet values: " + values[0] + ", " + values[2]);
                 continue;
             }
-            Gdx.app.log("AftRemoveCiv", "Civ: " + CFG.game.getCiv(values[2]).getCivName() + " PuppetOfCiv: " + CFG.game.getCiv(values[0]).getCivName() + " Autonomy: " + CFG.gameAutonomy.getAutonomy(values[1]).getName());
+            //Gdx.app.log("AftRemoveCiv", "Civ: " + CFG.game.getCiv(values[2]).getCivName() + " PuppetOfCiv: " + CFG.game.getCiv(values[0]).getCivName() + " Autonomy: " + CFG.gameAutonomy.getAutonomy(values[1]).getName());
         }
 
         //second pass, set puppet relations to those seen in adjusted hashmap
