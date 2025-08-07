@@ -505,7 +505,7 @@ class Map_TouchManager {
                     }
                     if (CFG.iCreateScenario_AssignProvinces_Civ >= 0) {
                         for (int i = 1; i < CFG.game.getCivsSize(); ++i) {
-                            if (CFG.game.getCiv(i).getCapitalProvinceID() != CFG.game.getActiveProvinceID()) continue;
+                            if (!AoCGame.isShiftDown && CFG.game.getCiv(i).getCapitalProvinceID() != CFG.game.getActiveProvinceID()) continue;
                             if (!CFG.brushTool && CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() != CFG.iCreateScenario_AssignProvinces_Civ) {
                                 CFG.setDialogType(Dialog.CREATE_SCENARIO_ASSIGN_CIVILIZATION);
                             }
@@ -532,7 +532,7 @@ class Map_TouchManager {
                         }
                     } else {
                         for (int i = 1; i < CFG.game.getCivsSize(); ++i) {
-                            if (CFG.game.getCiv(i).getCapitalProvinceID() != CFG.game.getActiveProvinceID()) continue;
+                            if (!AoCGame.isShiftDown && CFG.game.getCiv(i).getCapitalProvinceID() != CFG.game.getActiveProvinceID()) continue;
                             if (CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() != CFG.iCreateScenario_AssignProvinces_Civ) {
                                 CFG.setDialogType(Dialog.CREATE_SCENARIO_ASSIGN_CIVILIZATION);
                             }
@@ -1423,7 +1423,7 @@ class Map_TouchManager {
             public void extraAction(int nPosX, int nPosY) {
                 if (CFG.brushTool) {
                     for (int i = 1; i < CFG.game.getCivsSize(); ++i) {
-                        if (CFG.game.getCiv(i).getCapitalProvinceID() != CFG.game.getActiveProvinceID()) continue;
+                        if (!AoCGame.isShiftDown && CFG.game.getCiv(i).getCapitalProvinceID() != CFG.game.getActiveProvinceID()) continue;
                         if (CFG.game.getProvince(CFG.game.getActiveProvinceID()).getCivID() != CFG.iCreateScenario_AssignProvinces_Civ) {
                             CFG.setDialogType(Dialog.CREATE_SCENARIO_ASSIGN_CIVILIZATION);
                         }
