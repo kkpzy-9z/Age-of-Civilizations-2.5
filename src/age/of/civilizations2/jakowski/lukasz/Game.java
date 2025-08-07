@@ -2718,6 +2718,15 @@ class Game {
                 } else {
                     hmTemp.put(i, new int[] {i, -1, i});
                 }
+            } else {
+                try {
+                    if (i > nRemoveCivID) {
+                        hmTemp.put(i - 1, new int[] {this.getCiv(this.getCiv(i).getPuppetOfCivID()).getCivID(), this.getCiv(this.getCiv(i).getPuppetOfCivID()).getVassal_AutonomyStatus(i).getIndexOf(), i - 1});
+                    } else {
+                        hmTemp.put(i, new int[] {this.getCiv(this.getCiv(i).getPuppetOfCivID()).getCivID(), this.getCiv(this.getCiv(i).getPuppetOfCivID()).getVassal_AutonomyStatus(i).getIndexOf(), i});
+                    }
+                } catch (NullPointerException ex) {
+                }
             }
         }
 
